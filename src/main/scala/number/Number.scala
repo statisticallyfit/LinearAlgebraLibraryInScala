@@ -8,7 +8,7 @@ import scala.reflect.runtime.universe._
 import scala.reflect.runtime.{universe=>ru}
 
 
-trait Number[N <: Number[N]] extends Ring[N] with Field[N] {
+trait Number[+N] extends Ring[N] with Field[N] {
      //methods inherited: add,subtract,opposite,divide,inverse,identity
 
      def ZERO(): N

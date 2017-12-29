@@ -12,7 +12,7 @@ class Norm[N <: Number[N]](mat: Matrix[N])
 
 object Norm {
      /** Computes the Frobenius norm (2-norm) of the matrix */
-     def frobeniusNorm[N <: Number[N]](mat: Matrix[N]): Double = pnorm(mat, 2)
+     def frobeniusNorm[N <: Number[N]](mat: Matrix[N]): Double = pNorm(mat, 2)
 
      /** Computes the infinity norm of this matrix, the largest row sum of absolute value */
      def infinityNorm[N <: Number[N]](mat: Matrix[N]): Double ={
@@ -31,7 +31,7 @@ object Norm {
        * @param p specifies which norm is to be computed
        * @return the p-norm of the matrix
        */
-     def pnorm[N <: Number[N]](mat: Matrix[N], p: Int): Double ={
+     def pNorm[N <: Number[N]](mat: Matrix[N], p: Int): Double ={
 
           if(p == 1) return oneNorm(mat)
 
