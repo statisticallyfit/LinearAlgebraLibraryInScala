@@ -1,4 +1,4 @@
-import number._
+import numerics._
 import matrix._
 import vector._
 

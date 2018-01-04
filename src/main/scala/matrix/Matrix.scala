@@ -2,10 +2,10 @@ package matrix
 
 
 import util._
-import util.Implicits._
-import number._
+//import util.Implicits._
+
 import vector._
-import factorization._
+import temp_factorization._
 
 import org.apache.commons.lang3.StringUtils
 import scala.collection.IndexedSeq
@@ -15,7 +15,7 @@ import scala.util.control.Breaks._
 
 
 
-
+/*
 class Matrix[N <: Number[N]: TypeTag](cols: Vector[N]*) extends VectorSet[N](cols:_*) {
 
 
@@ -439,6 +439,9 @@ class DiagonalMatrix[N <: Number[N] : TypeTag](diagonal: Vector[N]) extends Matr
 class HilbertMatrix[N <: Number[N] : TypeTag](cols: Vector[N]*) extends Matrix[N](cols:_*)
 
 class JacobianMatrix[N <: Number[N] : TypeTag](cols: Vector[N]*) extends Matrix[N](cols:_*)
+
+*/
+
 
 */
 

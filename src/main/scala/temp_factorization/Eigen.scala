@@ -1,8 +1,7 @@
-package factorization
+package temp_factorization
 
 import util._
 import theory._
-import number._
 import matrix._
 /*
 

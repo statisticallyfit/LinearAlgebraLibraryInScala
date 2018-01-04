@@ -1,20 +1,32 @@
 package vector
 
 
+
 import util._
-import util.Implicits._
 import theory._
-import number._
 import matrix._
 
 import matrixLib.exception.DimensionMismatchException
 import scala.collection.mutable.ListBuffer
 import scala.reflect.runtime.universe._
 
+//import spire.math.Number
 /**
   *
   */
 
+/*class Vector[T](elems: T*) {
+
+     def +(that: Vector[spire.math.Number]): Vector[spire.math.Number] =
+          new Vector(this.toList.zip(that.toList).map(pair => pair._1 + pair._2):_*)
+
+     def toList: List[T] = elems.toList
+
+
+}*/
+
+
+/*
 //(Util.seqToVecSet(elems:_*).getColumns():_*)
 class Vector[N <: Number[N]: TypeTag](elems: N*) //extends VectorSet[N](elems:_*)
      extends VectorSpace[Vector[N], N]
@@ -136,3 +148,6 @@ object Vector {
      def apply[N <: Number[N]: TypeTag](v: Vector[N]): Vector[N] = v //copy constructor
      def apply[N <: Number[N]: TypeTag](length: Int): Vector[N] = new Vector[N](length)
 }
+*/
+
+

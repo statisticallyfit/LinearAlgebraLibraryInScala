@@ -2,10 +2,10 @@ package vector
 
 import matrix._
 import matrixLib.exception.DimensionMismatchException
-import number._
+
 import org.apache.commons.lang3.StringUtils
 import theory._
-import util.Implicits._
+//import util.Implicits._
 import util._
 
 import scala.collection.mutable.ListBuffer
@@ -14,8 +14,14 @@ import scala.util.control.Breaks._
 
 
 
-//key make adjugate funciton
+//todo make adjugate funciton
 
+
+/*class VectorSet[N <: spire.math.Number](cols: List[N]*) {
+
+}*/
+
+/*
 
 class VectorSet[N <: Number[N]: TypeTag](cols: Vector[N]*)
      extends VectorSpace[VectorSet[N], N] with BanachSpace[VectorSet[N], N] with AbelianGroup[VectorSet[N]] //with
@@ -361,6 +367,7 @@ object VectorSet {
           VectorSet.fromLists(list.grouped(nc).toList.map(_.toList):_*)
      }
 }
+*/
 
 
 
