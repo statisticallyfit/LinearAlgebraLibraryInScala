@@ -6,19 +6,111 @@ import theory._
 import scala.language.implicitConversions
 
 
+trait Number
 
-sealed trait Number[T] extends Ring[T] with Field[T] with Ordered[T]{
-     //inherited: ONE, ZERO, +, -, *, /, inverse, compare
+private[numerics] trait Numerical[N] extends Field[N] with Ring[N] with AbelianGroup[N] { //intermediary type!
+
+     def plus(x: N, y: N): N
+     def minus(x: N, y: N): N
+     def times(x: N, y: N): N
+     def divide(x: N, y: N): N
+}
+
+object Numerical {
+     implicit object RealIsNumerical extends Numerical[Real] {
+          def plus(x: Real, y: Real): Real = Real(x.value + y.value)
+          def minus(x: Real, y: Real): Real = Real(x.value - y.value)
+          def times(x: Real, y: Real): Real = Real(x.value * y.value)
+          def divide(x: Real, y: Real): Real = Real(x.value / y.value)
+     }
+}
+
+class Real(val value: Double)(implicit n: Numerical[Real]) extends Number {
+
+     def +(other: Real): Real = n.plus(this, other)
+     def -(other: Real): Real = n.minus(this, other)
+     def *(other: Real): Real = n.times(this, other)
+     def /(other: Real): Real = n.divide(this, other)
+
+     def inverse(): Real = Real(1 / this.value)
+
+     override def toString: String = value.toString
+}
+
+object Real {
+     def apply(doubleValue: Double) = new Real(doubleValue)
+}
+
+
+
+
+object Tester extends App {
+     println(Real(24) + Real(31))
+     /*import Numerical._
+
+     def addTwoNumbers[A](first: A, second: A)(implicit n: Numerical[A]): A = {
+          n.plus(first, second)
+     }
+
+
+
+     Console.println(addTwoNumbers(Real(24), Real(31)))*/
+}
+/*sealed trait Number[T <: Numeric[T]] extends Ring[T] with Field[T] with Ordered[T]{
+     //inherited: ONE, ZERO, +, -, *, /, inverse, compare, equals
      def negate(): T
-     def abs()
+     def abs(): Real
      def ^(exp: T): T
-     def sqrt()
+     def sqrt(): Real
 
-     def equals(that: T): Boolean
      def isZero: Boolean
      def isNegative: Boolean
+
+     def plus(a: T, b: T): T
 }
-object Number {
+
+/*object Number {
+     def plus[A](x: A, y: A)(implicit numeric: Numeric[A]): A = numeric.plus(x, y)
+
+}*/
+trait FakeNum[T] {
+     def plus(a: T, b: T): T
+}
+
+object FakeNum {
+     implicit object RealIsNumeric extends FakeNum[Real]{
+          def plus(x: Real, y: Real): Real = Real(x.dec + y.dec)
+     }
+}
+
+object Temp {
+     def makeRealsAdd[N](a: N, b: N)(implicit n: FakeNum[N]) = n.plus(a, b)
+}
+
+class Real(val dec: Double)(implicit n: FakeNum[Real]) /*{
+     def +(other: Real) = n.plus(this, other)
+}*/
+object Real {
+     implicit def apply(real: Double)(implicit n : Numeric[Real]): Real = new Real(real)(n)
+}
+
+
+object NumberTester extends App {
+
+     val r1 = new Real(3)
+     val r2 = new Real(5)
+     println(r1 + r2 + r1)
+     /*val c1: Complex[Int] = Complex(3, 2)
+     val c2: Complex[Int] = Complex(5, 1)
+     //println(c1 plus c2)
+     println(c1.plus(c1, c2))*/
+}*/
+
+/*class Complex[N <: Numeric[N]](val re: N, val im: N) extends NumFake[N]{
+     def +(other: Complex[N]): Complex[N] = new Complex(re + other.re, im + other.im)
+}*/
+
+/*object Number {
 
      //implicit def intToComplex(int: Int): Complex[Int] = new Complex(int, 0)
      //implicit def doubleToComplex(double: Double): Complex[Double] = new Complex(double, 0)
@@ -27,13 +119,15 @@ object Number {
           override val ONE: Int = 1
           override val ZERO: Int = 0
 
+          def plus(a: Int, b: Int) = a + b
+
           def +(other: Int): Int = int + other
           def *(other: Int): Int = int * other
           def ^(exp: Int): Int = int ^ exp
           def /(other: Int): Int = int / other
           def sqrt(): Double = scala.math.sqrt(int)
 
-          def abs(): Int = if(int < 0) int.negate() else int
+          def abs(): Double = if(int < 0) int.negate()*1.0 else int*1.0
 
           def inverse(): Int = int.negate()
 
@@ -41,7 +135,6 @@ object Number {
 
           def compare(other: Int): Int = other + int.inverse()
 
-          def equals(other: Int): Boolean = int == other
           def isNegative: Boolean = int < 0
           def isZero: Boolean = int == 0
      }
@@ -49,6 +142,8 @@ object Number {
      implicit class DoubleOps(double: Double) extends Number[Double] {
           override val ONE: Double = 1
           override val ZERO: Double = 0
+
+          def plus(a: Double, b: Double) = a + b
 
           def +(other: Double): Double = double + other
           def *(other: Double): Double = double * other
@@ -64,38 +159,41 @@ object Number {
 
           def compare(other: Double): Int = (double - other).toInt
 
-          def equals(other: Double): Boolean = double == other
           def isNegative: Boolean = double < 0
           def isZero: Boolean = double == 0
      }
-}
+}*/
 
-class Complex[N](val re: N, val im: N)(implicit n: Number[N]) /*extends Number[Complex[N]]*/ {
+/*class Complex[N](val re: N, val im: N)(implicit n: Number[N]) /*extends Number[Complex[N]]*/ {
 
      val ZERO: Complex[N] = Complex(n.ZERO, n.ZERO)
      val ONE: Complex[N] = Complex(n.ONE, n.ZERO)
 
-     def +(other: Complex[N]): Complex[N] = new Complex[N](n + other.re, other.im)
+     //def +(other: Complex[N]): Complex[N] = new Complex[N](n + other.re, other.im)
      // .im)
      //def -(other: Complex[N]): Complex[N] = Complex(n  )
+     def plus(a: N, b: N): N = n.plus(a, b)
 }
 
 object Complex {
-     def apply[N : Number](re: N, im: N) = new Complex[N](implicitly[Complex[N]].re, implicitly[Complex[N]].im)
 
-     def apply(int: Int): Complex[Int] =  new Complex[Int](int, 0)
+     implicit def apply[N](re: N, im: N)(implicit n: Number[N]) = new Complex[N](re, im)(n)
 
-     def apply(double: Double): Complex[Double] =  new Complex[Double](double, 0)
-}
+     implicit def apply(int: Int)(implicit n: Number[Int]): Complex[Int] =  new Complex[Int](int, 0)(n)
+
+     implicit def apply(double: Double)(implicit n: Number[Double]): Complex[Double] =  new Complex[Double](double, 0)(n)
+}*/
 
 
-object Tester extends App {
-     import Number._
 
-     val c1 = Complex(3, 2)
-     val c2 = Complex(5, 1)
-     println(c1 + c2)
-}
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------------
+
 /*case class Complex(re: Int, im: Int) extends Number[Complex] { //(implicit n: Number[Complex])//
      val ZERO: Complex = Complex(0, 0)
      val ONE: Complex = Complex(1, 0)
@@ -115,12 +213,11 @@ object Tester extends App {
 }*/
 
 
-class Real(override val re: Double) extends Complex[Double](re, 0)
-class Rational(val num: Int, val denom: Int) extends Real(num * 1.0 / denom)
-//integers
+/*class Real(override val re: Double) extends Complex[Double](re, 0)
 
-//case class Whole(whole: Int) extends Integer(whole)
-class Natural(nat: Int) extends Rational(nat, 1) //{ require}
+class Rational(val num: Int, val denom: Int) extends Real(num * 1.0 / denom)
+
+class Natural(nat: Int) extends Rational(nat, 1) //{ require}*/
 
 
 /*object Complex {
