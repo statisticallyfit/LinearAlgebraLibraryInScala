@@ -68,4 +68,3 @@ trait Field[F/* <: Field[F]*/] extends AbelianGroup[F] with Ring[F] with Monoid[
 
      protected def one: F
 }
-

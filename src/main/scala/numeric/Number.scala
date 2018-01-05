@@ -5,16 +5,40 @@ import theory._
 
 import scala.language.implicitConversions
 
+
+
+
+object Implicits {
+     implicit def Real2Double(r: Real): Double = r.value
+
+     //note: all well and good but we won't ever find the combo of realnum + numerical, will we? Needs to be
+     // an actual class, and THAT is exactly what we can't get due to type issues.
+     /*implicit class RealExt(real: RealNum with Numerical[RealNum]) {
+          def +(that: RealNum): RealNum = new RealNum(real.value + that.value)
+     }*/
+}
+
+
+
+
+
+// ---------------------------------------------------------------------------------------------------------
+
+
+
 // Number trait does nothing - just here to look pretty and get the "nice"
 // methods from Field: +, *, ...
 trait Number[T] extends Field[T] with Ordered[T]
 
+object Number {
+     implicit object NIsNumerical extends Number[N]
+}
 
 //numerical trait is just here to provide implementation
 private[numeric] trait Numerical[N] { //note finally, intermediary type to do grunt work!
 
      def plus(x: N, y: N): N
-     def minus(x: N, y: N): N
+     /*def minus(x: N, y: N): N
      def times(x: N, y: N): N
      def divide(x: N, y: N): N
      def power(x: N, y: N): N
@@ -26,7 +50,7 @@ private[numeric] trait Numerical[N] { //note finally, intermediary type to do gr
      def inverse(x: N): N
 
      def isZero(x: N): Boolean
-     def isNegative(x: N): Boolean
+     def isNegative(x: N): Boolean*/
 }
 // this is standard typeclass pattern
 object Numerical {
@@ -47,20 +71,29 @@ object Numerical {
           def isNegative(x: Real): Boolean = x < Real.ZERO
 
      }
-}
 
-object Implicits {
-     implicit def Real2Double(r: Real): Double = r.value
+     //type N <: Complex[N] //todo make type parameter?
+     implicit object ComplexIsNumerical extends Numerical[Complex[_]] {
+          def plus[N](x: Complex[N], y: Complex[N])(implicit n: Numerical[Complex[N]]): Complex[N] =
+               new Complex(n.plus, n.plus(x.im, y.im))
+     }
+     //todo: how to make scala know how to add two generic N parameters? either with plus? or with (+)???
+     // todo must extend Number? or implicit number instead of implicit numerical???
 
-     //note: all well and good but we won't ever find the combo of realnum + numerical, will we? Needs to be
-     // an actual class, and THAT is exactly what we can't get due to type issues.
-     /*implicit class RealExt(real: RealNum with Numerical[RealNum]) {
-          def +(that: RealNum): RealNum = new RealNum(real.value + that.value)
+     /*implicit object NIsNumerical extends Numerical[N] {
+
      }*/
+     //implicit class ComplexIsNumerical[N](re: N, im: N) extends Numerical[Complex[N]]
 }
 
 
-class RealNum(val value: Double)
+class Complex[N](val re: N, val im: N)(implicit n: Numerical[N] with Number[N]) /*extends
+Number[Complex[N]]*/ {
+
+     //override def compare(other: Complex[N])
+}
+
+//class RealNum(val value: Double)
 // note: the new thing: here I am just copying the methods from Numerical trait
 // using alternate object syntax for sake of prettiness.
 class Real(val value: Double)(implicit n: Numerical[Real]) extends Number[Real] {
@@ -102,6 +135,8 @@ object Real {
 
      def apply(doubleValue: Double) = new Real(doubleValue)
 
+     implicit def doubleToReal(d: Double): Real = new Real(d)
+     implicit def intToReal(i: Int): Real = new Real(i)
 }
 
 
