@@ -3,6 +3,8 @@ package numerics
 
 import theory._
 
+import scala.language.implicitConversions
+
 
 
 sealed trait Number[T] extends Ring[T] with Field[T] with Ordered[T]{
@@ -17,6 +19,9 @@ sealed trait Number[T] extends Ring[T] with Field[T] with Ordered[T]{
      def isNegative: Boolean
 }
 object Number {
+
+     //implicit def intToComplex(int: Int): Complex[Int] = new Complex(int, 0)
+     //implicit def doubleToComplex(double: Double): Complex[Double] = new Complex(double, 0)
 
      implicit class IntOps(int: Int) extends Number[Int] {
           override val ONE: Int = 1
@@ -65,15 +70,28 @@ object Number {
      }
 }
 
-case class Complex[N](re: N, im: N)(implicit n: Number[N]) {
+class Complex[N](val re: N, val im: N)(implicit n: Number[N]) /*extends Number[Complex[N]]*/ {
+
      val ZERO: Complex[N] = Complex(n.ZERO, n.ZERO)
      val ONE: Complex[N] = Complex(n.ONE, n.ZERO)
 
-     def +(other: Complex[N]): Complex[N] = Complex(n + other.re, other.im)
+     def +(other: Complex[N]): Complex[N] = new Complex[N](n + other.re, other.im)
+     // .im)
      //def -(other: Complex[N]): Complex[N] = Complex(n  )
 }
 
+object Complex {
+     def apply[N : Number](re: N, im: N) = new Complex[N](implicitly[Complex[N]].re, implicitly[Complex[N]].im)
+
+     def apply(int: Int): Complex[Int] =  new Complex[Int](int, 0)
+
+     def apply(double: Double): Complex[Double] =  new Complex[Double](double, 0)
+}
+
+
 object Tester extends App {
+     import Number._
+
      val c1 = Complex(3, 2)
      val c2 = Complex(5, 1)
      println(c1 + c2)
@@ -95,12 +113,10 @@ object Tester extends App {
      def conjugate(): Complex = Complex(re, -im)
 
 }*/
-object Complex {
 
-}
 
 class Real(override val re: Double) extends Complex[Double](re, 0)
-class Rational(num: Int, denom: Int) extends Real(num * 1.0 / denom)
+class Rational(val num: Int, val denom: Int) extends Real(num * 1.0 / denom)
 //integers
 
 //case class Whole(whole: Int) extends Integer(whole)

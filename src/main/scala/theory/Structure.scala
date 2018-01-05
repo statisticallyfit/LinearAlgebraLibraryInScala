@@ -57,7 +57,7 @@ trait Ring[R] extends AbelianGroup[R] with Monoid[R] {
   * possess a multiplicative inverse. In addition, the multiplication operation
   * in a field is required to be commutative.
   */
-trait Field[F] extends AbelianGroup[F] with Ring[F] with Monoid[F] {
+trait Field[F <: Field[F]] extends AbelianGroup[F] with Ring[F] with Monoid[F] {
 
      //methods inherited: add,subtract,opposite,identity
 
