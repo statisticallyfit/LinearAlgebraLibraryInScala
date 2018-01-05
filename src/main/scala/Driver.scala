@@ -1,3 +1,4 @@
+/*
 import numerics._
 import matrix._
 import vector._
@@ -225,3 +226,4 @@ Vector[Rational](3,3,1))
 val w = Vector[Rational](3,4,5)
 Console.println(wset.isSpanned(w))
 Console.println(wset.getSpanningCoefficients(w))*/
+*/

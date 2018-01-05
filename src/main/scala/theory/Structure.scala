@@ -26,9 +26,9 @@ trait Monoid[G] extends Group[G]
 trait AbelianGroup[G] extends Group[G] {
 
      // the associative operations
-     def +(a: G, b: G): G
+     def +(that: G): G
      // For each a in G, there exists an element b in G such that a + b = b + a = 0.
-     def inverse(g: G): G
+     def inverse(): G
      // zero is identity for abelian: a + 0 = a
      val ZERO: G
 }
@@ -45,7 +45,7 @@ trait AbelianGroup[G] extends Group[G] {
 trait Ring[R] extends AbelianGroup[R] with Monoid[R] {
 
      //methods inherited: add,subtract,opposite,identity
-     def *(a: R, b: R): R
+     def *(that: R): R
 }
 
 
@@ -62,9 +62,9 @@ trait Field[F] extends AbelianGroup[F] with Ring[F] with Monoid[F] {
      //methods inherited: add,subtract,opposite,identity
 
      //That is the same as this.multiply(that.inverse())
-     def /(a: F, b: F): F
+     def /(that: F): F
      //For each a in F, there exists an element b in F such that a × b = b × a = 1.
-     def inverse(f: F): F
+     def inverse(): F
 
      val ONE: F
 }
