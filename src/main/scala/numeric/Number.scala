@@ -1,28 +1,34 @@
-package numerics
+package numeric
 
 
 import theory._
 
 import scala.language.implicitConversions
 
+// Number trait does nothing - just here to look pretty and get the "nice"
+// methods from Field: +, *, ...
+trait Number[T] extends Field[T] with Ordered[T]
 
-trait Number[T] extends Field[T] {
-     def ^(exp: T): T
 
-     def negate(): T
-}
-
-private[numerics] trait Numerical[N] {//extends Field[N] with Ring[N] with AbelianGroup[N] { //intermediary type!
+//numerical trait is just here to provide implementation
+private[numeric] trait Numerical[N] { //note finally, intermediary type to do grunt work!
 
      def plus(x: N, y: N): N
      def minus(x: N, y: N): N
      def times(x: N, y: N): N
      def divide(x: N, y: N): N
      def power(x: N, y: N): N
+     def squareRoot(x: N): N
+     def absoluteValue(x: N): N
 
      def negate(x: N): N
-}
 
+     def inverse(x: N): N
+
+     def isZero(x: N): Boolean
+     def isNegative(x: N): Boolean
+}
+// this is standard typeclass pattern
 object Numerical {
      implicit object RealIsNumerical extends Numerical[Real] {
           def plus(x: Real, y: Real): Real = Real(x.value + y.value)
@@ -30,39 +36,82 @@ object Numerical {
           def times(x: Real, y: Real): Real = Real(x.value * y.value)
           def divide(x: Real, y: Real): Real = Real(x.value / y.value)
           def power(base: Real, exp: Real): Real = Real(scala.math.pow(base.value, exp.value))
+          def squareRoot(x: Real): Real = Real(scala.math.sqrt(x.value))
+          def absoluteValue(x: Real): Real = Real(scala.math.abs(x.value))
 
           def negate(x: Real): Real = Real(-x.value)
+
+          def inverse(x: Real): Real = divide(Real.ONE, x)
+
+          def isZero(x: Real): Boolean = x equals Real.ZERO
+          def isNegative(x: Real): Boolean = x < Real.ZERO
+
      }
 }
 
+object Implicits {
+     implicit def Real2Double(r: Real): Double = r.value
+
+     //note: all well and good but we won't ever find the combo of realnum + numerical, will we? Needs to be
+     // an actual class, and THAT is exactly what we can't get due to type issues.
+     /*implicit class RealExt(real: RealNum with Numerical[RealNum]) {
+          def +(that: RealNum): RealNum = new RealNum(real.value + that.value)
+     }*/
+}
+
+
+class RealNum(val value: Double)
+// note: the new thing: here I am just copying the methods from Numerical trait
+// using alternate object syntax for sake of prettiness.
 class Real(val value: Double)(implicit n: Numerical[Real]) extends Number[Real] {
 
-     val ZERO: Real = Real(0)
-     val ONE: Real = Real(1)
+     import Implicits._
+
+     // protected because don't want to use these outside of class
+     // placed here to satisfy Field and Ring
+     // just want to use ZERO and ONE from the object. , just from Object Real
+     protected def zero: Real = new Real(0)
+     protected def one: Real = new Real(1)
 
      def +(other: Real): Real = n.plus(this, other)
      def -(other: Real): Real = n.minus(this, other)
      def *(other: Real): Real = n.times(this, other)
      def /(other: Real): Real = n.divide(this, other)
      def ^(exp: Real): Real = n.power(this, exp)
-
-     def inverse(): Real = Real(1 / this.value)
+     def sqrt(): Real = n.squareRoot(this)
+     def abs(): Real = n.absoluteValue(this)
 
      def negate(): Real = n.negate(this)
+
+     def inverse(): Real = n.inverse(this)
+
+     def isZero: Boolean = n.isZero(this)
+     def isNegative: Boolean = n.isNegative(this)
+
+     //todo: cannot make Numerical Ordered because compare() only takes one argument ..
+     override def compare(that: Real): Int = (this - that).toInt
+     def equals(that: Real): Boolean = this.value == that.value
 
      override def toString: String = value.toString
 }
 
 object Real {
+
+     val ZERO: Real = new Real(0)
+     val ONE: Real = new Real(1)
+
      def apply(doubleValue: Double) = new Real(doubleValue)
+
 }
 
 
 
 
 object Tester extends App {
-     import Numerical._
-     println(Real(24) + Real(31))
+     println(Real.ZERO)
+     println(Real(31))
+     println(Real(31).negate())
+     println(Real(24) + Real(31).negate())
      /*import Numerical._
 
      def addTwoNumbers[A](first: A, second: A)(implicit n: Numerical[A]): A = {

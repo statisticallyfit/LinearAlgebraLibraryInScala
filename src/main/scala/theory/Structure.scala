@@ -30,7 +30,7 @@ trait AbelianGroup[G] extends Group[G] {
      // For each a in G, there exists an element b in G such that a + b = b + a = 0.
      def inverse(): G
      // zero is identity for abelian: a + 0 = a
-     val ZERO: G
+     protected def zero: G
 }
 
 /**
@@ -66,6 +66,6 @@ trait Field[F/* <: Field[F]*/] extends AbelianGroup[F] with Ring[F] with Monoid[
      //For each a in F, there exists an element b in F such that a × b = b × a = 1.
      def inverse(): F
 
-     val ONE: F
+     protected def one: F
 }
 
