@@ -6,14 +6,21 @@ import theory._
 import scala.language.implicitConversions
 
 
-trait Number
+trait Number[T] extends Field[T] {
+     def ^(exp: T): T
 
-private[numerics] trait Numerical[N] extends Field[N] with Ring[N] with AbelianGroup[N] { //intermediary type!
+     def negate(): T
+}
+
+private[numerics] trait Numerical[N] {//extends Field[N] with Ring[N] with AbelianGroup[N] { //intermediary type!
 
      def plus(x: N, y: N): N
      def minus(x: N, y: N): N
      def times(x: N, y: N): N
      def divide(x: N, y: N): N
+     def power(x: N, y: N): N
+
+     def negate(x: N): N
 }
 
 object Numerical {
@@ -22,17 +29,26 @@ object Numerical {
           def minus(x: Real, y: Real): Real = Real(x.value - y.value)
           def times(x: Real, y: Real): Real = Real(x.value * y.value)
           def divide(x: Real, y: Real): Real = Real(x.value / y.value)
+          def power(base: Real, exp: Real): Real = Real(scala.math.pow(base.value, exp.value))
+
+          def negate(x: Real): Real = Real(-x.value)
      }
 }
 
-class Real(val value: Double)(implicit n: Numerical[Real]) extends Number {
+class Real(val value: Double)(implicit n: Numerical[Real]) extends Number[Real] {
+
+     val ZERO: Real = Real(0)
+     val ONE: Real = Real(1)
 
      def +(other: Real): Real = n.plus(this, other)
      def -(other: Real): Real = n.minus(this, other)
      def *(other: Real): Real = n.times(this, other)
      def /(other: Real): Real = n.divide(this, other)
+     def ^(exp: Real): Real = n.power(this, exp)
 
      def inverse(): Real = Real(1 / this.value)
+
+     def negate(): Real = n.negate(this)
 
      override def toString: String = value.toString
 }
@@ -45,6 +61,7 @@ object Real {
 
 
 object Tester extends App {
+     import Numerical._
      println(Real(24) + Real(31))
      /*import Numerical._
 
