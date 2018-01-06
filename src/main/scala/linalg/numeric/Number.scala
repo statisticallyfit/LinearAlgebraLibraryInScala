@@ -73,9 +73,20 @@ object Numerical {
           type C = Complex[N]
 
           def plus(x: C, y: C): C = Complex(n.plus(x.re, y.re), n.plus(x.im, y.im))
+
           def minus(x: C, y: C): C = Complex(n.minus(x.re, y.re), n.minus(x.im, y.im))
-          def times(x: C, y: C): C = Complex(n.minus(x.re, y.re), n.minus(x.im, y.im))
-          def divide(x: C, y: C): C = Complex(n.minus(x.re, y.re), n.minus(x.im, y.im))
+
+          def times(x: C, y: C): C = Complex(n.minus(n.times(x.re, y.im), n.times(y.re, x.im)),
+                                             n.plus(n.times(x.re, y.re), n.times(y.im, x.im)))
+
+          //def negate(x: C): C = Complex(x.re, -x.im)
+
+          def divide(x: C, y: C): C = {
+
+               val quot: Complex[N] = times(x, y.conjugate())
+               val recMod: Double = other.re ^ 2 + other.im ^ 2
+               new Complex(quot.re/recMod, quot.im/recMod)
+          }
      }
      /*implicit object ComplexIsNumerical extends Numerical[Complex[_]] { //todo is this ok? whats it mean?
 
@@ -94,12 +105,21 @@ object Numerical {
 }
 
 
-class Complex[N](val re: N, val im: N)(implicit n: Numerical[Complex[N]]) extends Number[Complex[N]] {
+class Complex[N](val re: N, val im: N)(implicit n: Numerical[N], implicit val c: Numerical[Complex[N]])
+     extends Number[Complex[N]] {
+
+
+     //val n = implicitly[Numerical[N]]
 
      //private val modulus: Double =
-     def +(other: Complex[N]): Complex[N] = n.plus(this, other)
-     //def -(other: Complex[N]): Complex[N] = Complex(n.minus(re, other.re), n.minus(im, other.im))
+     def +(other: Complex[N]): Complex[N] = c.plus(this, other)
+     def -(other: Complex[N]): Complex[N] = c.minus(this, other)
+     def *(other: Complex[N]): Complex[N] = c.times(this, other)
+     def /(other: Complex[N]): Complex[N] = c.divide(this, other)
 
+     def conjugate(): Complex[N] = Complex(re, n.negate(im))
+
+     def negate(): Complex[N] = c.negate(this)
      //override def compare(other: Complex[N]): Int =
 }
 
