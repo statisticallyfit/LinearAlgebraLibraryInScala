@@ -9,7 +9,7 @@ import scala.language.implicitConversions
 object Implicits {
      implicit def realToDouble(r: Real): Double = r.value
 
-     implicit def complexToDouble[N](c: Complex[N])(implicit n: Numerical[N]): Double = c.abs()
+     implicit def complexToDouble[N](c: Complex[N])(implicit n: NumericBase[N]): Double = c.abs()
 
 
      //note: all well and good but we won't ever find the combo of realnum + numerical, will we? Needs to be
