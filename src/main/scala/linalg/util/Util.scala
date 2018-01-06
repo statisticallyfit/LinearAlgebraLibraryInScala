@@ -1,11 +1,11 @@
-//package util
+//package linalg.util
 //
 //
-//import util._
-////import util.Implicits._
-//import matrix._
-//import vector._
-//import theory._
+//import linalg.util._
+////import linalg.util.Implicits._
+//import linalg.matrix._
+//import linalg.vector._
+//import linalg.theory._
 //
 //
 //import scala.reflect.runtime.universe._

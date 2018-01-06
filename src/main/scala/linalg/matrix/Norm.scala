@@ -1,10 +1,10 @@
-//package matrix
+//package linalg.matrix
 //
-//import util._
-//import number._
-//import matrix._
-//import vector._
-//import theory._
+//import linalg.util._
+//import linalg.numeric._
+//import linalg.matrix._
+//import linalg.vector._
+//import linalg.theory._
 ///**
 //  *
 //  */

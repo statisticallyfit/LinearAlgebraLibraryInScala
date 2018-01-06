@@ -1,4 +1,4 @@
-package theory
+package linalg.theory
 
 
 //------------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ trait AbelianGroup[G] extends Group[G] {
      // the associative operations
      def +(that: G): G
      // For each a in G, there exists an element b in G such that a + b = b + a = 0.
-     def inverse(): G
+     def negate(): G
      // zero is identity for abelian: a + 0 = a
      protected def zero: G
 }
@@ -64,7 +64,7 @@ trait Field[F/* <: Field[F]*/] extends AbelianGroup[F] with Ring[F] with Monoid[
      //That is the same as this.multiply(that.inverse())
      def /(that: F): F
      //For each a in F, there exists an element b in F such that a × b = b × a = 1.
-     def inverse(): F
+     def negate(): F
 
      protected def one: F
 }

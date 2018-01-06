@@ -1,13 +1,13 @@
-package vector
+package linalg.vector
 
-import matrix._
+import linalg.matrix._
+import linalg.theory._
+//import linalg.util.Implicits._
+import linalg.util._
+
+
 import matrixLib.exception.DimensionMismatchException
-
 import org.apache.commons.lang3.StringUtils
-import theory._
-//import util.Implicits._
-import util._
-
 import scala.collection.mutable.ListBuffer
 import scala.reflect.runtime.universe._
 import scala.util.control.Breaks._

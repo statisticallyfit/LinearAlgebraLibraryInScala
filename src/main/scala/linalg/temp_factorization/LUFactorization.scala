@@ -1,7 +1,7 @@
-//package factorization
+//package linalg.factorization
 //
-//import number._
-//import matrix._
+//import linalg.numeric._
+//import linalg.matrix._
 //
 //
 //import matrixLib.exception._

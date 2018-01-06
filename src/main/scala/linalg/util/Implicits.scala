@@ -1,3 +1,24 @@
+package linalg.util
+
+import linalg.numeric._
+import linalg.matrix._
+import linalg.vector._
+
+import scala.language.implicitConversions
+
+object Implicits {
+     implicit def realToDouble(r: Real): Double = r.value
+
+     implicit def complexToDouble[N](c: Complex[N])(implicit n: Numerical[N]): Double = c.abs()
+
+
+     //note: all well and good but we won't ever find the combo of realnum + numerical, will we? Needs to be
+     // an actual class, and THAT is exactly what we can't get due to type issues.
+     /*implicit class RealExt(real: RealNum with Numerical[RealNum]) {
+          def +(that: RealNum): RealNum = new RealNum(real.value + that.value)
+     }*/
+}
+
 //package util
 //
 //

@@ -1,11 +1,11 @@
-//package theory
+//package linalg.theory
 //
 //
-//import util._
-//import util.Implicits._
-//import number._
-//import matrix._
-//import vector._
+//import linalg.util._
+//import linalg.util.Implicits._
+//import linalg.numeric._
+//import linalg.matrix._
+//import linalg.vector._
 //
 //import scala.collection.mutable.ListBuffer
 //import scala.reflect.runtime.universe._

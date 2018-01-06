@@ -1,6 +1,6 @@
-//package theory
+//package linalg.theory
 //
-//import number._
+//import linalg.numeric._
 ///**
 //  *
 //  */

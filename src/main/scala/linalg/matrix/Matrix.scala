@@ -1,11 +1,11 @@
-package matrix
+package linalg.matrix
 
 
-import util._
-//import util.Implicits._
+import linalg.util._
+//import linalg.util.Implicits._
 
-import vector._
-import temp_factorization._
+import linalg.vector._
+import linalg.temp_factorization._
 
 import org.apache.commons.lang3.StringUtils
 import scala.collection.IndexedSeq

@@ -1,10 +1,10 @@
-package vector
+package linalg.vector
 
 
 
-import util._
-import theory._
-import matrix._
+import linalg.util._
+import linalg.theory._
+import linalg.matrix._
 
 import matrixLib.exception.DimensionMismatchException
 import scala.collection.mutable.ListBuffer

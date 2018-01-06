@@ -1,4 +1,4 @@
-//package theory
+//package linalg.theory
 //
 ///**
 //  * The vectorset that inherits this must tell whether its cols are linearly independent

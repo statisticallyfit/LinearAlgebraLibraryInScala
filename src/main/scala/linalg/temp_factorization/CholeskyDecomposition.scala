@@ -1,8 +1,8 @@
-package temp_factorization
+package linalg.temp_factorization
 
-import util._
-import theory._
-import matrix._
+import linalg.util._
+import linalg.theory._
+import linalg.matrix._
 
 
 import matrixLib.exception._

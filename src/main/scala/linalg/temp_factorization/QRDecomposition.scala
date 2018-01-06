@@ -1,8 +1,8 @@
-//package factorization
+//package linalg.factorization
 //
-//import number._
-//import matrix._
-//import vector._
+//import linalg.numeric._
+//import linalg.matrix._
+//import linalg.vector._
 //
 //
 //import org.apache.commons.lang3.StringUtils

@@ -1,7 +1,7 @@
-//package theory
+//package linalg.theory
 //
 //
-//import number._
+//import linalg.numeric._
 //
 ////note M ~ for matrix
 //trait BasisSpace[M, F <: Field[F]] {

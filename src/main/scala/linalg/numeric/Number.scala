@@ -1,67 +1,62 @@
-package numeric
+package linalg.numeric
 
 
-import theory._
+import linalg.theory._
+import linalg.util.Implicits._
+
 
 import scala.language.implicitConversions
 
 
 
 
-object Implicits {
-     implicit def Real2Double(r: Real): Double = r.value
-
-     //note: all well and good but we won't ever find the combo of realnum + numerical, will we? Needs to be
-     // an actual class, and THAT is exactly what we can't get due to type issues.
-     /*implicit class RealExt(real: RealNum with Numerical[RealNum]) {
-          def +(that: RealNum): RealNum = new RealNum(real.value + that.value)
-     }*/
-}
-
-
-
-
-
-// ---------------------------------------------------------------------------------------------------------
-
-
-
 // Number trait does nothing - just here to look pretty and get the "nice"
 // methods from Field: +, *, ...
-trait Number[T] extends Field[T] with Ordered[T]
-
-object Number {
-     implicit object NIsNumerical extends Number[N]
+trait Number[T] extends Field[T] with Ordered[T] {
+     //inherited: +, *, /, inverse, negate, ONE, ZERO
+     def -(other: T): T
+     def ^(exp: T): T
+     def abs(): Double
+     def sqrt(): Double
 }
 
+
+
 //numerical trait is just here to provide implementation
-private[numeric] trait Numerical[N] { //note finally, intermediary type to do grunt work!
+private[linalg] trait Numerical[N] { //note finally, intermediary type to do grunt work!
+
+     def nOne: N
+     def numericalZero: N
 
      def plus(x: N, y: N): N
-     /*def minus(x: N, y: N): N
+     def minus(x: N, y: N): N
      def times(x: N, y: N): N
      def divide(x: N, y: N): N
      def power(x: N, y: N): N
-     def squareRoot(x: N): N
-     def absoluteValue(x: N): N
+     def squareRoot(x: N): Double
+     def absoluteValue(x: N): Double
 
      def negate(x: N): N
 
      def inverse(x: N): N
 
      def isZero(x: N): Boolean
-     def isNegative(x: N): Boolean*/
+     def isNegative(x: N): Boolean
 }
 // this is standard typeclass pattern
 object Numerical {
+
      implicit object RealIsNumerical extends Numerical[Real] {
+          override def nOne = Real(1)
+          override def numericalZero = Real(0)
+
           def plus(x: Real, y: Real): Real = Real(x.value + y.value)
           def minus(x: Real, y: Real): Real = Real(x.value - y.value)
           def times(x: Real, y: Real): Real = Real(x.value * y.value)
           def divide(x: Real, y: Real): Real = Real(x.value / y.value)
           def power(base: Real, exp: Real): Real = Real(scala.math.pow(base.value, exp.value))
-          def squareRoot(x: Real): Real = Real(scala.math.sqrt(x.value))
-          def absoluteValue(x: Real): Real = Real(scala.math.abs(x.value))
+          def squareRoot(x: Real): Double = scala.math.sqrt(x.value)
+          def absoluteValue(x: Real): Double = scala.math.abs(x.value)
 
           def negate(x: Real): Real = Real(-x.value)
 
@@ -72,37 +67,50 @@ object Numerical {
 
      }
 
-     //type N <: Complex[N] //todo make type parameter?
-     implicit object ComplexIsNumerical extends Numerical[Complex[_]] {
-          def plus[N](x: Complex[N], y: Complex[N])(implicit n: Numerical[Complex[N]]): Complex[N] =
-               new Complex(n.plus, n.plus(x.im, y.im))
+
+     implicit def ComplexIsNumerical[N](implicit n: Numerical[N]) = new Numerical[Complex[N]] {
+
+          type C = Complex[N]
+
+          def plus(x: C, y: C): C = Complex(n.plus(x.re, y.re), n.plus(x.im, y.im))
+          def minus(x: C, y: C): C = Complex(n.minus(x.re, y.re), n.minus(x.im, y.im))
+          def times(x: C, y: C): C = Complex(n.minus(x.re, y.re), n.minus(x.im, y.im))
+          def divide(x: C, y: C): C = Complex(n.minus(x.re, y.re), n.minus(x.im, y.im))
      }
-     //todo: how to make scala know how to add two generic N parameters? either with plus? or with (+)???
-     // todo must extend Number? or implicit number instead of implicit numerical???
+     /*implicit object ComplexIsNumerical extends Numerical[Complex[_]] { //todo is this ok? whats it mean?
 
-     /*implicit object NIsNumerical extends Numerical[N] {
+          //todo because of above type gap, using the apply() method won't work ... :(
+          def plus[N](x: Complex[N], y: Complex[N])(implicit n: Numerical[N]): Complex[N] =
+               new Complex(n.plus(x.re, y.re), n.plus(x.im, y.im))
 
+
+          def absoluteValue[N](x: Complex[N])(implicit n: Numerical[N]): Double ={
+               val two: N = n.plus(n.nOne, n.nOne)
+          }
+               n.squareRoot(n.power(x.re, ), n.power(x.im, Natural(2)))
      }*/
-     //implicit class ComplexIsNumerical[N](re: N, im: N) extends Numerical[Complex[N]]
+
+
 }
 
 
-class Complex[N](val re: N, val im: N)(implicit n: Numerical[N] with Number[N]) /*extends
-Number[Complex[N]]*/ {
+class Complex[N](val re: N, val im: N)(implicit n: Numerical[Complex[N]]) extends Number[Complex[N]] {
 
-     //override def compare(other: Complex[N])
+     //private val modulus: Double =
+     def +(other: Complex[N]): Complex[N] = n.plus(this, other)
+     //def -(other: Complex[N]): Complex[N] = Complex(n.minus(re, other.re), n.minus(im, other.im))
+
+     //override def compare(other: Complex[N]): Int =
 }
 
-//class RealNum(val value: Double)
+
 // note: the new thing: here I am just copying the methods from Numerical trait
 // using alternate object syntax for sake of prettiness.
-class Real(val value: Double)(implicit n: Numerical[Real]) extends Number[Real] {
+class Real(val value: Double)(implicit n: Numerical[Real]) extends Complex[Real](Real(value), Real(0)) {
 
-     import Implicits._
-
-     // protected because don't want to use these outside of class
-     // placed here to satisfy Field and Ring
-     // just want to use ZERO and ONE from the object. , just from Object Real
+     // Protected because don't want to use these outside of class
+     // Placed here to satisfy Field and Ring
+     // Instead I want to use ZERO and ONE from the static Object.
      protected def zero: Real = new Real(0)
      protected def one: Real = new Real(1)
 
@@ -111,8 +119,8 @@ class Real(val value: Double)(implicit n: Numerical[Real]) extends Number[Real] 
      def *(other: Real): Real = n.times(this, other)
      def /(other: Real): Real = n.divide(this, other)
      def ^(exp: Real): Real = n.power(this, exp)
-     def sqrt(): Real = n.squareRoot(this)
-     def abs(): Real = n.absoluteValue(this)
+     def sqrt(): Double = n.squareRoot(this)
+     def abs(): Double = n.absoluteValue(this)
 
      def negate(): Real = n.negate(this)
 
@@ -122,11 +130,19 @@ class Real(val value: Double)(implicit n: Numerical[Real]) extends Number[Real] 
      def isNegative: Boolean = n.isNegative(this)
 
      //todo: cannot make Numerical Ordered because compare() only takes one argument ..
-     override def compare(that: Real): Int = (this - that).toInt
+     //override def compare(that: Real): Int = (this - that).toInt
      def equals(that: Real): Boolean = this.value == that.value
 
      override def toString: String = value.toString
 }
+
+
+
+class Rational(val num: Int, val denom: Int) extends Real(num * 1.0 / denom)
+
+class Natural(nat: Int) extends Rational(nat, 1) //{ require}
+
+
 
 object Real {
 
@@ -137,6 +153,33 @@ object Real {
 
      implicit def doubleToReal(d: Double): Real = new Real(d)
      implicit def intToReal(i: Int): Real = new Real(i)
+}
+
+object Complex {
+
+     //     val ZERO: Real = new Real(0)
+     //     val ONE: Real = new Real(1)
+
+     def apply[N: Numerical](re: N, im: N) = new Complex(re, im)
+
+     implicit def doubleToComplex(d: Double): Complex[Real] = new Complex(Real(d), Real(0))
+     implicit def intToComplex(i: Int): Complex[Natural] = new Complex(Natural(i), Natural(0))
+}
+
+object Natural {
+     val ZERO: Natural = new Natural(0)
+     val ONE: Natural = new Natural(1)
+
+     def apply(intValue: Int) = new Natural(intValue)
+
+     implicit def intToNatural(i: Int): Natural = new Natural(i)
+}
+
+object Rational {
+     val ZERO: Rational = new Rational(0, 1)
+     val ONE: Rational = new Rational(1, 1)
+
+     def apply(numerator: Int, denominator: Int) = new Rational(numerator, denominator)
 }
 
 
@@ -314,11 +357,8 @@ object Complex {
 }*/
 
 
-/*class Real(override val re: Double) extends Complex[Double](re, 0)
 
-class Rational(val num: Int, val denom: Int) extends Real(num * 1.0 / denom)
 
-class Natural(nat: Int) extends Rational(nat, 1) //{ require}*/
 
 
 /*object Complex {
