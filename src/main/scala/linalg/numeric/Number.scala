@@ -13,19 +13,25 @@ import scala.language.implicitConversions
 
 // Number trait does nothing - just here to look pretty and get the "nice"
 // methods from Field: +, *, ...
-trait Number[T] extends Field[T] with Ordered[T] {
-     //inherited: +, *, /, inverse, negate, ONE, ZERO
-     def +(other: T): T
-     def -(other: T): T
-     def ^(exp: T): T
-     def abs(): Double
-     def sqrt(): Double
+trait Number[N <: Number[N]] extends Field[N] with Ordered[N] {
+     //inherited: +, *, /, inverse, negate, one, zero
+     def one: N
+     def zero: N
 
-     def negate(): T
-     def inverse(): T
+     def +(other: N): N
+     def -(other: N): N
+     def *(other: N): N
+     def /(other: N): N
+     def ^(exp: N): N
 
-     def ==(that: T): Boolean
-     def compare(that: T): Int
+     def abs(): N
+     def sqrt(): N
+
+     def negate(): N
+     def inverse(): N
+
+     def ==(that: N): Boolean
+     def compare(that: N): Int
 
      def isZero: Boolean
      def isNegative: Boolean
@@ -36,6 +42,12 @@ trait Number[T] extends Field[T] with Ordered[T] {
      //def toString: String
 }
 
+object Number {
+     def ZERO[N <: Number[N]](implicit n: Number[N]): N = n.zero
+     def ONE[N <: Number[N]](implicit n: Number[N]): N = n.one
+     def TWO[N <: Number[N]](implicit n: Number[N]): N = n.one + n.one
+}
+
 
 
 class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N],
@@ -43,9 +55,15 @@ class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N
                                        implicit val n: Number[N]*/)
      extends Number[Complex[N]] {
 
-     private val modulus: Double = abs()
-     protected def zero: Complex[N] = Complex.ZERO[N]
-     protected def one: Complex[N] = Complex.ONE[N]
+     private val modulus: Double = math.sqrt(math.pow(re.toDouble, 2) + math.pow(im.toDouble, 2))
+
+     //def zero: N = Number.ZERO[N]
+     def zero: Complex[N] = Complex.ZERO[N]
+     //def one: N = Number.ONE[N]
+     def one: Complex[N] = Complex.ONE[N] //todo which one????
+     //protected def zero: Complex[N] = Complex.ZERO[N]
+     //protected def one: Complex[N] = Complex.ONE[N]
+     //protected def two: Complex[N] = one + one
 
 
      def +(other: Complex[N]): Complex[N] = Complex(re + other.re, im + other.im)
@@ -54,11 +72,8 @@ class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N
 
      def /(other: Complex[N]): Complex[N] = {
           val newNumerator: Complex[N] = this * other
-          /*val complexDenom: Complex[N] = this * this.conjugate()
 
-          assert(complexDenom.im.isZero) //todo remove later - better way to verify?*/
-
-          val newDenominator: N = complexDenom.re
+          val newDenominator: N = other.abs()
 
           Complex(re / newDenominator, im / newDenominator)
           /*val quot: Complex[N] = times(x, y.conjugate())
@@ -69,9 +84,18 @@ class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N
      }
 
      def conjugate(): Complex[N] = Complex(re, im.negate())
+     def polar(): Complex[N] = ???
+     def rootsOfUnity(): Complex[N] = ???
+     def theta(): N = ???
 
-     def isZero: Boolean =
+     def isZero: Boolean = re.isZero && im.isZero
+     def isNegative: Boolean = re.isNegative && im.isNegative
 
+
+
+     def abs(): Complex[N] = Complex((re^Number.TWO[N] + im^two).sqrt(), implicitly[Number[N]].zero)
+
+     def sqrt(): N = ???
      /*def +(other: Complex[N]): Complex[N] = c.plus(this, other)
      def -(other: Complex[N]): Complex[N] = c.minus(this, other)
      def *(other: Complex[N]): Complex[N] = c.times(this, other)
@@ -140,7 +164,7 @@ class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N
 
 // note: the new thing: here I am just copying the methods from Numerical trait
 // using alternate object syntax for sake of prettiness.
-class Real(val value: Double)(implicit n: NumericBase[Real]) extends Complex[Real](Real(value), Real(0)) {
+class Real(val value: Double) extends Complex[Real](Real(value), Real(0)) {
 
      // Protected because don't want to use these outside of class
      // Placed here to satisfy Field and Ring
@@ -174,7 +198,7 @@ class Real(val value: Double)(implicit n: NumericBase[Real]) extends Complex[Rea
 
 class Rational(val num: Int, val denom: Int) extends Real(num * 1.0 / denom)
 
-class Natural(nat: Int) extends Rational(nat, 1) //{ require}
+class Natural(value: Int) extends Rational(value, 1) //{ require}
 
 
 
@@ -184,6 +208,7 @@ object Real {
      val ONE: Real = new Real(1)
 
      def apply(doubleValue: Double) = new Real(doubleValue)
+     def unapply(real: Real): Option[Double] = Some(real.value)
 
      implicit def doubleToReal(d: Double): Real = new Real(d)
      implicit def intToReal(i: Int): Real = new Real(i)
@@ -221,6 +246,7 @@ object Natural {
      val ONE: Natural = new Natural(1)
 
      def apply(intValue: Int) = new Natural(intValue)
+     def unapply(natural: Natural): Option[Int] = Some(natural.value.toInt)
 
      implicit def intToNatural(i: Int): Natural = new Natural(i)
 }
@@ -230,6 +256,7 @@ object Rational {
      val ONE: Rational = new Rational(1, 1)
 
      def apply(numerator: Int, denominator: Int) = new Rational(numerator, denominator)
+     def unapply(rational: Rational): Option[(Int, Int)] = Some(rational.num, rational.denom)
 }
 
 
