@@ -25,6 +25,12 @@ trait Number[T] extends Field[T] with Ordered[T] {
      def inverse(): T
 
      def ==(that: T): Boolean
+     def compare(that: T): Int
+
+     def isZero: Boolean
+     def isNegative: Boolean
+     def isReal: Boolean
+     def isImaginary: Boolean
 
      def toDouble: Double
      //def toString: String
@@ -32,108 +38,9 @@ trait Number[T] extends Field[T] with Ordered[T] {
 
 
 
-//numerical trait is just here to provide implementation
-private[linalg] trait NumericBase[N] { //note finally, intermediary type to do grunt work!
-
-     //val baseOne: N
-     //val baseZero: N //todo rename these? seems ugly to have one and zero in both Number and NumericBase ...???
-
-     def plus(x: N, y: N): N
-     def minus(x: N, y: N): N
-     def times(x: N, y: N): N
-     def divide(x: N, y: N): N
-     def power(x: N, y: N): N
-     def squareRoot(x: N): Double
-     def absoluteValue(x: N): Double
-
-     def negate(x: N): N
-
-     def inverse(x: N): N
-
-     def isZero(x: N): Boolean
-     def isNegative(x: N): Boolean
-     def isEqual(x: N, y: N): Boolean
-
-     def toDouble(x: N): Double
-}
-// this is standard typeclass pattern
-object NumericBase {
-
-     /*implicit object RealIsNumeric extends NumericBase[Real] {
-          //override def nOne = Real(1)
-          //override def numericalZero = Real(0)
-
-          def plus(x: Real, y: Real): Real = Real(x.value + y.value)
-          def minus(x: Real, y: Real): Real = Real(x.value - y.value)
-          def times(x: Real, y: Real): Real = Real(x.value * y.value)
-          def divide(x: Real, y: Real): Real = Real(x.value / y.value)
-          def power(base: Real, exp: Real): Real = Real(scala.math.pow(base.value, exp.value))
-          def squareRoot(x: Real): Double = scala.math.sqrt(x.value)
-          def absoluteValue(x: Real): Double = scala.math.abs(x.value)
-
-          def negate(x: Real): Real = Real(-x.value)
-
-          def inverse(x: Real): Real = divide(Real.ONE, x)
-
-          def isZero(x: Real): Boolean = x equals Real.ZERO
-          def isNegative(x: Real): Boolean = x < Real.ZERO
-
-          def toDouble(x: Real) = x.value
-
-     }*/
-
-
-     implicit def ComplexIsNumeric[N](implicit b: NumericBase[N]) = new NumericBase[Complex[N]] {
-
-          type C = Complex[N]
-
-          def plus(x: C, y: C): C = Complex(b.plus(x.re, y.re), b.plus(x.im, y.im))
-
-          def minus(x: C, y: C): C = Complex(b.minus(x.re, y.re), b.minus(x.im, y.im))
-
-          def times(x: C, y: C): C = Complex(b.minus(b.times(x.re, y.im), b.times(y.re, x.im)),
-                                             b.plus(b.times(x.re, y.re), b.times(y.im, x.im)))
-
-          def divide(x: C, y: C): C = ???/*{
-
-               //val two: N = n.plus(n.nOne, n.nOne)
-
-               val quot: Complex[N] = times(x, y.conjugate())
-               val recMod: Double = math.pow(n.toDouble(y.re), 2) + math.pow(n.toDouble(y.im), 2)
-                    //n.plus(n.power(y.re, two),  n.power(y.im, two))
-
-               Complex[N](Real(n.toDouble(quot.re) / recMod), n.toDouble(quot.im) / recMod)
-          }*/
-
-          def power(base: C, exp: C): C = ???
-
-          def squareRoot(x: C): C = ???
-
-          // todo polar, rootsOfUnity, theta ,...
-
-          def absoluteValue(x: C): Double = math.pow(b.toDouble(x.re), 2) + math.pow(b.toDouble(x.im), 2)
-
-          def negate(x: C): C = Complex(b.negate(x.re), b.negate(x.im))
-
-          def inverse(x: C): C = divide(Complex.ONE[N], x)
-
-          //def conjugate(x: C): C = Complex(x.re, n.negate(x.im)) //todo erase from here since NumericBase
-          // isn't necessarily a complex number. If we put it here, then it must go in numericbase - no!
-
-          def isZero(x: C): Boolean = isEqual(x, Complex.ZERO[N])
-          def isNegative(x: C): Boolean  = b.isNegative(x.re) && b.isNegative(x.im)
-          def isEqual(x: C, y: C): Boolean = x.re == y.re && x.im == y.im
-
-          def toDouble(x: C): Double = absoluteValue(x)
-
-     }
-
-}
-
-
-class Complex[N](val re: N, val im: N)(implicit nb: NumericBase[N],
+class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N],
                                        implicit val c: NumericBase[Complex[N]],
-                                       implicit val n: Number[N])
+                                       implicit val n: Number[N]*/)
      extends Number[Complex[N]] {
 
      private val modulus: Double = abs()
@@ -141,11 +48,37 @@ class Complex[N](val re: N, val im: N)(implicit nb: NumericBase[N],
      protected def one: Complex[N] = Complex.ONE[N]
 
 
-     def +(other: Complex[N]): Complex[N] = c.plus(this, other)
+     def +(other: Complex[N]): Complex[N] = Complex(re + other.re, im + other.im)
+     def -(other: Complex[N]): Complex[N] = Complex(re - other.re, im - other.im)
+     def *(other: Complex[N]): Complex[N] = Complex(re * other.im - other.re * im, re * other.re + other.im * im)
+
+     def /(other: Complex[N]): Complex[N] = {
+          val newNumerator: Complex[N] = this * other
+          /*val complexDenom: Complex[N] = this * this.conjugate()
+
+          assert(complexDenom.im.isZero) //todo remove later - better way to verify?*/
+
+          val newDenominator: N = complexDenom.re
+
+          Complex(re / newDenominator, im / newDenominator)
+          /*val quot: Complex[N] = times(x, y.conjugate())
+          val recMod: Double = math.pow(n.toDouble(y.re), 2) + math.pow(n.toDouble(y.im), 2)
+          //n.plus(n.power(y.re, two),  n.power(y.im, two))
+
+          Complex[N](Real(n.toDouble(quot.re) / recMod), n.toDouble(quot.im) / recMod)*/
+     }
+
+     def conjugate(): Complex[N] = Complex(re, im.negate())
+
+     def isZero: Boolean =
+
+     /*def +(other: Complex[N]): Complex[N] = c.plus(this, other)
      def -(other: Complex[N]): Complex[N] = c.minus(this, other)
      def *(other: Complex[N]): Complex[N] = c.times(this, other)
      def /(other: Complex[N]): Complex[N] = c.divide(this, other)
      def ^(exp: Complex[N]): Complex[N] = c.power(this, exp)
+
+     //def something = re + im //works when I have N <: Number[N] in type.
 
      def sqrt(): Double = c.squareRoot(this)
      def abs(): Double = c.absoluteValue(this)
@@ -158,7 +91,7 @@ class Complex[N](val re: N, val im: N)(implicit nb: NumericBase[N],
      def isZero: Boolean = c.isZero(this)
      def isNegative: Boolean = c.isNegative(this)
      override def compare(that: Complex[N]): Int = (this.toDouble - that.toDouble).toInt
-     def ==(that: Complex[N]): Boolean = c.isEqual(this, that)
+     def ==(that: Complex[N]): Boolean = c.isEqual(this, that)*/
 
      def toDouble: Double = modulus
 
@@ -170,8 +103,8 @@ class Complex[N](val re: N, val im: N)(implicit nb: NumericBase[N],
 
           this match {
                case Complex.i => "i"
-               case Complex(re, n.zero) => re.toString
-               case Complex(n.zero, im) => im.toString + "i"
+               case Complex(real, n.zero) => real.toString
+               case Complex(n.zero, imaginary) => imaginary.toString + "i"
                case _ => complexString
           }
 
@@ -317,6 +250,113 @@ object Tester extends App {
 
      Console.println(addTwoNumbers(Real(24), Real(31)))*/
 }
+
+
+// ----------------------------------------
+//numerical trait is just here to provide implementation
+private[linalg] trait NumericBase[N] { //note finally, intermediary type to do grunt work!
+
+     //val baseOne: N
+     //val baseZero: N //todo rename these? seems ugly to have one and zero in both Number and NumericBase ...???
+
+     def plus(x: N, y: N): N
+     def minus(x: N, y: N): N
+     def times(x: N, y: N): N
+     def divide(x: N, y: N): N
+     def power(x: N, y: N): N
+     def squareRoot(x: N): Double
+     def absoluteValue(x: N): Double
+
+     def negate(x: N): N
+
+     def inverse(x: N): N
+
+     def isZero(x: N): Boolean
+     def isNegative(x: N): Boolean
+     def isEqual(x: N, y: N): Boolean
+
+     def toDouble(x: N): Double
+}
+// this is standard typeclass pattern
+object NumericBase {
+
+     /*implicit object RealIsNumeric extends NumericBase[Real] {
+          //override def nOne = Real(1)
+          //override def numericalZero = Real(0)
+
+          def plus(x: Real, y: Real): Real = Real(x.value + y.value)
+          def minus(x: Real, y: Real): Real = Real(x.value - y.value)
+          def times(x: Real, y: Real): Real = Real(x.value * y.value)
+          def divide(x: Real, y: Real): Real = Real(x.value / y.value)
+          def power(base: Real, exp: Real): Real = Real(scala.math.pow(base.value, exp.value))
+          def squareRoot(x: Real): Double = scala.math.sqrt(x.value)
+          def absoluteValue(x: Real): Double = scala.math.abs(x.value)
+
+          def negate(x: Real): Real = Real(-x.value)
+
+          def inverse(x: Real): Real = divide(Real.ONE, x)
+
+          def isZero(x: Real): Boolean = x equals Real.ZERO
+          def isNegative(x: Real): Boolean = x < Real.ZERO
+
+          def toDouble(x: Real) = x.value
+
+     }*/
+
+
+     implicit def ComplexIsNumeric[N](implicit b: NumericBase[N]) = new NumericBase[Complex[N]] {
+
+          type C = Complex[N]
+
+          def plus(x: C, y: C): C = Complex(b.plus(x.re, y.re), b.plus(x.im, y.im))
+
+          def minus(x: C, y: C): C = Complex(b.minus(x.re, y.re), b.minus(x.im, y.im))
+
+          def times(x: C, y: C): C = Complex(b.minus(b.times(x.re, y.im), b.times(y.re, x.im)),
+               b.plus(b.times(x.re, y.re), b.times(y.im, x.im)))
+
+          def divide(x: C, y: C): C = ???/*{
+
+               //val two: N = n.plus(n.nOne, n.nOne)
+
+               val quot: Complex[N] = times(x, y.conjugate())
+               val recMod: Double = math.pow(n.toDouble(y.re), 2) + math.pow(n.toDouble(y.im), 2)
+                    //n.plus(n.power(y.re, two),  n.power(y.im, two))
+
+               Complex[N](Real(n.toDouble(quot.re) / recMod), n.toDouble(quot.im) / recMod)
+          }*/
+
+          def power(base: C, exp: C): C = ???
+
+          def squareRoot(x: C): C = ???
+
+          // todo polar, rootsOfUnity, theta ,...
+
+          def absoluteValue(x: C): Double = math.pow(b.toDouble(x.re), 2) + math.pow(b.toDouble(x.im), 2)
+
+          def negate(x: C): C = Complex(b.negate(x.re), b.negate(x.im))
+
+          def inverse(x: C): C = divide(Complex.ONE[N], x)
+
+          //def conjugate(x: C): C = Complex(x.re, n.negate(x.im)) //todo erase from here since NumericBase
+          // isn't necessarily a complex number. If we put it here, then it must go in numericbase - no!
+
+          def isZero(x: C): Boolean = isEqual(x, Complex.ZERO[N])
+          def isNegative(x: C): Boolean  = b.isNegative(x.re) && b.isNegative(x.im)
+          def isEqual(x: C, y: C): Boolean = x.re == y.re && x.im == y.im
+
+          def toDouble(x: C): Double = absoluteValue(x)
+
+     }
+
+}
+
+
+// --------------------------------------
+
+
+
+
 /*sealed trait Number[T <: Numeric[T]] extends Ring[T] with Field[T] with Ordered[T]{
      //inherited: ONE, ZERO, +, -, *, /, inverse, compare, equals
      def negate(): T
