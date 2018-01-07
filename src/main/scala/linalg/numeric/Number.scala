@@ -9,37 +9,37 @@ import linalg.util._
 import scala.language.implicitConversions
 
 
-
+//todo here tomorrow: http://blog.kamkor.me/Covariance-And-Contravariance-In-Scala/
 
 // Number trait does nothing - just here to look pretty and get the "nice"
 // methods from Field: +, *, ...
-trait Number/*[N <: Number[N]]*/ extends Field[Number] with Ordered[Number] {
+trait Number[N <: Number[N]] extends Field[N] with Ordered[N] {
      //inherited: +, *, /, inverse, negate, one, zero
-     def one: Number
-     def zero: Number
+//     def one: Number
+//     def zero: Number
 
-     def +(other: Number): Number
-     def -(other: Number): Number
-     def *(other: Number): Number
-     def /(other: Number): Number
-     def ^(exp: Number): Number
+//     def +(other: Number): Number
+//     def -(other: Number): Number
+//     def *(other: Number): Number
+//     def /(other: Number): Number
+//     def ^(exp: Number): Number
+//
+//     def abs(): Number
+//     def sqrt(): Number
+//
+//     def negate(): Number
+//     def inverse(): Number
+//
+//     def ==(that: Number): Boolean
+//     def compare(that: Number): Int
+//
+//     def isZero: Boolean
+//     def isNegative: Boolean
+//     def isReal: Boolean
+//     def isImaginary: Boolean
+//
 
-     def abs(): Number
-     def sqrt(): Number
-
-     def negate(): Number
-     def inverse(): Number
-
-     def ==(that: Number): Boolean
-     def compare(that: Number): Int
-
-     def isZero: Boolean
-     def isNegative: Boolean
-     def isReal: Boolean
-     def isImaginary: Boolean
-
-     def toDouble: Double
-     /*def one: N
+     def one: N
      def zero: N
 
      def +(other: N): N
@@ -62,226 +62,22 @@ trait Number/*[N <: Number[N]]*/ extends Field[Number] with Ordered[Number] {
      def isReal: Boolean
      def isImaginary: Boolean
 
-     def toDouble: Double*/
-     //def toString: String
+     def toDouble: Double
+     def toString: String
 }
 
 object Number {
-     def ZERO(implicit n: Number): Number = n.zero
-     def ONE(implicit n: Number): Number = n.one
-     def TWO(implicit n: Number): Number = n.one + n.one
+     def ZERO[N](implicit n: Number[N]): N = n.zero
+     def ONE[N](implicit n: Number[N]): N = n.one
+     def TWO[N](implicit n: Number[N]): N = n.one + n.one //todo: to work, put N <: Number[N]
      /*def ONE[N <: Number[N]](implicit n: Number[N]): N = n.one
      def TWO[N <: Number[N]](implicit n: Number[N]): N = n.one + n.one*/
 }
 
 
-/*implicit nb: NumericBase[N],
-implicit val c: NumericBase[Complex[N]],
-implicit val n: Number[N]*/
-class Complex[N <: Number[N]](val re: N, val im: N)(implicit n: Number[N]) extends Number[Complex[N]] {
 
 
-     private val modulus: Double = abs().toDouble
-          //math.sqrt(math.pow(re.toDouble, 2) + math.pow(im.toDouble, 2))
 
-     //def zero: N = Number.ZERO[N]
-     protected def zero: Complex[N] = Complex.ZERO[N]
-     //def one: N = Number.ONE[N]
-     protected def one: Complex[N] = Complex.ONE[N] //todo which one???? above or this one? both types work ....!
-
-
-     def +(other: Complex[N]): Complex[N] = Complex[N](re + other.re, im + other.im)
-     def -(other: Complex[N]): Complex[N] = Complex[N](re - other.re, im - other.im)
-     def *(other: Complex[N]): Complex[N] = Complex[N](re * other.im - other.re * im, re * other.re + other.im * im)
-
-     def /(other: Complex[N]): Complex[N] = {
-          val newNumerator: Complex[N] = this * other
-          val newDenominator: N = other.abs()
-
-          Complex(re / newDenominator, im / newDenominator)
-     }
-
-     def ^(exp: Complex[N]): Complex[N] = ???
-
-     //note - can also have return type 'N' because N <: Number[N].
-     def abs(): N =  (re^Number.TWO[N] + im^Number.TWO[N]).sqrt()
-     //Complex[N] = Complex((re^Number.TWO[N] + im^Number.TWO[N]).sqrt(), Number.ZERO[N])
-     def sqrt(): N = ??? //call the roots of unity function with 1/2 as arg (make it have a Real arg)
-
-     def negate(): Complex[N] = Complex(re.negate(), im.negate())
-     def inverse(): Complex[N] = Complex.ZERO[N] / this
-
-     def ==(other: Complex[N]): Boolean = re == other.re && im == other.im
-     def compare(other: Complex[N]): Int = (this - other).toDouble.toInt
-
-     def isZero: Boolean = re.isZero && im.isZero
-     def isNegative: Boolean = re.isNegative && im.isNegative
-     def isReal: Boolean = im.isZero
-     def isImaginary: Boolean = !isReal
-
-     def toDouble: Double = modulus
-
-     /**
-       * Complex Number logic here
-       */
-     def conjugate(): Complex[N] = Complex(re, im.negate())
-     //def polar(): Polar[N] = ???
-     //def rootsOfUnity(): Complex[N] = ???
-     //todo  need to normalize for theta to be between -pi and pi?
-     //def theta(): Double = ??? //math.atan((im / re).toDouble) //todo: make a Trig trait with all trig functions ...
-
-
-     override def toString: String = {
-
-          val genZero: N = Number.ZERO[N]
-          val genOne: N = Number.ONE[N]
-
-          val stringComplex: String = this match {
-               //todo case Complex.i => "i"
-               case Complex(real, genZero) => real.toString
-               case Complex(genOne, imaginary) => imaginary.toString + "i"
-               case _ => {
-                    val imStr: String = if(im < genZero) " - " + im.negate() else " + " + im + "i"
-                    re.toString + imStr
-               }
-          }
-
-          stringComplex
-     }
-     //todo old code
-     /* val realTemp: Rational = Rational(real)
-     val imagTemp: Rational = Rational(imaginary)
-
-     if(realTemp.isZero && imagTemp.isZero) return "0"
-     if(imagTemp.isZero) return realTemp.toString
-
-     var imagStr: String = ""
-     var realStr: String = ""
-
-     if(realTemp.isZero){
-          //dealing with imag now
-          imagStr = if(imagTemp == -1) "-i"
-          else if(imagTemp == 1) "i"
-          else if(imagTemp.isNegative) imagTemp + "i"
-          else imagTemp + "i"
-     } else {
-          realStr = realTemp.toString
-          imagStr = if(imagTemp == -1) " - i"
-          else if(imagTemp == 1) " + i"
-          else if(imagTemp.isNegative) " - " + imagTemp.abs() + "i"
-          else " + " + imagTemp + "i"
-     }
-
-     realStr + imagStr
-       */
-}
-
-
-// note: the new thing: here I am just copying the methods from Numerical trait
-// using alternate object syntax for sake of prettiness.
-class Real(val value: Double)(implicit n: Number[Real]) extends Complex[Real](Real(value), Real(0))
-
-class Rational(val num: Int, val denom: Int)(implicit n: Number[Real]) extends Real(num * 1.0 / denom)  {
-     override def toString: String = this.denom match {
-          case 0 => num.toString
-          case _ => num + " / " + denom
-     }
-}
-
-class Natural(value: Int)(implicit n: Number[Real]) extends Rational(value, 1) { require(value > 0) }
-
-
-// ---------------------
-
-object Real {
-
-     def ZERO[N](implicit n: Number[Real]): Real = new Real(0)
-     def ONE[N](implicit n: Number[Real]): Real = new Real(1)
-     /*val ZERO: Real = new Real(0)
-     val ONE: Real = new Real(1)*/
-
-     def apply(doubleValue: Double)(implicit n: Number[Real]) = new Real(doubleValue)
-     def unapply(real: Real)(implicit n: Number[Real]): Option[Double] = Some(real.value)
-
-     implicit def doubleToReal(d: Double)(implicit n: Number[Real]): Real = new Real(d)
-     implicit def intToReal(i: Int)(implicit n: Number[Real]): Real = new Real(i)
-}
-
-
-//object i extends Complex[Int](0, 1)
-object Complex {
-
-     //todo use above object? else how to get in the type parameter?
-     def i[N <: Number[N]](implicit n: Number[N]): Complex[N] = Complex(n.zero, n.one)
-
-     def ONE[N <: Number[N]](implicit n: Number[N]): Complex[N] = Complex(n.one, n.zero)
-     def ZERO[N <: Number[N]](implicit n: Number[N]): Complex[N] = Complex(n.zero, n.zero)
-
-     def apply[N <: Number[N]](re: N, im: N)(implicit n: Number[N]) = new Complex[N](re, im)
-     def unapply[N <: Number[N]](complex: Complex[N])(implicit n: Number[N]): Option[(N, N)] = Some(complex.re, complex.im)
-
-
-     //todo
-     /*implicit def doubleToComplex(d: Double)(implicit n: Number[Real]): Complex[Real] =
-          new Complex(Real(d), Real(0))*/
-
-     /*implicit def intToComplex(i: Int)(implicit n: Number[Natural]): Complex[Natural] =
-          new Complex(Natural(i), Natural(0))*/
-}
-
-
-object Natural {
-
-     val n = implicitly[Number[Natural]]
-     val ZERO: Natural = new Natural(0)
-     val ONE: Natural = new Natural(1)
-
-     def apply(intValue: Int) = new Natural(intValue)
-     def unapply(natural: Natural): Option[Int] = Some(natural.value.toInt)
-
-     implicit def intToNatural(i: Int): Natural = new Natural(i)
-}
-
-object Rational {
-     val ZERO: Rational = new Rational(0, 1)
-     val ONE: Rational = new Rational(1, 1)
-
-     def apply(numerator: Int, denominator: Int) = new Rational(numerator, denominator)
-     def unapply(rational: Rational): Option[(Int, Int)] = Some(rational.num, rational.denom)
-}
-
-
-
-
-object Tester extends App {
-     println(Real.ZERO)
-     println(Real(31))
-     println(Real(31).negate())
-     println(Real(24) + Real(31).negate())
-     /*import Numerical._
-
-     def addTwoNumbers[A](first: A, second: A)(implicit n: Numerical[A]): A = {
-          n.plus(first, second)
-     }
-
-
-
-     Console.println(addTwoNumbers(Real(24), Real(31)))*/
-}
-
-
-// ---------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-/*
 class Complex[N <: Number[N]](val re: N, val im: N)(implicit n: Number[N]) extends Number[Complex[N]] {
 
 
@@ -436,7 +232,7 @@ object Complex {
 
 object Natural {
 
-     val n = implicitly[Number[Natural]]
+     //val n = implicitly[Number[Natural]]
      val ZERO: Natural = new Natural(0)
      val ONE: Natural = new Natural(1)
 
@@ -452,17 +248,230 @@ object Rational {
 
      def apply(numerator: Int, denominator: Int) = new Rational(numerator, denominator)
      def unapply(rational: Rational): Option[(Int, Int)] = Some(rational.num, rational.denom)
+}
+
+
+
+
+
+
+
+
+
+
+// -------------------------------------------------------------------------
+
+
+
+
+
+//note: all the non-parameter stuff - not working because Scala doesn't have regular
+// polymorphism and expects the actual Number type, not subtypes of it (Number won't resolve as subtypes)
+
+
+
+
+/*implicit nb: NumericBase[N],
+implicit val c: NumericBase[Complex[N]],
+implicit val n: Number[N]*/
+
+
+/*
+class Complex[N <: Number[N]](val re: N, val im: Number)/*(implicit n: Number)*/ extends Number {
+
+
+//     private val modulus: Double = abs().toDouble
+//          //math.sqrt(math.pow(re.toDouble, 2) + math.pow(im.toDouble, 2))
+//
+//     //def zero: N = Number.ZERO[N]
+//     protected def zero: Number = Complex.ZERO
+//     //def one: N = Number.ONE[N]
+//     protected def one: Number = Complex.ONE //todo which one???? above or this one? both types work ....!
+
+
+     def +(other: Complex): Complex = new Complex(re + other.re, im + other.im)
+     def -(other: Complex): Number = new Complex(re - other.re, im - other.im)
+//     def *(other: Complex): Complex = Complex(re * other.im - other.re * im, re * other.re + other.im * im)
+//
+//     def /(other: Complex): Complex = {
+//          val newNumerator: Complex = this * other
+//          val newDenominator: Number = other.abs()
+//
+//          Complex(re / newDenominator, im / newDenominator)
+//     }
+//
+//     def ^(exp: Number): Complex = ???
+//
+//     //note - can also have return type 'N' because N <: Number[N].
+//     def abs(): Number =  (re^Number.TWO + im^Number.TWO).sqrt()
+//     //Complex[N] = Complex((re^Number.TWO[N] + im^Number.TWO[N]).sqrt(), Number.ZERO[N])
+//     def sqrt(): Number = ??? //call the roots of unity function with 1/2 as arg (make it have a Real arg)
+//
+//     def negate(): Complex = Complex(re.negate(), im.negate())
+//     def inverse(): Complex = Complex.ZERO / this
+//
+//     def ==(other: Complex): Boolean = re == other.re && im == other.im
+     def compare(other: Number): Int = (this - other).toDouble.toInt
+//
+//     def isZero: Boolean = re.isZero && im.isZero
+//     def isNegative: Boolean = re.isNegative && im.isNegative
+//     def isReal: Boolean = im.isZero
+//     def isImaginary: Boolean = !isReal
+//
+//     def toDouble: Double = modulus
+//
+//     /**
+//       * Complex Number logic here
+//       */
+//     def conjugate(): Complex = Complex(re, im.negate())
+//     //def polar(): Polar[N] = ???
+//     //def rootsOfUnity(): Complex[N] = ???
+//     //todo  need to normalize for theta to be between -pi and pi?
+//     //def theta(): Double = ??? //math.atan((im / re).toDouble) //todo: make a Trig trait with all trig functions ...
+//
+//
+//     override def toString: String = {
+//
+//          val genZero: Number = Number.ZERO
+//          val genOne: Number = Number.ONE
+//
+//          val stringComplex: String = this match {
+//               //todo case Complex.i => "i"
+//               case Complex(real, genZero) => real.toString
+//               case Complex(genOne, imaginary) => imaginary.toString + "i"
+//               case _ => {
+//                    val imStr: String = if(im < genZero) " - " + im.negate() else " + " + im + "i"
+//                    re.toString + imStr
+//               }
+//          }
+//
+//          stringComplex
+//     }
+     //todo old code
+     /* val realTemp: Rational = Rational(real)
+     val imagTemp: Rational = Rational(imaginary)
+
+     if(realTemp.isZero && imagTemp.isZero) return "0"
+     if(imagTemp.isZero) return realTemp.toString
+
+     var imagStr: String = ""
+     var realStr: String = ""
+
+     if(realTemp.isZero){
+          //dealing with imag now
+          imagStr = if(imagTemp == -1) "-i"
+          else if(imagTemp == 1) "i"
+          else if(imagTemp.isNegative) imagTemp + "i"
+          else imagTemp + "i"
+     } else {
+          realStr = realTemp.toString
+          imagStr = if(imagTemp == -1) " - i"
+          else if(imagTemp == 1) " + i"
+          else if(imagTemp.isNegative) " - " + imagTemp.abs() + "i"
+          else " + " + imagTemp + "i"
+     }
+
+     realStr + imagStr
+       */
 }*/
 
 
+// note: the new thing: here I am just copying the methods from Numerical trait
+// using alternate object syntax for sake of prettiness.
+//class Real(val value: Double) extends Complex(Real(value), Real(0))
+//
+//class Rational(val num: Int, val denom: Int) extends Real(num * 1.0 / denom)  {
+//     override def toString: String = this.denom match {
+//          case 0 => num.toString
+//          case _ => num + " / " + denom
+//     }
+//}
+//
+//class Natural(value: Int) extends Rational(value, 1) { require(value > 0) }
+//
+//
+//// ---------------------
+//
+//object Real {
+//
+//     val ZERO: Real = new Real(0)
+//     val ONE: Real = new Real(1)
+//     /*val ZERO: Real = new Real(0)
+//     val ONE: Real = new Real(1)*/
+//
+//     def apply(doubleValue: Double) = new Real(doubleValue)
+//     def unapply(real: Real): Option[Double] = Some(real.value)
+//
+//     implicit def doubleToReal(d: Double): Real = new Real(d)
+//     implicit def intToReal(i: Int): Real = new Real(i)
+//}
+//
+//
+////object i extends Complex[Int](0, 1)
+//object i extends Complex(0, 1) // todo make type class instance for Int //
+//object Complex {
+//
+//     //todo use above object? else how to get in the type parameter?
+//     def I(implicit n: Number): Complex = Complex(n.zero, n.one)
+//
+//     val ONE: Complex = Complex(Number.ONE, Number.ZERO) //or need implicit and use as below?
+//          //def ONE(implicit n: Number): Complex = Complex(n.one, n.zero)
+//     val ZERO: Complex = Complex(Number.ZERO, Number.ZERO)
+//
+//     def apply(re: Number, im: Number) = new Complex(re, im)
+//     def unapply(complex: Complex): Option[(Number, Number)] = Some(complex.re, complex.im)
+//
+//
+//     //todo
+//     /*implicit def doubleToComplex(d: Double)(implicit n: Number[Real]): Complex[Real] =
+//          new Complex(Real(d), Real(0))*/
+//
+//     /*implicit def intToComplex(i: Int)(implicit n: Number[Natural]): Complex[Natural] =
+//          new Complex(Natural(i), Natural(0))*/
+//}
+//
+//
+//object Natural {
+//
+//     val n = implicitly[Number[Natural]]
+//     val ZERO: Natural = new Natural(0)
+//     val ONE: Natural = new Natural(1)
+//
+//     def apply(intValue: Int) = new Natural(intValue)
+//     def unapply(natural: Natural): Option[Int] = Some(natural.value.toInt)
+//
+//     implicit def intToNatural(i: Int): Natural = new Natural(i)
+//}
+//
+//object Rational {
+//     val ZERO: Rational = new Rational(0, 1)
+//     val ONE: Rational = new Rational(1, 1)
+//
+//     def apply(numerator: Int, denominator: Int) = new Rational(numerator, denominator)
+//     def unapply(rational: Rational): Option[(Int, Int)] = Some(rational.num, rational.denom)
+//}
 
 
 
 
+//object Tester extends App {
+//     println(Real.ZERO)
+//     println(Real(31))
+//     println(Real(31).negate())
+//     println(Real(24) + Real(31).negate())
+//     /*import Numerical._
+//
+//     def addTwoNumbers[A](first: A, second: A)(implicit n: Numerical[A]): A = {
+//          n.plus(first, second)
+//     }
+//
+//
+//
+//     Console.println(addTwoNumbers(Real(24), Real(31)))*/
+//}
 
 
-
-
+// ---------------------------------------------------------------------------------
 
 
 
