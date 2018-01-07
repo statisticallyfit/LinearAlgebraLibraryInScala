@@ -1,8 +1,7 @@
 package linalg.util
 
 import linalg.numeric._
-import linalg.matrix._
-import linalg.vector._
+
 
 
 
@@ -13,16 +12,16 @@ import scala.language.implicitConversions
 object Implicits {
      implicit def realToDouble(r: Real): Double = r.value
 
-     implicit def complexToDouble[N: Number](complex: Complex[N]): Double = complex.abs()
+     implicit def complexToDouble[N: Number](complex: Complex[N]): Double = complex.toDouble
 
-     implicit def doubleToGeneralN[N <: Number[N]](double: Double)(implicit n: Number[N]): N = {
+     /*implicit def doubleToGeneralN[N <: Number[N]](double: Double)(implicit n: Number[N]): N = {
 
           n match {
                case _: Complex[N] =>
                case _: Real => n.one
 
           }
-     }
+     }*/
 
      //note: all well and good but we won't ever find the combo of realnum + numerical, will we? Needs to be
      // an actual class, and THAT is exactly what we can't get due to type issues.
