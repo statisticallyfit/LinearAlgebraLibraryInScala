@@ -5,7 +5,7 @@ import linalg.theory._
 import linalg.util.Implicits._
 
 
-import scala.math
+
 import scala.language.implicitConversions
 
 
@@ -58,12 +58,9 @@ class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N
      private val modulus: Double = math.sqrt(math.pow(re.toDouble, 2) + math.pow(im.toDouble, 2))
 
      //def zero: N = Number.ZERO[N]
-     def zero: Complex[N] = Complex.ZERO[N]
+     protected def zero: Complex[N] = Complex.ZERO[N]
      //def one: N = Number.ONE[N]
-     def one: Complex[N] = Complex.ONE[N] //todo which one????
-     //protected def zero: Complex[N] = Complex.ZERO[N]
-     //protected def one: Complex[N] = Complex.ONE[N]
-     //protected def two: Complex[N] = one + one
+     protected def one: Complex[N] = Complex.ONE[N] //todo which one???? above or this one? both types work ....!
 
 
      def +(other: Complex[N]): Complex[N] = Complex(re + other.re, im + other.im)
@@ -72,16 +69,23 @@ class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N
 
      def /(other: Complex[N]): Complex[N] = {
           val newNumerator: Complex[N] = this * other
-
           val newDenominator: N = other.abs()
 
           Complex(re / newDenominator, im / newDenominator)
-          /*val quot: Complex[N] = times(x, y.conjugate())
-          val recMod: Double = math.pow(n.toDouble(y.re), 2) + math.pow(n.toDouble(y.im), 2)
-          //n.plus(n.power(y.re, two),  n.power(y.im, two))
-
-          Complex[N](Real(n.toDouble(quot.re) / recMod), n.toDouble(quot.im) / recMod)*/
      }
+
+     def ^(exp: Complex[N]): Complex[N] = ???
+
+     //note - can also have return type 'N' because N <: Number[N].
+     def abs(): N =  (re^Number.TWO[N] + im^Number.TWO[N]).sqrt()
+     //Complex[N] = Complex((re^Number.TWO[N] + im^Number.TWO[N]).sqrt(), Number.ZERO[N])
+     def sqrt(): N = ???
+
+     def negate(): Complex[N] = Complex(re.negate(), im.negate())
+     def inverse(): Complex[N] = Complex.ZERO[N] / this
+
+     def ==(other: Complex[N]): Boolean = re == other.re && im == other.im
+     def compare(other: Complex[N]): Int = (this - other).toDouble.toInt
 
      def conjugate(): Complex[N] = Complex(re, im.negate())
      def polar(): Complex[N] = ???
@@ -90,32 +94,8 @@ class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N
 
      def isZero: Boolean = re.isZero && im.isZero
      def isNegative: Boolean = re.isNegative && im.isNegative
-
-
-
-     def abs(): Complex[N] = Complex((re^Number.TWO[N] + im^two).sqrt(), implicitly[Number[N]].zero)
-
-     def sqrt(): N = ???
-     /*def +(other: Complex[N]): Complex[N] = c.plus(this, other)
-     def -(other: Complex[N]): Complex[N] = c.minus(this, other)
-     def *(other: Complex[N]): Complex[N] = c.times(this, other)
-     def /(other: Complex[N]): Complex[N] = c.divide(this, other)
-     def ^(exp: Complex[N]): Complex[N] = c.power(this, exp)
-
-     //def something = re + im //works when I have N <: Number[N] in type.
-
-     def sqrt(): Double = c.squareRoot(this)
-     def abs(): Double = c.absoluteValue(this)
-
-     def conjugate(): Complex[N] = Complex(re, nb.negate(im))
-
-     def negate(): Complex[N] = c.negate(this)
-     def inverse(): Complex[N] = c.inverse(this)
-
-     def isZero: Boolean = c.isZero(this)
-     def isNegative: Boolean = c.isNegative(this)
-     override def compare(that: Complex[N]): Int = (this.toDouble - that.toDouble).toInt
-     def ==(that: Complex[N]): Boolean = c.isEqual(this, that)*/
+     def isReal: Boolean = im.isZero
+     def isImaginary: Boolean = !isReal
 
      def toDouble: Double = modulus
 
@@ -164,37 +144,7 @@ class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N
 
 // note: the new thing: here I am just copying the methods from Numerical trait
 // using alternate object syntax for sake of prettiness.
-class Real(val value: Double) extends Complex[Real](Real(value), Real(0)) {
-
-     // Protected because don't want to use these outside of class
-     // Placed here to satisfy Field and Ring
-     // Instead I want to use ZERO and ONE from the static Object.
-     /*protected def zero: Real = new Real(0)
-     protected def one: Real = new Real(1)
-
-     def +(other: Real): Real = n.plus(this, other)
-     def -(other: Real): Real = n.minus(this, other)
-     def *(other: Real): Real = n.times(this, other)
-     def /(other: Real): Real = n.divide(this, other)
-     def ^(exp: Real): Real = n.power(this, exp)
-     def sqrt(): Double = n.squareRoot(this)*/
-     //def abs(): Double = n.absoluteValue(this)
-
-     //def negate(): Real = n.negate(this)
-
-     //def inverse(): Real = n.inverse(this)
-
-     //def isZero: Boolean = n.isZero(this)
-     //def isNegative: Boolean = n.isNegative(this)
-
-     //todo: cannot make Numerical Ordered because compare() only takes one argument ..
-     //override def compare(that: Real): Int = (this - that).toInt
-     //def equals(that: Real): Boolean = this.value == that.value
-
-     //override def toString: String = value.toString
-}
-
-
+class Real(val value: Double) extends Complex[Real](Real(value), Real(0))
 
 class Rational(val num: Int, val denom: Int) extends Real(num * 1.0 / denom)
 
@@ -223,16 +173,6 @@ object Complex {
 
      def ONE[N](implicit n: Number[N]): Complex[N] = Complex(n.one, n.zero)
      def ZERO[N](implicit n: Number[N]): Complex[N] = Complex(n.zero, n.zero)
-
-     /*type N <: Number[N]
-     //note: this mess below is explanation why I can't have ONE and ZERO as constants ...
-     val ZERO = makeZero()
-     val ONE: Complex[N] = makeOne[N]()*/
-          //new Complex(implicitly[Number[N]].zero, implicitly[Number[N]].zero)
-     //     val ONE: Real = new Real(1)
-     /*private def makeZero[N]()(implicit n: Number[N]): Complex[N] = Complex(n.zero, n.zero)
-     private def makeOne[N]()(implicit n: Number[N]): Complex[N] = Complex(n.one, n.zero)*/
-
 
      def apply[N: Number](re: N, im: N) = new Complex(re, im)
      def unapply[N: Number](complex: Complex[N]): Option[(N, N)] = Some(complex.re, complex.im)
@@ -281,7 +221,7 @@ object Tester extends App {
 
 // ----------------------------------------
 //numerical trait is just here to provide implementation
-private[linalg] trait NumericBase[N] { //note finally, intermediary type to do grunt work!
+/*private[linalg] trait NumericBase[N] { //note finally, intermediary type to do grunt work!
 
      //val baseOne: N
      //val baseZero: N //todo rename these? seems ugly to have one and zero in both Number and NumericBase ...???
@@ -303,9 +243,74 @@ private[linalg] trait NumericBase[N] { //note finally, intermediary type to do g
      def isEqual(x: N, y: N): Boolean
 
      def toDouble(x: N): Double
-}
+}*/
+
+
+/**
+  * stuff that was in Complex class when using NumericBase typeclass:
+  *
+  *
+
+/*def +(other: Complex[N]): Complex[N] = c.plus(this, other)
+     def -(other: Complex[N]): Complex[N] = c.minus(this, other)
+     def *(other: Complex[N]): Complex[N] = c.times(this, other)
+     def /(other: Complex[N]): Complex[N] = c.divide(this, other)
+     //def (exp: Complex[N]): Complex[N] = c.power(this, exp)
+
+     //def something = re + im //works when I have N "lessthansign": Number[N] in type.
+
+     def sqrt(): Double = c.squareRoot(this)
+     def abs(): Double = c.absoluteValue(this)
+
+     def conjugate(): Complex[N] = Complex(re, nb.negate(im))
+
+     def negate(): Complex[N] = c.negate(this)
+     def inverse(): Complex[N] = c.inverse(this)
+
+     def isZero: Boolean = c.isZero(this)
+     def isNegative: Boolean = c.isNegative(this)
+     override def compare(that: Complex[N]): Int = (this.toDouble - that.toDouble).toInt
+     def ==(that: Complex[N]): Boolean = c.isEqual(this, that)*/
+
+
+
+
+  stuff that was in Real class when using NumericBase typeclass:
+
+  // Protected because don't want to use these outside of class
+     // Placed here to satisfy Field and Ring
+     // Instead I want to use ZERO and ONE from the static Object.
+     /*protected def zero: Real = new Real(0)
+     protected def one: Real = new Real(1)
+
+     def +(other: Real): Real = n.plus(this, other)
+     def -(other: Real): Real = n.minus(this, other)
+     def *(other: Real): Real = n.times(this, other)
+     def /(other: Real): Real = n.divide(this, other)
+     def (exp: Real): Real = n.power(this, exp)
+     def sqrt(): Double = n.squareRoot(this)*/
+     //def abs(): Double = n.absoluteValue(this)
+
+     //def negate(): Real = n.negate(this)
+
+     //def inverse(): Real = n.inverse(this)
+
+     //def isZero: Boolean = n.isZero(this)
+     //def isNegative: Boolean = n.isNegative(this)
+
+     //todo: cannot make Numerical Ordered because compare() only takes one argument ..
+     //override def compare(that: Real): Int = (this - that).toInt
+     //def equals(that: Real): Boolean = this.value == that.value
+
+     //override def toString: String = value.toString
+
+
+  */
+
+
+
 // this is standard typeclass pattern
-object NumericBase {
+/*object NumericBase {
 
      /*implicit object RealIsNumeric extends NumericBase[Real] {
           //override def nOne = Real(1)
@@ -376,7 +381,7 @@ object NumericBase {
 
      }
 
-}
+}*/
 
 
 // --------------------------------------
