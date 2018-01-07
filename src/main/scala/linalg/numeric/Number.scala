@@ -55,7 +55,9 @@ class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N
                                        implicit val n: Number[N]*/)
      extends Number[Complex[N]] {
 
-     private val modulus: Double = math.sqrt(math.pow(re.toDouble, 2) + math.pow(im.toDouble, 2))
+
+     private val modulus: Double = abs().toDouble
+          //math.sqrt(math.pow(re.toDouble, 2) + math.pow(im.toDouble, 2))
 
      //def zero: N = Number.ZERO[N]
      protected def zero: Complex[N] = Complex.ZERO[N]
@@ -79,18 +81,13 @@ class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N
      //note - can also have return type 'N' because N <: Number[N].
      def abs(): N =  (re^Number.TWO[N] + im^Number.TWO[N]).sqrt()
      //Complex[N] = Complex((re^Number.TWO[N] + im^Number.TWO[N]).sqrt(), Number.ZERO[N])
-     def sqrt(): N = ???
+     def sqrt(): N = ??? //call the roots of unity function with 1/2 as arg (make it have a Real arg)
 
      def negate(): Complex[N] = Complex(re.negate(), im.negate())
      def inverse(): Complex[N] = Complex.ZERO[N] / this
 
      def ==(other: Complex[N]): Boolean = re == other.re && im == other.im
      def compare(other: Complex[N]): Int = (this - other).toDouble.toInt
-
-     def conjugate(): Complex[N] = Complex(re, im.negate())
-     def polar(): Complex[N] = ???
-     def rootsOfUnity(): Complex[N] = ???
-     def theta(): N = ???
 
      def isZero: Boolean = re.isZero && im.isZero
      def isNegative: Boolean = re.isNegative && im.isNegative
@@ -99,46 +96,59 @@ class Complex[N <: Number[N]](val re: N, val im: N)(/*implicit nb: NumericBase[N
 
      def toDouble: Double = modulus
 
+     /**
+       * Complex Number logic here
+       */
+     def conjugate(): Complex[N] = Complex(re, im.negate())
+     //def polar(): Polar[N] = ???
+     //def rootsOfUnity(): Complex[N] = ???
+     //todo  need to normalize for theta to be between -pi and pi?
+     //def theta(): Double = ??? //math.atan((im / re).toDouble) //todo: make a Trig trait with all trig functions ...
+
+
      override def toString: String = {
 
-          //todo: to make nb < 0 instead? that would mean Ordered in NumericBase ...
-          private def complexAsString: String =
-               re + (if(im < 0) " - " + im.negate() else " + " + im) + "i"
+          val genZero: N = Number.ZERO[N]
+          val genOne: N = Number.ONE[N]
 
-          this match {
+          val stringComplex: String = this match {
                case Complex.i => "i"
-               case Complex(real, n.zero) => real.toString
-               case Complex(n.zero, imaginary) => imaginary.toString + "i"
-               case _ => complexString
+               case Complex(real, genZero) => real.toString
+               case Complex(genOne, imaginary) => imaginary.toString + "i"
+               case _ => {
+                    val imStr: String = if(im < genZero) " - " + im.negate() else " + " + im + "i"
+                    re.toString + imStr
+               }
           }
 
-          //todo old code
-          /* val realTemp: Rational = Rational(real)
-          val imagTemp: Rational = Rational(imaginary)
-
-          if(realTemp.isZero && imagTemp.isZero) return "0"
-          if(imagTemp.isZero) return realTemp.toString
-
-          var imagStr: String = ""
-          var realStr: String = ""
-
-          if(realTemp.isZero){
-               //dealing with imag now
-               imagStr = if(imagTemp == -1) "-i"
-               else if(imagTemp == 1) "i"
-               else if(imagTemp.isNegative) imagTemp + "i"
-               else imagTemp + "i"
-          } else {
-               realStr = realTemp.toString
-               imagStr = if(imagTemp == -1) " - i"
-               else if(imagTemp == 1) " + i"
-               else if(imagTemp.isNegative) " - " + imagTemp.abs() + "i"
-               else " + " + imagTemp + "i"
-          }
-
-          realStr + imagStr
-            */
+          stringComplex
      }
+     //todo old code
+     /* val realTemp: Rational = Rational(real)
+     val imagTemp: Rational = Rational(imaginary)
+
+     if(realTemp.isZero && imagTemp.isZero) return "0"
+     if(imagTemp.isZero) return realTemp.toString
+
+     var imagStr: String = ""
+     var realStr: String = ""
+
+     if(realTemp.isZero){
+          //dealing with imag now
+          imagStr = if(imagTemp == -1) "-i"
+          else if(imagTemp == 1) "i"
+          else if(imagTemp.isNegative) imagTemp + "i"
+          else imagTemp + "i"
+     } else {
+          realStr = realTemp.toString
+          imagStr = if(imagTemp == -1) " - i"
+          else if(imagTemp == 1) " + i"
+          else if(imagTemp.isNegative) " - " + imagTemp.abs() + "i"
+          else " + " + imagTemp + "i"
+     }
+
+     realStr + imagStr
+       */
 }
 
 
