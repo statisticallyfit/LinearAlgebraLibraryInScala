@@ -13,7 +13,7 @@ import scala.language.implicitConversions
 
 // Number trait does nothing - just here to look pretty and get the "nice"
 // methods from Field: +, *, ...
-trait Number[N <: Number[N]] extends Field[N] with Ordered[N] {
+trait Number[N <: Number[N]] extends Field[N] with Ordered[N] { this: N =>
      //inherited: +, *, /, inverse, negate, one, zero
 //     def one: Number
 //     def zero: Number
@@ -76,9 +76,11 @@ object Number {
 
 
 
+//private[numeric] trait Numeric[N <: Numeric[N]] extends Number[Numeric[N]]
 
 
-class Complex[N <: Number[N]](val re: N, val im: N)/*(implicit n: Number[N])*/ extends Number[Complex[N]] {
+/*(implicit n: Number[N])*/
+class Complex[N <: Number[N]/*: Complex*/](val re: N, val im: N) extends Number[Complex[N]] {
 
      implicit val n: Number[N] = implicitly[Number[N]]
 
@@ -91,7 +93,7 @@ class Complex[N <: Number[N]](val re: N, val im: N)/*(implicit n: Number[N])*/ e
      val one: Complex[N] = Complex.ONE[N] //todo which one???? above or this one? both types work ....!
 
 
-     def +(other: Complex[N]): Complex[N] = Complex[N](re + other.re, im + other.im)
+     def +(other: Complex[N]): Complex[N] = Complex(re + other.re, im + other.im)
      def -(other: Complex[N]): Complex[N] = Complex[N](re - other.re, im - other.im)
      def *(other: Complex[N]): Complex[N] = Complex[N](re * other.im - other.re * im, re * other.re + other.im * im)
 
@@ -156,16 +158,40 @@ class Complex[N <: Number[N]](val re: N, val im: N)/*(implicit n: Number[N])*/ e
 // note: the new thing: here I am just copying the methods from Numerical trait
 // using alternate object syntax for sake of prettiness.
 /*(implicit n: Number[Real])*/
-class Real(val value: Double) extends Complex[Real](Real(value), Real(0))
+class Real(val value: Double) extends Complex[Real](value, 0)
+{
 
-class Rational(val num: Int, val denom: Int)/*(implicit n: Number[Real])*/ extends Real(num * 1.0 / denom)  {
-     override def toString: String = this.denom match {
-          case 0 => num.toString
-          case _ => num + " / " + denom
-     }
+     /** As seen from class Real, the missing signatures are as follows.
+       *  For convenience, these are usable as stub implementations.
+       */
+     /*def /(other: linalg.numeric.Real): linalg.numeric.Real = ???
+     def ==(that: linalg.numeric.Real): Boolean = ???
+     def -(other: linalg.numeric.Real): linalg.numeric.Real = ???
+     def +(other: linalg.numeric.Real): linalg.numeric.Real = ???
+     def *(other: linalg.numeric.Real): linalg.numeric.Real = ???
+     def ^(exp: linalg.numeric.Real): linalg.numeric.Real = ???
+     def abs(): linalg.numeric.Real = ???
+     def compare(that: linalg.numeric.Real): Int = ???
+     def inverse(): linalg.numeric.Real = ???
+     def isImaginary: Boolean = ???
+     def isNegative: Boolean = ???
+     def isReal: Boolean = ???
+     def isZero: Boolean = ???
+     def negate(): linalg.numeric.Real = ???
+     def one: linalg.numeric.Real = ???
+     def sqrt(): linalg.numeric.Real = ???
+     def toDouble: Double = ???
+     def zero: linalg.numeric.Real = ???*/
+     //class Real(val value: Double) extends Number[Real] //Complex[Real](Real(value), Real(0))
 }
-
-class Natural(value: Int)/*(implicit n: Number[Real])*/ extends Rational(value, 1) { require(value > 0) }
+//class Rational(val num: Int, val denom: Int)/*(implicit n: Number[Real])*/ extends Real(num * 1.0 / denom)  {
+//     override def toString: String = this.denom match {
+//          case 0 => num.toString
+//          case _ => num + " / " + denom
+//     }
+//}
+//
+//class Natural(value: Int)/*(implicit n: Number[Real])*/ extends Rational(value, 1) { require(value > 0) }
 
 
 // ---------------------
@@ -209,25 +235,25 @@ object Complex {
 }
 
 
-object Natural {
-
-     //val n = implicitly[Number[Natural]]
-     val ZERO: Natural = new Natural(0)
-     val ONE: Natural = new Natural(1)
-
-     def apply(intValue: Int) = new Natural(intValue)
-     def unapply(natural: Natural): Option[Int] = Some(natural.value.toInt)
-
-     implicit def intToNatural(i: Int): Natural = new Natural(i)
-}
-
-object Rational {
-     val ZERO: Rational = new Rational(0, 1)
-     val ONE: Rational = new Rational(1, 1)
-
-     def apply(numerator: Int, denominator: Int) = new Rational(numerator, denominator)
-     def unapply(rational: Rational): Option[(Int, Int)] = Some(rational.num, rational.denom)
-}
+//object Natural {
+//
+//     //val n = implicitly[Number[Natural]]
+//     val ZERO: Natural = new Natural(0)
+//     val ONE: Natural = new Natural(1)
+//
+//     def apply(intValue: Int) = new Natural(intValue)
+//     def unapply(natural: Natural): Option[Int] = Some(natural.value.toInt)
+//
+//     implicit def intToNatural(i: Int): Natural = new Natural(i)
+//}
+//
+//object Rational {
+//     val ZERO: Rational = new Rational(0, 1)
+//     val ONE: Rational = new Rational(1, 1)
+//
+//     def apply(numerator: Int, denominator: Int) = new Rational(numerator, denominator)
+//     def unapply(rational: Rational): Option[(Int, Int)] = Some(rational.num, rational.denom)
+//}
 
 
 
