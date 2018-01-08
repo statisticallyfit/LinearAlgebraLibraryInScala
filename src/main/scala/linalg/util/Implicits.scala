@@ -4,12 +4,19 @@ import linalg.numeric._
 
 
 
-
+import org.apache.commons.lang3.math.Fraction
 import scala.language.implicitConversions
 
 
 
 object Implicits {
+
+     implicit def intToRational(int: Int): Rational = Rational(int, 1)
+
+     implicit def doubleToRational(double: Double): Rational ={
+          val f: Fraction = Fraction.getFraction(double)
+          Rational(f.getNumerator, f.getDenominator)
+     }
      //implicit def realToDouble(r: Real): Double = r.value
 
      //implicit def complexToDouble[N <: Number[N]](complex: Complex[N]): Double = complex.toDouble

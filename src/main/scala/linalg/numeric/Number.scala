@@ -2,7 +2,7 @@ package linalg.numeric
 
 
 import linalg.theory._
-import linalg.util._
+import linalg.util.Implicits._
 
 
 import org.apache.commons.lang3.math.Fraction
@@ -64,14 +64,14 @@ object ImplicitNumberOps {
           def ==(other: T): Boolean = ev.isEqual(current, other)
 
           def toDouble: Double = ev.asDouble(current)*/
-          //override def toString: String = ev.asString(current)
+          override def toString: String = ev.asString(current)
      }
 }
 
 
 
 
-case class Complex(real: Double, imag: Double)
+case class Complex(re: Rational, im: Rational)
 
 case class Real(value: Double){
      //override def toString: String = value.toString //todo why tostring doesn't work in NumberOps?
@@ -102,8 +102,10 @@ object Number {
 
      // Now my own types: ------------------------------------------------
      implicit val ComplexNumber = new Number[Complex] {
-          def plus(x: Complex, y: Complex): Complex = Complex(x.real + y.real, x.imag + y.imag)
-          def asString(x: Complex): String = x.real + " + " + x.imag //todo fix later
+
+          def plus(x: Complex, y: Complex): Complex = Complex(x.re) //todo
+
+          def asString(x: Complex): String = x.re + " + " + x.im + "i"//todo fix later
      }
 
      implicit val RealNumber = new Number[Real] {
@@ -124,6 +126,15 @@ object Number {
 
           def asString(x: Natural): String = x.value.toString
      }
+
+     //---------------------------------------------------------------------
+     //todo - why doesn't this nor asString method work?
+     /*implicit class ComplexString(val complex: Complex) {
+          override def toString: String = complex.real + " + " + complex.imag + "i"
+     }
+     implicit class RealString(val real: Real) {
+          override def toString: String = real.value.toString
+     }*/
 }
 
 
@@ -134,10 +145,12 @@ object NumberTester extends App {
      /*val c1: Complex[Real] = Complex(Real(1), Real(3))
      val c2: Complex[Real] = Complex(Real(2), Real(5))
      println(c1)*/
+     val c1: Complex[Int] = Complex(1,2)
 
      println(Real(23))
      println(Real(1) + Real(1))
-     println(Complex(1, 2) + Complex(3, 4))
+     println()
+     //println(Complex(1, 2) + Complex(3, 4))
 
 }
 

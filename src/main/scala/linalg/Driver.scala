@@ -1,37 +1,47 @@
-/*
-import numerics._
-import matrix._
-import vector._
+import spire.algebra.{Field, Trig}
+import spire.math._
 
 /**
-  *
   */
 object Driver {
 
+     //class Vector[N](elements: N*)
+
 
      def main(args: Array[String]) {
+          println(Rational(1, 2) + Rational(2, 3))
+
+          val r1 = Rational(4, 6)
+          val r2 = Rational(8, 3)
+          val c: Complex[Rational] = Complex(1/2, 4/5)
+
+          println(Complex(r1, r2*2) + Complex(r1, r1))
+          println(c) //not fractions ..? note
+          //println(Complex.polar[Rational](4, 30))
 
 
-          val mat1: Matrix[Real] = Matrix(
+
+          //val v: Vector[Rational] =
+
+          /*val mat1: Matrix[Real] = Matrix(
                Vector(1,1,8,-3,1),
                Vector(2,-4,8,5,-1),
                Vector(9,5,1,-7,0),
                Vector(10,7,2,-4,5)
           )
-          println(mat1)
+          println(mat1)*/
           //println(new QRDecomposition[Real](mat1))
      }
 }
 
 
 
-
+/*
 // todo:
 // 1) testing simple rref for square system
 // 2) testing non-square inverse using toRow sedenion (gauss-jordan)
 // 3) testing solving system (for a vector)
 
-/*
 
 
 //error fixed 1/3 on bottom
@@ -72,21 +82,21 @@ val mat4: Matrix[Rational] = Matrix(Vector(1,3,6), Vector(2, -1, 5), Vector(3, 0
 
 println("test 1: simple rref for square: " + mat1.reducedRowEchelon())
 println("\ntest 2: gauss jordan for non-square: " + mat2.reducedRowEchelon())
-println("\ntest 3: solving for system: " + mat3.reducedRowEchelon())*/
+println("\ntest 3: solving for system: " + mat3.reducedRowEchelon())
 
-/*val v1: Vector[Complex] = new Vector[Complex](Complex(1,2), Complex(2,0))
+val v1: Vector[Complex] = new Vector[Complex](Complex(1,2), Complex(2,0))
 val v2: Vector[Rational] = new Vector(Rational(1,2), Rational(2,4))
 zeroer(v1.get(0))
 zeroer(v2.get(0))
 def zeroer[N <: Number[N]: TypeTag](arg: N) = {
      println(Number.ZERO[N] + ", type: " + Number.ZERO[N].getClass.getSimpleName + "; insideType: " + arg.insideType)
-}*/
+}
 
 
 
 
 //todo 1) testing kernel
-/*val mat5A: VectorSet[Rational] = VectorSet(Vector[Rational](1,2),
+val mat5A: VectorSet[Rational] = VectorSet(Vector[Rational](1,2),
 Vector[Rational](-4,5), Vector[Rational](-9, -7))
 val z5: Vector[Rational] = Vector.ZERO[Rational](2)
 val aug = new AugmentedMatrix[Rational](mat5A, z5)
@@ -115,12 +125,12 @@ Console.println("mat3C: " + new NullSpace(mat3C).kernel())
 
 val mat3D: Matrix[Rational] = new Matrix(Vector[Rational](-3, 2, 4),
 Vector[Rational](1, 5, 8), Vector[Rational](-1, -7, -4))
-Console.println("mat3D: " + new NullSpace(mat3D).kernel())*/
+Console.println("mat3D: " + new NullSpace(mat3D).kernel())
 
 
 
 //todo 2) testing solve augmented matrix
-/*val mat1A: Matrix[Rational] = Matrix(Vector[Rational](1,2,-1), Vector[Rational](3,-1,2),
+val mat1A: Matrix[Rational] = Matrix(Vector[Rational](1,2,-1), Vector[Rational](3,-1,2),
      Vector[Rational](2,-1,1))
 val v1A: Vector[Rational] = Vector[Rational](5,1,3)
 val aug1A = new AugmentedMatrix[Rational](mat1A, v1A)
@@ -185,22 +195,21 @@ Console.println("1J: " + aug1J.solve())
 val mat: Matrix[Rational] = Matrix(Vector[Rational](1,2,0,2), Vector[Rational](3,6,0,6),
      Vector[Rational](-2,-5,5,0), Vector[Rational](0,-2,10,8), Vector[Rational](2,4,0,4),
      Vector[Rational](0,-3,15,18))
-Console.println(new NullSpace[Rational](mat).kernel())*/
+Console.println(new NullSpace[Rational](mat).kernel())
 
 //todo rowspace/colspace tester
-/*val mat1E: Matrix[Rational] = Matrix(
+val mat1E: Matrix[Rational] = Matrix(
                Vector[Rational](1,2,2,-1),
                Vector[Rational](-3,-6,-6,3),
                Vector[Rational](4, 9,9,-4),
                Vector[Rational](-2,-1,-1,2),
                Vector[Rational](5,8,9,-5),
-               Vector[Rational](4,2,7,-4))*/
+               Vector[Rational](4,2,7,-4))
 
 
 
 
 //todo 3) testing spanned methods now
-/*
 val vset: VectorSet[Rational] = new VectorSet(Vector[Rational](1,2,3), Vector[Rational](1,5,4),
 Vector[Rational](0,0,9))
 val uset: VectorSet[Rational] = new VectorSet(Vector[Rational](1,4,7), Vector[Rational](2,5,8),
@@ -225,5 +234,5 @@ val wset: VectorSet[Rational] = new VectorSet(Vector[Rational](9,4,-2), Vector[R
 Vector[Rational](3,3,1))
 val w = Vector[Rational](3,4,5)
 Console.println(wset.isSpanned(w))
-Console.println(wset.getSpanningCoefficients(w))*/
+Console.println(wset.getSpanningCoefficients(w))
 */
