@@ -26,9 +26,9 @@ trait Monoid[G] extends Group[G]
 trait AbelianGroup[G] extends Group[G] {
 
      // the associative operations
-     def +(that: G): G
+     def plus(x: G, y: G): G
      // For each a in G, there exists an element b in G such that a + b = b + a = 0.
-     def negate(): G
+     def negate(x: G): G
      // zero is identity for abelian: a + 0 = a
      protected def zero: G
 }
@@ -45,7 +45,7 @@ trait AbelianGroup[G] extends Group[G] {
 trait Ring[R] extends AbelianGroup[R] with Monoid[R] {
 
      //methods inherited: add,subtract,opposite,identity
-     def *(that: R): R
+     def times(x: R, y: R): R
 }
 
 
@@ -57,14 +57,14 @@ trait Ring[R] extends AbelianGroup[R] with Monoid[R] {
   * possess a multiplicative inverse. In addition, the multiplication operation
   * in a field is required to be commutative.
   */
-trait Field[F/* <: Field[F]*/] extends AbelianGroup[F] with Ring[F] with Monoid[F] {
+trait Field[F] extends Ring[F] {
 
      //methods inherited: add,subtract,opposite,identity
 
      //That is the same as this.multiply(that.inverse())
-     def /(that: F): F
+     def divide(x: F, y: F): F
      //For each a in F, there exists an element b in F such that a × b = b × a = 1.
-     def negate(): F
+     def inverse(x: F): F
 
      protected def one: F
 }

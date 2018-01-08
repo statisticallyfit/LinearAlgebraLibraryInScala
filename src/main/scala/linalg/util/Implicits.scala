@@ -10,9 +10,9 @@ import scala.language.implicitConversions
 
 
 object Implicits {
-     implicit def realToDouble(r: Real): Double = r.value
+     //implicit def realToDouble(r: Real): Double = r.value
 
-     implicit def complexToDouble[N <: Number[N]](complex: Complex[N]): Double = complex.toDouble
+     //implicit def complexToDouble[N <: Number[N]](complex: Complex[N]): Double = complex.toDouble
 
      /*implicit def doubleToGeneralN[N <: Number[N]](double: Double)(implicit n: Number[N]): N = {
 
