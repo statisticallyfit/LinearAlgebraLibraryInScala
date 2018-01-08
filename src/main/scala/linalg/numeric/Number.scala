@@ -69,7 +69,7 @@ trait Number[N <: Number[N]] extends Field[N] with Ordered[N] {
 object Number {
      def ZERO[N](implicit n: Number[N]): N = n.zero
      def ONE[N](implicit n: Number[N]): N = n.one
-     def TWO[N](implicit n: Number[N]): N = n.one + n.one //todo: to work, put N <: Number[N]
+     def TWO[N <: Number[N]](implicit n: Number[N]): N = n.one + n.one //todo: to work, put N <: Number[N]
      /*def ONE[N <: Number[N]](implicit n: Number[N]): N = n.one
      def TWO[N <: Number[N]](implicit n: Number[N]): N = n.one + n.one*/
 }
