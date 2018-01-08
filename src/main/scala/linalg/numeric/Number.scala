@@ -67,8 +67,8 @@ trait Number[N <: Number[N]] extends Field[N] with Ordered[N] {
 }
 
 object Number {
-     def ZERO[N](implicit n: Number[N]): N = n.zero
-     def ONE[N](implicit n: Number[N]): N = n.one
+     def ZERO[N <: Number[N]](implicit n: Number[N]): N = n.zero
+     def ONE[N <: Number[N]](implicit n: Number[N]): N = n.one
      def TWO[N <: Number[N]](implicit n: Number[N]): N = n.one + n.one //todo: to work, put N <: Number[N]
      /*def ONE[N <: Number[N]](implicit n: Number[N]): N = n.one
      def TWO[N <: Number[N]](implicit n: Number[N]): N = n.one + n.one*/
@@ -78,16 +78,17 @@ object Number {
 
 
 
-class Complex[N <: Number[N]](val re: N, val im: N)(implicit n: Number[N]) extends Number[Complex[N]] {
+class Complex[N <: Number[N]](val re: N, val im: N)/*(implicit n: Number[N])*/ extends Number[Complex[N]] {
 
+     implicit val n: Number[N] = implicitly[Number[N]]
 
      private val modulus: Double = abs().toDouble
      //math.sqrt(math.pow(re.toDouble, 2) + math.pow(im.toDouble, 2))
 
      //def zero: N = Number.ZERO[N]
-     protected def zero: Complex[N] = Complex.ZERO[N]
+     val zero: Complex[N] = Complex.ZERO[N]
      //def one: N = Number.ONE[N]
-     protected def one: Complex[N] = Complex.ONE[N] //todo which one???? above or this one? both types work ....!
+     val one: Complex[N] = Complex.ONE[N] //todo which one???? above or this one? both types work ....!
 
 
      def +(other: Complex[N]): Complex[N] = Complex[N](re + other.re, im + other.im)
@@ -96,17 +97,18 @@ class Complex[N <: Number[N]](val re: N, val im: N)(implicit n: Number[N]) exten
 
      def /(other: Complex[N]): Complex[N] = {
           val newNumerator: Complex[N] = this * other
-          val newDenominator: N = other.abs()
+          val newDenominator: N = other.abs().re
+          //todo
+          assert(other.abs().im.isZero)
 
           Complex(re / newDenominator, im / newDenominator)
      }
 
      def ^(exp: Complex[N]): Complex[N] = ???
 
-     //note - can also have return type 'N' because N <: Number[N].
-     def abs(): N =  (re^Number.TWO[N] + im^Number.TWO[N]).sqrt()
+     def abs(): Complex[N] =  Complex((re^Number.TWO[N] + im^Number.TWO[N]).sqrt(), Number.ZERO[N])
      //Complex[N] = Complex((re^Number.TWO[N] + im^Number.TWO[N]).sqrt(), Number.ZERO[N])
-     def sqrt(): N = ??? //call the roots of unity function with 1/2 as arg (make it have a Real arg)
+     def sqrt(): Complex[N] = ??? //call the roots of unity function with 1/2 as arg (make it have a Real arg)
 
      def negate(): Complex[N] = Complex(re.negate(), im.negate())
      def inverse(): Complex[N] = Complex.ZERO[N] / this
@@ -148,68 +150,44 @@ class Complex[N <: Number[N]](val re: N, val im: N)(implicit n: Number[N]) exten
 
           stringComplex
      }
-     //todo old code
-     /* val realTemp: Rational = Rational(real)
-     val imagTemp: Rational = Rational(imaginary)
-
-     if(realTemp.isZero && imagTemp.isZero) return "0"
-     if(imagTemp.isZero) return realTemp.toString
-
-     var imagStr: String = ""
-     var realStr: String = ""
-
-     if(realTemp.isZero){
-          //dealing with imag now
-          imagStr = if(imagTemp == -1) "-i"
-          else if(imagTemp == 1) "i"
-          else if(imagTemp.isNegative) imagTemp + "i"
-          else imagTemp + "i"
-     } else {
-          realStr = realTemp.toString
-          imagStr = if(imagTemp == -1) " - i"
-          else if(imagTemp == 1) " + i"
-          else if(imagTemp.isNegative) " - " + imagTemp.abs() + "i"
-          else " + " + imagTemp + "i"
-     }
-
-     realStr + imagStr
-       */
 }
 
 
 // note: the new thing: here I am just copying the methods from Numerical trait
 // using alternate object syntax for sake of prettiness.
-class Real(val value: Double)(implicit n: Number[Real]) extends Complex[Real](Real(value), Real(0))
+/*(implicit n: Number[Real])*/
+class Real(val value: Double) extends Complex[Real](Real(value), Real(0))
 
-class Rational(val num: Int, val denom: Int)(implicit n: Number[Real]) extends Real(num * 1.0 / denom)  {
+class Rational(val num: Int, val denom: Int)/*(implicit n: Number[Real])*/ extends Real(num * 1.0 / denom)  {
      override def toString: String = this.denom match {
           case 0 => num.toString
           case _ => num + " / " + denom
      }
 }
 
-class Natural(value: Int)(implicit n: Number[Real]) extends Rational(value, 1) { require(value > 0) }
+class Natural(value: Int)/*(implicit n: Number[Real])*/ extends Rational(value, 1) { require(value > 0) }
 
 
 // ---------------------
 
 object Real {
 
-     def ZERO[N](implicit n: Number[Real]): Real = new Real(0)
-     def ONE[N](implicit n: Number[Real]): Real = new Real(1)
-     /*val ZERO: Real = new Real(0)
-     val ONE: Real = new Real(1)*/
+     /*def ZERO[N](implicit n: Number[Real]): Real = new Real(0)
+     def ONE[N](implicit n: Number[Real]): Real = new Real(1)*/
+     val ZERO: Real = new Real(0)
+     val ONE: Real = new Real(1)
 
-     def apply(doubleValue: Double)(implicit n: Number[Real]) = new Real(doubleValue)
-     def unapply(real: Real)(implicit n: Number[Real]): Option[Double] = Some(real.value)
+     def apply(doubleValue: Double)/*(implicit n: Number[Real])*/ = new Real(doubleValue)
+     def unapply(real: Real)/*(implicit n: Number[Real])*/: Option[Double] = Some(real.value)
 
-     implicit def doubleToReal(d: Double)(implicit n: Number[Real]): Real = new Real(d)
-     implicit def intToReal(i: Int)(implicit n: Number[Real]): Real = new Real(i)
+     implicit def doubleToReal(d: Double)/*(implicit n: Number[Real])*/: Real = new Real(d)
+     implicit def intToReal(i: Int)/*(implicit n: Number[Real])*/: Real = new Real(i)
 }
 
 
 //object i extends Complex[Int](0, 1)
 object Complex {
+
 
      //todo use above object? else how to get in the type parameter?
      def i[N <: Number[N]](implicit n: Number[N]): Complex[N] = Complex(n.zero, n.one)
@@ -218,7 +196,8 @@ object Complex {
      def ZERO[N <: Number[N]](implicit n: Number[N]): Complex[N] = Complex(n.zero, n.zero)
 
      def apply[N <: Number[N]](re: N, im: N)(implicit n: Number[N]) = new Complex[N](re, im)
-     def unapply[N <: Number[N]](complex: Complex[N])(implicit n: Number[N]): Option[(N, N)] = Some(complex.re, complex.im)
+     def unapply[N <: Number[N]](complex: Complex[N])(implicit n: Number[N]): Option[(N, N)] =
+          Some(complex.re, complex.im)
 
 
      //todo
