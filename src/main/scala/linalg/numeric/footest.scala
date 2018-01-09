@@ -1,23 +1,35 @@
+import scala.language.implicitConversions
+
 
 object footest {
      //class LowerCase(val s: String)
 
-     implicit case class LowerCase(s: String) {
+     implicit class LowerCase(val s: String) {
           // Use `equals`, not `==`
+          def +(other: LowerCase): LowerCase = LowerCase(s + other.s)
+
           override def equals(that: Any) = that match {
                case t: LowerCase => t.s.equalsIgnoreCase(this.s)
                case _ => false
           }
 
-          override def toString() = s
+          override def toString: String = s
+
+          //def apply(s: String): LowerCase = new LowerCase(s)
      }
 
      def main(args: Array[String]) {
+
           val a = new LowerCase("a")
           val b = new LowerCase("b")
+          val e = LowerCase("e")
           println(a)
           println(a equals b)
+          println(e, a)
+          println(e + a)
      }
+
+
      /*trait Printer[T] {
           def print(t: T): String
      }

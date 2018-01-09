@@ -16,28 +16,6 @@ import scala.language.implicitConversions
   * todo: move Complex theta, polar ... functionality in same place with the main +, -, / code ...
   *
   */
-trait Show[S] {
-     def show(s: S): String
-}
-object Show {
-     implicit class ShowOps[S: Show](s: S) {
-          val ev: Show[S] = implicitly[Show[S]]
-
-          override def toString: String = ev.show(s)
-     }
-
-     implicit def ComplexAsShown[N: Number] = new Show[Complex[N]] {
-          def show(c: Complex[N]): String = c.re.toString + " + " + c.im.toString + "i"
-          //todo: tostrings for N - in the classes
-     }
-     implicit val RealShow = new Show[Real] {
-          def show(real: Real): String = real.value.toString
-     }
-     implicit val RationalShow = new Show[Rational] {
-          def show(rational: Rational): String = rational.num.toString + "/" + rational.den.toString
-     }
-}
-import Show._
 
 
 trait Number[N] extends Field[N] {
@@ -87,7 +65,7 @@ object Number {
           def isZero: Boolean = ev.isZero(current)
           def isNegative: Boolean = ev.isNegative(current)
           def isEqualTo(other: N): Boolean = ev.areEqual(current, other)
-          def compare(other: N): Int = ev.minus(current, other).toDouble.toInt
+          /*override*/ def compare(other: N): Int = ev.minus(current, other).toDouble.toInt
 
           def toDouble: Double = ev.doubleValue(current)
      }
@@ -146,7 +124,7 @@ object Number {
           def doubleValue(x: Double): Double = x
      }
 
-
+     //implicit class Complex[N : Number](re: N, im: N)
 
      implicit def ComplexNumber[N : Number] = new Number[Complex[N]]{
 
@@ -269,17 +247,14 @@ object Number {
 
 
 
-/*object Complex {
-     implicit def complexToString[N: Number](c: Complex[N]): String = implicitly[Show[N]].show(c)
-}*/
 
 
 case class Complex[N : Number](re: N, im: N){
 
-     val gen = implicitly[Number[N]]
-
-     //todo to put in compelx class?
-     def conjugate(): Complex[N] = Complex(re, im.negate())
+//     val gen = implicitly[Number[N]]
+//
+//     //todo to put in compelx class?
+//     def conjugate(): Complex[N] = Complex(re, im.negate())
      //def polar(): (N, N) = (, )
      //def rootsOfUnity(): Complex[N] = ???
      //todo  need to normalize for theta to be between -pi and pi?
