@@ -74,14 +74,16 @@ case class Rational(private val n: Int, private val d: Int){
 }*/
 
 //todo: make trait Trig, and Sqrt and mix in appropriately, not to all numbers.
-//todo make class Polar to interact with Complex. 
+//todo make class Polar to interact with Complex.
+//todo: decide about Show trait
+//todo: make ordering trait or use it - but how?
 
 
 
 
 object Number {
 
-     implicit class NumberOps[N : Number](current: N) {
+     implicit class NumberOps[N : Number](current: N) extends Ordered[N] {
           val ev = implicitly[Number[N]]
 
           def +(other: N): N = ev.plus(current, other)
@@ -99,14 +101,16 @@ object Number {
           def isZero: Boolean = ev.isZero(current)
           def isNegative: Boolean = ev.isNegative(current)
           def isEqualTo(other: N): Boolean = ev.areEqual(current, other)
+          def compare(other: N): Int = ev.minus(current, other).toDouble.toInt
 
           def toDouble: Double = ev.doubleValue(current)
      }
 
+
+
      implicit object IntNumber extends Number[Int] {
           val one: Int = 1
           val zero: Int = 0
-
 
           def plus(x: Int, y: Int): Int = x + y
           def times(x: Int, y: Int): Int = x * y
@@ -128,6 +132,8 @@ object Number {
 
           def doubleValue(x: Int): Double = x * 1.0
      }
+
+
 
      implicit object DoubleNumber extends Number[Double] {
           val one: Double = 1.0
@@ -153,6 +159,8 @@ object Number {
 
           def doubleValue(x: Double): Double = x
      }
+
+
 
      implicit def ComplexNumber[N : Number] = new Number[Complex[N]]{
 
@@ -193,6 +201,8 @@ object Number {
           def doubleValue(x: C): Double = absoluteValue(x).re.toDouble
      }
 
+
+
      implicit val RealNumber = new Number[Real] {
           val zero: Real = Real(0)
           val one: Real = Real(1)
@@ -215,6 +225,8 @@ object Number {
 
           def doubleValue(x: Real): Double = x.value
      }
+
+
 
      implicit val RationalNumber = new Number[Rational] {
           //val f: Fraction = Fraction.getFraction()
@@ -259,33 +271,6 @@ object Number {
 
           def doubleValue(x: Rational): Double = x.num * 1.0 / x.num
      }
-
-
-
-     /*implicit val NaturalNumber = new Number[Natural] {
-          val zero: Natural = Natural(0)
-          val one: Natural = Natural(1)
-
-          def plus(x: Natural, y: Natural): Natural = Natural(x.value + y.value)
-          def times(x: Natural, y: Natural): Natural = Natural(x.value * y.value)
-          def divide(x: Natural, y: Natural): Natural = Natural(x.value / y.value)
-
-          //the inner class can return abs(): N not abs(): Complex[N]
-          def power(x: Natural, y: Natural): Natural = Natural(math.pow(x.value, y.value).toInt)
-          def squareRoot(x: Natural): Natural = Natural(math.sqrt(x.value).toInt) //todo gets chopped off
-          def absoluteValue(x: Natural): Natural = Natural(math.abs(x.value))
-
-          def negate(x: Natural): Natural = Natural(-x.value)
-          //def inverse(x: Real): Real = divide(one, x)
-
-          //todo def compare(x: Natural): Int = (implicitly[Natural].value - x.value).toInt
-
-          def areEqual(x: Natural, y: Natural): Boolean = x.value == y.value
-          def isZero(x: Natural): Boolean = areEqual(x, zero)
-          def isNegative(x: Natural): Boolean = x.value < 0
-
-          def doubleValue(x: Natural): Double = x.value
-     }*/
 }
 
 
@@ -295,4 +280,5 @@ object NumberTester extends App {
      val c2: Complex[Int] = Complex(9, 3)
 
      println(c1 + c2)
+     println(c1 < c2)
 }
