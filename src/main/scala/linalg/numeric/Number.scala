@@ -71,7 +71,7 @@ object ImplicitNumberOps {
 
 
 
-case class Complex(re: Rational, im: Rational)
+case class Complex[N : Number](re: N, im: N)
 
 case class Real(value: Double){
      //override def toString: String = value.toString //todo why tostring doesn't work in NumberOps?
@@ -84,6 +84,7 @@ case class Natural(value: Int) { require(value > 0) }
 
 
 object Number {
+     import ImplicitNumberOps._
 
      implicit object IntNumber extends Number[Int] {
           def plus(x: Int, y: Int): Int = x + y
@@ -101,11 +102,11 @@ object Number {
      }
 
      // Now my own types: ------------------------------------------------
-     implicit val ComplexNumber = new Number[Complex] {
+     implicit def ComplexNumber[N : Number] = new Number[Complex[N]] {
 
-          def plus(x: Complex, y: Complex): Complex = Complex(x.re) //todo
+          def plus(x: Complex[N], y: Complex[N]): Complex[N] = Complex(x.re + y.re, x.im + y.im)
 
-          def asString(x: Complex): String = x.re + " + " + x.im + "i"//todo fix later
+          def asString(x: Complex[N]): String = x.re + " + " + x.im + "i"//todo fix later
      }
 
      implicit val RealNumber = new Number[Real] {
@@ -137,10 +138,18 @@ object Number {
      }*/
 }
 
+import ImplicitNumberOps._
+
+case class Vec[N : Number](elems: N*){
+     def +(other: Vec[N]): Vec[N] = Vec(elems.zip(other.elems).map(pair => pair._1 + pair._2):_*)
+
+     override def toString: String = {
+          
+     }
+}
 
 
 object NumberTester extends App {
-     import ImplicitNumberOps._
 
      /*val c1: Complex[Real] = Complex(Real(1), Real(3))
      val c2: Complex[Real] = Complex(Real(2), Real(5))
@@ -149,7 +158,11 @@ object NumberTester extends App {
 
      println(Real(23))
      println(Real(1) + Real(1))
-     println()
+     println(c1)
+     println(c1 + c1)
+     println(new Complex[Rational](Rational(1,2), Rational(3,4)))
+     println(Complex(1,2) + Complex(5,8))
+     println(Vec(1,2,3,4,5) + Vec(8,3,2,1,2))
      //println(Complex(1, 2) + Complex(3, 4))
 
 }
