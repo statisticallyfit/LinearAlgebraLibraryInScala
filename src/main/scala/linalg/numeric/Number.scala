@@ -41,6 +41,7 @@ trait Number[N] extends Field[N] {
      //compare?
 
      def doubleValue(x: N): Double
+     def show(x: N): String
 }
 
 import Number._
@@ -68,6 +69,7 @@ object Number {
           /*override*/ def compare(other: N): Int = ev.minus(current, other).toDouble.toInt
 
           def toDouble: Double = ev.doubleValue(current)
+          //override def toString: String = ev.show(current) //todo which this would work implicitly!
      }
 
 
@@ -95,6 +97,7 @@ object Number {
           //def compare(x: Int, y: Int) = x.compare(y)
 
           def doubleValue(x: Int): Double = x * 1.0
+          def show(x: Int): String = x.toString
      }
 
 
@@ -122,6 +125,7 @@ object Number {
           //def compare(x: Double, y: Double): Int = x.compare(y)
 
           def doubleValue(x: Double): Double = x
+          def show(x: Double): String = x.toString
      }
 
      //implicit class Complex[N : Number](re: N, im: N)
@@ -163,6 +167,7 @@ object Number {
           def isImaginary(x: C): Boolean = !isReal(x)
 
           def doubleValue(x: C): Double = absoluteValue(x).re.toDouble
+          def show(x: C): String = x.re.toString + " + " + x.im.toString + "i" //todo fix later
      }
 
 
@@ -188,6 +193,7 @@ object Number {
           def isNegative(x: Real): Boolean = x.value < 0
 
           def doubleValue(x: Real): Double = x.value
+          def show(x: Real): String = x.value.toString
      }
 
 
@@ -203,6 +209,7 @@ object Number {
 
           val zero: Rational = Rational(0, 1)
           val one: Rational = Rational(1, 1)
+
 
           def plus(x: Rational, y: Rational): Rational =
                Rational(x.num*y.den + y.num*x.den, x.den * y.den)
@@ -223,7 +230,7 @@ object Number {
                Rational(frac.getNumerator, frac.getDenominator)
           }
 
-          def absoluteValue(x: Rational): Rational = ??? // Rational(x.num.abs(), x.den.abs())
+          def absoluteValue(x: Rational): Rational = ??? //todo why error? Rational(x.num.abs(), x.den.abs())
 
           def negate(x: Rational): Rational = Rational(x.num.negate(), x.num.negate())
 
@@ -234,60 +241,33 @@ object Number {
           def isNegative(x: Rational): Boolean = x.num == 0
 
           def doubleValue(x: Rational): Double = x.num * 1.0 / x.num
+          def show(x: Rational): String = x.num.toString + "/" + x.den.toString //todo fix later.
      }
 }
 
-//ideas:
-// 1. make implicit def complex tostring with show function so whenever complex string is needed
-// we make the switch
-
-// 2. make show trait and override def tostring in implicit class and stick in show() for impl.
-
-// 3. override tostring in implicit class?
 
 
 
 
+case class Complex[N : Number](re: N, im: N) { override def toString = implicitly[Number[Complex[N]]].show(this) }
 
-case class Complex[N : Number](re: N, im: N){
+case class Real(value: Double) { override def toString = implicitly[Number[Real]].show(this) }
 
-//     val gen = implicitly[Number[N]]
-//
-//     //todo to put in compelx class?
-//     def conjugate(): Complex[N] = Complex(re, im.negate())
-     //def polar(): (N, N) = (, )
-     //def rootsOfUnity(): Complex[N] = ???
-     //todo  need to normalize for theta to be between -pi and pi?
-     //def theta(): Double = ??? //math.atan((im / re).toDouble) //todo: make a Trig trait with all trig functions ...
-
-
-     //todo fix later
-     //override def toString: String = re.toString + " + " + im.toString + "i"
-}
-
-case class Real(value: Double){
-     //override def toString: String = value.toString
-}
-
-case class Rational(private val n: Int, private val d: Int){
-     private val reduced: Fraction = Fraction.getFraction(n, d)
+class Rational(val num: Int, /*private */val den: Int) {
+     /*val reduced: Fraction = Fraction.getFraction(n, d)
      val num: Int = reduced.getNumerator
-     val den: Int = reduced.getDenominator
+     val den: Int = reduced.getDenominator*/
 
-     //todo fix later
-     //override def toString = num.toString + "/" + den.toString
+     override def toString = implicitly[Number[Rational]].show(this)
 }
-
-/*case class Natural(value: Int) {
-     //require(value > 0)
-     //todo how can do anything if value must > 0 ??
-
-     override def toString: String = value.toString
-}*/
-
-
-
-
+//todo: did not make Rational a case class since need to replace the apply method - decide if helps to auto reduce.
+object Rational {
+     implicit def apply(n: Int, d: Int): Rational = {
+          val reduced: Fraction = Fraction.getFraction(n, d)
+          new Rational(reduced.getNumerator, reduced.getDenominator)
+     }
+     def unapply(rational: Rational): Option[(Int, Int)] = Some(rational.num, rational.den)
+}
 
 
 
@@ -296,6 +276,12 @@ object NumberTester extends App {
      val c2: Complex[Int] = Complex(9, 3)
      val c3 = c1 + c2
 
-     println(c3)
+     println("got here")
+     //println(c3)
+     println(c1 + c2)
+     //println(c3)
      println(c1 < c2)
+
+     println(Rational(4, 8))
+     println(Rational(4, 8) + Rational(5, 15))
 }

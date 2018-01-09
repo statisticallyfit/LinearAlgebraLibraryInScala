@@ -3,6 +3,16 @@ import scala.language.implicitConversions
 
 object footest {
      //class LowerCase(val s: String)
+     trait Case[T] {
+          def isLower(x: T): Boolean
+     }
+     object Case {
+          implicit val LowerHasCase = new Case[LowerCase] {
+               def isLower(x: LowerCase): Boolean = true
+          }
+     }
+
+     //implicit class Compl[N: Case](re: N)
 
      implicit class LowerCase(val s: String) {
           // Use `equals`, not `==`
