@@ -3,7 +3,6 @@ package linalg.numeric
 
 import linalg.numeric
 import linalg.theory._
-import linalg.util.Show._
 import linalg.util._
 import org.apache.commons.lang3.math.Fraction
 
@@ -42,10 +41,25 @@ trait Number[N] {//extends Field[T] with Ordered[T] {
 }
 
 
-case class Complex[N : Number : Show](re: N, im: N)
-case class Real(value: Double)
-case class Rational(num: Int, denom: Int)
-case class Natural(value: Int) { require(value > 0) }
+case class Complex[N : Number](re: N, im: N) {
+     override def toString: String = re.toString + " + " + im.toString + "i" //todo fix later
+
+     //todo note: if im is rational (pattern-match) then use (3/4)i paranetheses around it. Or space between.
+}
+
+case class Real(value: Double) {
+     override def toString: String = value.toString
+}
+
+case class Rational(num: Int, denom: Int){
+     override def toString: String = num.toString + "/" + denom.toString //todo fix later
+}
+
+case class Natural(value: Int) {
+     require(value > 0)
+
+     override def toString: String = value.toString
+}
 
 
 
@@ -90,7 +104,7 @@ object Number {
      }
 
      // Now my own types: ------------------------------------------------
-     implicit def ComplexNumber[N : Number](implicit s: Show[N]) = new Number[Complex[N]] {
+     implicit def ComplexNumber[N : Number] = new Number[Complex[N]] {
 
           def plus(x: Complex[N], y: Complex[N]): Complex[N] = Complex(x.re + y.re, x.im + y.im)
 
@@ -130,7 +144,6 @@ case class Vec[N : Number](elems: N*){
 
 object NumberTester extends App {
      //import Number._
-     import Show._
 
      /*val c1: Complex[Real] = Complex(Real(1), Real(3))
      val c2: Complex[Real] = Complex(Real(2), Real(5))
@@ -139,14 +152,14 @@ object NumberTester extends App {
      val c2: Complex[Int] = Complex(8, 5)
      val c3: Complex[Int] = c1 + c2
 
-     println(Real(23).show)
-     println((Real(1) + Real(1)).show)
-     println(c1.show)
-     println(c2.show)
-     println(c3.show)
-     println((c1 + c2).show)
-     println((Complex[Rational](Rational(1,2), Rational(3,4))).show)
-     println((Complex(1,2) + Complex(5,8)).show)
+     println(Real(23))
+     println(Real(1) + Real(1))
+     println(c1)
+     println(c2)
+     println(c3)
+     println(c1 + c2)
+     println(Complex[Rational](Rational(1,2), Rational(3,4)))
+     println(Complex(1,2) + Complex(5,8))
      println(Vec(1,2,3,4,5) + Vec(8,3,2,1,2))
      //println(Complex(1, 2) + Complex(3, 4))
 

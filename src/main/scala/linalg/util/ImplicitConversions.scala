@@ -7,7 +7,7 @@ import org.apache.commons.lang3.math.Fraction
 import scala.language.implicitConversions
 
 
-trait Show[S] {
+/*trait Show[S] {
      def show(s: S): String
 }
 
@@ -32,7 +32,7 @@ object Show {
      implicit val NaturalString = new Show[Natural] {
           def show(s: Natural): String = s.value.toString
      }
-}
+}*/
 
 
 
