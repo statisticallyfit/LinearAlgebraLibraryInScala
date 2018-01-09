@@ -8,11 +8,9 @@ import scala.language.implicitConversions
 
 
 /**
-  * todo: make trait Trig, and Sqrt and mix in appropriately, not to all numbers.
+  * todo: make trait Trig, and mix in appropriately (decide if need it - complex: if must stay angle as N or as Double)
   * todo make class Polar to interact with Complex.
-  * todo: decide about Show trait
   *
-  * todo: move Rational frac reduction functionality in same place with the main +, -, / code ...
   * todo: move Complex theta, polar ... functionality in same place with the main +, -, / code ...
   *
   */
