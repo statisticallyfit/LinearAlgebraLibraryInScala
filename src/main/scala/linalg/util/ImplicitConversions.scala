@@ -3,13 +3,44 @@ package linalg.util
 import linalg.numeric._
 
 
-
 import org.apache.commons.lang3.math.Fraction
 import scala.language.implicitConversions
 
 
+trait Show[S] {
+     def show(s: S): String
+}
 
-object Implicits {
+object Show {
+
+     implicit class ShowOps[S](thing: S)(implicit ev: Show[S]){
+          def show: String = ev.show(thing)
+     }
+
+     implicit def ComplexString[N : Number : Show] = new Show[Complex[N]]{
+          def show(s: Complex[N]): String = s.re.show + " + " + s.im.show + "i" //todo fix later
+     }
+
+     implicit val RealString = new Show[Real] {
+          def show(s: Real): String = s.value.toString
+     }
+
+     implicit val RationalString = new Show[Rational] {
+          def show(s: Rational): String = s.num + " / " + s.denom //todo fix later
+     }
+
+     implicit val NaturalString = new Show[Natural] {
+          def show(s: Natural): String = s.value.toString
+     }
+}
+
+
+
+
+// ---------------------------------------------------------------------------------------------------
+
+
+object ImplicitConversions {
 
      implicit def intToRational(int: Int): Rational = Rational(int, 1)
 
@@ -17,24 +48,10 @@ object Implicits {
           val f: Fraction = Fraction.getFraction(double)
           Rational(f.getNumerator, f.getDenominator)
      }
-     //implicit def realToDouble(r: Real): Double = r.value
-
-     //implicit def complexToDouble[N <: Number[N]](complex: Complex[N]): Double = complex.toDouble
-
-     /*implicit def doubleToGeneralN[N <: Number[N]](double: Double)(implicit n: Number[N]): N = {
-
-          n match {
-               case _: Complex[N] =>
-               case _: Real => n.one
-
-          }
-     }*/
-
-     //note: all well and good but we won't ever find the combo of realnum + numerical, will we? Needs to be
-     // an actual class, and THAT is exactly what we can't get due to type issues.
-     /*implicit class RealExt(real: RealNum with Numerical[RealNum]) {
-          def +(that: RealNum): RealNum = new RealNum(real.value + that.value)
-     }*/
+     /*implicit def complexToString[N : Number](complex: Complex[N]): String = complex.show()
+     implicit def rationalToString(rational: Rational): String = rational.show()
+     implicit def realToString(real: Real): String = real.show()
+     implicit def naturalToString(natural: Natural): String = natural.show()*/
 }
 
 //package util

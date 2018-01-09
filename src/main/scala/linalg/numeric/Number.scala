@@ -1,26 +1,25 @@
 package linalg.numeric
 
 
+import linalg.numeric
 import linalg.theory._
-import linalg.util.Implicits._
-
-
+import linalg.util.Show._
+import linalg.util._
 import org.apache.commons.lang3.math.Fraction
+
 import scala.language.implicitConversions
 
 /**
   *
-  *
   */
 
-
-trait Number[T] {//extends Field[T] with Ordered[T] {
+trait Number[N] {//extends Field[T] with Ordered[T] {
 
      //inherited: add, multiply, divide, one, zero, negate, inverse
 //     val one: T
 //     val zero: T
 
-     def plus(x: T, y: T): T
+     def plus(x: N, y: N): N
      /*def minus(x: T, y: T): T
      def times(x: T, y: T): T
      def divide(x: T, y: T): T
@@ -36,18 +35,26 @@ trait Number[T] {//extends Field[T] with Ordered[T] {
      def isEqual(x: T, y: T): Boolean
      //compare?
 
-     def asDouble(x: T): Double*/
-     def asString(x: T): String
+     def toDouble(x: T): Double*/
+     //def toString(x: N)(implicit ev: Show[N]): String = x.show()
 
      //note: just for complex: isreal, isimaginary, polar, rootsofunity, theta, conjugate ...
 }
 
 
-object ImplicitNumberOps {
+case class Complex[N : Number : Show](re: N, im: N)
+case class Real(value: Double)
+case class Rational(num: Int, denom: Int)
+case class Natural(value: Int) { require(value > 0) }
 
-     implicit class NumberOps[T](current: T)(implicit ev: Number[T]) {
 
-          def +(other: T): T = ev.plus(current, other)
+
+object Number {
+     implicit class NumberOps[T : Number](current: T) {
+
+          val n = implicitly[Number[T]]
+
+          def +(other: T): T = n.plus(current, other)
           /*def -(other: T): T = ev.minus(current, other)
           def *(other: T): T = ev.times(current, other)
           def /(other: T): T = ev.divide(current, other)
@@ -64,54 +71,35 @@ object ImplicitNumberOps {
           def ==(other: T): Boolean = ev.isEqual(current, other)
 
           def toDouble: Double = ev.asDouble(current)*/
-          override def toString: String = ev.asString(current)
+          //override def toString: String = s.show(current)
      }
-}
-
-
-
-
-case class Complex[N : Number](re: N, im: N)
-
-case class Real(value: Double){
-     //override def toString: String = value.toString //todo why tostring doesn't work in NumberOps?
-}
-
-case class Rational(num: Int, denom: Int)
-
-case class Natural(value: Int) { require(value > 0) }
-
-
-
-object Number {
-     import ImplicitNumberOps._
 
      implicit object IntNumber extends Number[Int] {
           def plus(x: Int, y: Int): Int = x + y
-          def asString(x: Int): String = x.toString
+          //def toString(x: Int): String = x.toString
      }
 
      implicit object DoubleNumber extends Number[Double] {
           def plus(x: Double, y: Double): Double = x + y
-          def asString(x: Double): String = x.toString
+          //def toString(x: Double): String = x.toString
      }
 
      implicit object BigDecimalNumber extends Number[BigDecimal] {
           def plus(x: BigDecimal, y: BigDecimal): BigDecimal = x + y
-          def asString(x: BigDecimal): String = x.toString
+          //def toString(x: BigDecimal): String = x.toString
      }
 
      // Now my own types: ------------------------------------------------
-     implicit def ComplexNumber[N : Number] = new Number[Complex[N]] {
+     implicit def ComplexNumber[N : Number](implicit s: Show[N]) = new Number[Complex[N]] {
 
           def plus(x: Complex[N], y: Complex[N]): Complex[N] = Complex(x.re + y.re, x.im + y.im)
 
-          def asString(x: Complex[N]): String = x.re + " + " + x.im + "i"//todo fix later
+          //def toString(x: Complex[N]): String = x.re + " + " + x.im + "i"//todo fix later
      }
 
      implicit val RealNumber = new Number[Real] {
           def plus(x: Real, y: Real): Real = Real(x.value + y.value)
-          def asString(x: Real): String = x.value.toString
+          //def toString(x: Real): String = x.value.toString
      }
 
      implicit val RationalNumber = new Number[Rational] {
@@ -119,49 +107,46 @@ object Number {
           def plus(x: Rational, y: Rational): Rational =
                Rational(x.num*y.denom + y.num*x.denom, x.denom * y.denom)
 
-          def asString(x: Rational): String = x.num + " / " + x.denom //todo fix later
+          //def toString(x: Rational): String = x.num + " / " + x.denom //todo fix later
      }
 
      implicit val NaturalNumber = new Number[Natural] {
           def plus(x: Natural, y: Natural): Natural = Natural(x.value + y.value)
 
-          def asString(x: Natural): String = x.value.toString
+          //def toString(x: Natural): String = x.value.toString
      }
-
-     //---------------------------------------------------------------------
-     //todo - why doesn't this nor asString method work?
-     /*implicit class ComplexString(val complex: Complex) {
-          override def toString: String = complex.real + " + " + complex.imag + "i"
-     }
-     implicit class RealString(val real: Real) {
-          override def toString: String = real.value.toString
-     }*/
 }
 
-import ImplicitNumberOps._
+import Number._
 
 case class Vec[N : Number](elems: N*){
-     def +(other: Vec[N]): Vec[N] = Vec(elems.zip(other.elems).map(pair => pair._1 + pair._2):_*)
+     def +(other: Vec[N]): Vec[N] = Vec(elems.zip(other.elems).map(p => p._1 + p._2):_*)
 
-     override def toString: String = {
-          
-     }
+     /*override def toString: String = {
+
+     }*/
 }
 
 
 object NumberTester extends App {
+     //import Number._
+     import Show._
 
      /*val c1: Complex[Real] = Complex(Real(1), Real(3))
      val c2: Complex[Real] = Complex(Real(2), Real(5))
      println(c1)*/
      val c1: Complex[Int] = Complex(1,2)
+     val c2: Complex[Int] = Complex(8, 5)
+     val c3: Complex[Int] = c1 + c2
 
-     println(Real(23))
-     println(Real(1) + Real(1))
-     println(c1)
-     println(c1 + c1)
-     println(new Complex[Rational](Rational(1,2), Rational(3,4)))
-     println(Complex(1,2) + Complex(5,8))
+     println(Real(23).show)
+     println((Real(1) + Real(1)).show)
+     println(c1.show)
+     println(c2.show)
+     println(c3.show)
+     println((c1 + c2).show)
+     println((Complex[Rational](Rational(1,2), Rational(3,4))).show)
+     println((Complex(1,2) + Complex(5,8)).show)
      println(Vec(1,2,3,4,5) + Vec(8,3,2,1,2))
      //println(Complex(1, 2) + Complex(3, 4))
 
