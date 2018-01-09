@@ -2,10 +2,42 @@ package linalg.numeric
 
 
 import linalg.theory._
-import linalg.util._
 import org.apache.commons.lang3.math.Fraction
 
 import scala.language.implicitConversions
+
+
+/**
+  * todo: make trait Trig, and Sqrt and mix in appropriately, not to all numbers.
+  * todo make class Polar to interact with Complex.
+  * todo: decide about Show trait
+  *
+  * todo: move Rational frac reduction functionality in same place with the main +, -, / code ...
+  * todo: move Complex theta, polar ... functionality in same place with the main +, -, / code ...
+  *
+  */
+trait Show[S] {
+     def show(s: S): String
+}
+object Show {
+     implicit class ShowOps[S: Show](s: S) {
+          val ev: Show[S] = implicitly[Show[S]]
+
+          override def toString: String = ev.show(s)
+     }
+
+     implicit def ComplexAsShown[N: Number] = new Show[Complex[N]] {
+          def show(c: Complex[N]): String = c.re.toString + " + " + c.im.toString + "i"
+          //todo: tostrings for N - in the classes
+     }
+     implicit val RealShow = new Show[Real] {
+          def show(real: Real): String = real.value.toString
+     }
+     implicit val RationalShow = new Show[Rational] {
+          def show(rational: Rational): String = rational.num.toString + "/" + rational.den.toString
+     }
+}
+import Show._
 
 
 trait Number[N] extends Field[N] {
@@ -34,52 +66,6 @@ trait Number[N] extends Field[N] {
 }
 
 import Number._
-
-
-
-case class Complex[N : Number](re: N, im: N){
-
-     val gen = implicitly[Number[N]]
-
-     //todo to put in compelx class?
-     def conjugate(): Complex[N] = Complex(re, im.negate())
-     //def polar(): (N, N) = (, )
-     //def rootsOfUnity(): Complex[N] = ???
-     //todo  need to normalize for theta to be between -pi and pi?
-     //def theta(): Double = ??? //math.atan((im / re).toDouble) //todo: make a Trig trait with all trig functions ...
-
-
-     //todo fix later
-     override def toString: String = re.toString + " + " + im.toString + "i"
-}
-
-case class Real(value: Double){
-     override def toString: String = value.toString
-}
-
-case class Rational(private val n: Int, private val d: Int){
-     private val reduced: Fraction = Fraction.getFraction(n, d)
-     val num: Int = reduced.getNumerator
-     val den: Int = reduced.getDenominator
-
-     //todo fix later
-     override def toString = num.toString + "/" + den.toString
-}
-
-/*case class Natural(value: Int) {
-     //require(value > 0)
-     //todo how can do anything if value must > 0 ??
-
-     override def toString: String = value.toString
-}*/
-
-//todo: make trait Trig, and Sqrt and mix in appropriately, not to all numbers.
-//todo make class Polar to interact with Complex.
-//todo: decide about Show trait
-//todo: make ordering trait or use it - but how?
-
-
-
 
 object Number {
 
@@ -273,12 +259,68 @@ object Number {
      }
 }
 
+//ideas:
+// 1. make implicit def complex tostring with show function so whenever complex string is needed
+// we make the switch
+
+// 2. make show trait and override def tostring in implicit class and stick in show() for impl.
+
+// 3. override tostring in implicit class?
+
+
+
+/*object Complex {
+     implicit def complexToString[N: Number](c: Complex[N]): String = implicitly[Show[N]].show(c)
+}*/
+
+
+case class Complex[N : Number](re: N, im: N){
+
+     val gen = implicitly[Number[N]]
+
+     //todo to put in compelx class?
+     def conjugate(): Complex[N] = Complex(re, im.negate())
+     //def polar(): (N, N) = (, )
+     //def rootsOfUnity(): Complex[N] = ???
+     //todo  need to normalize for theta to be between -pi and pi?
+     //def theta(): Double = ??? //math.atan((im / re).toDouble) //todo: make a Trig trait with all trig functions ...
+
+
+     //todo fix later
+     //override def toString: String = re.toString + " + " + im.toString + "i"
+}
+
+case class Real(value: Double){
+     //override def toString: String = value.toString
+}
+
+case class Rational(private val n: Int, private val d: Int){
+     private val reduced: Fraction = Fraction.getFraction(n, d)
+     val num: Int = reduced.getNumerator
+     val den: Int = reduced.getDenominator
+
+     //todo fix later
+     //override def toString = num.toString + "/" + den.toString
+}
+
+/*case class Natural(value: Int) {
+     //require(value > 0)
+     //todo how can do anything if value must > 0 ??
+
+     override def toString: String = value.toString
+}*/
+
+
+
+
+
 
 
 object NumberTester extends App {
      val c1: Complex[Int] = Complex(8, 2)
      val c2: Complex[Int] = Complex(9, 3)
+     val c3 = c1 + c2
 
-     println(c1 + c2)
+     println(c3)
      println(c1 < c2)
 }
