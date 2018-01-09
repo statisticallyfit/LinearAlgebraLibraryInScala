@@ -42,12 +42,12 @@ object Show {
 
 object ImplicitConversions {
 
-     implicit def intToRational(int: Int): Rational = Rational(int, 1)
+     /*implicit def intToRational(int: Int): Rational = Rational(int, 1)
 
      implicit def doubleToRational(double: Double): Rational ={
           val f: Fraction = Fraction.getFraction(double)
           Rational(f.getNumerator, f.getDenominator)
-     }
+     }*/
      /*implicit def complexToString[N : Number](complex: Complex[N]): String = complex.show()
      implicit def rationalToString(rational: Rational): String = rational.show()
      implicit def realToString(real: Real): String = real.show()

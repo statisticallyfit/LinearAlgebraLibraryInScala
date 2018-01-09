@@ -64,7 +64,7 @@ trait Field[F] extends Ring[F] {
      //That is the same as this.multiply(that.inverse())
      def divide(x: F, y: F): F
      //For each a in F, there exists an element b in F such that a × b = b × a = 1.
-     def inverse(x: F): F
+     def inverse(x: F): F = divide(one, x)
 
      protected def one: F
 }
