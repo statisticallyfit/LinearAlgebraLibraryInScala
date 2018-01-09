@@ -253,21 +253,21 @@ case class Complex[N : Number](re: N, im: N) { override def toString = implicitl
 
 case class Real(value: Double) { override def toString = implicitly[Number[Real]].show(this) }
 
-class Rational(val num: Int, /*private */val den: Int) {
-     /*val reduced: Fraction = Fraction.getFraction(n, d)
+case class Rational(private val n: Int, private val d: Int) {
+     val reduced: Fraction = Fraction.getFraction(n, d).reduce()
      val num: Int = reduced.getNumerator
-     val den: Int = reduced.getDenominator*/
+     val den: Int = reduced.getDenominator
 
      override def toString = implicitly[Number[Rational]].show(this)
 }
 //todo: did not make Rational a case class since need to replace the apply method - decide if helps to auto reduce.
-object Rational {
-     implicit def apply(n: Int, d: Int): Rational = {
-          val reduced: Fraction = Fraction.getFraction(n, d)
+/*object Rational {
+     def apply(n: Int, d: Int): Rational = {
+          val reduced: Fraction = Fraction.getFraction(n, d).reduce()
           new Rational(reduced.getNumerator, reduced.getDenominator)
      }
      def unapply(rational: Rational): Option[(Int, Int)] = Some(rational.num, rational.den)
-}
+}*/
 
 
 
@@ -282,6 +282,6 @@ object NumberTester extends App {
      //println(c3)
      println(c1 < c2)
 
-     println(Rational(4, 8))
+     println(new Rational(4, 8))
      println(Rational(4, 8) + Rational(5, 15))
 }
