@@ -45,17 +45,16 @@ trait Number[N] extends Field[N] {
      def isZero(x: N): Boolean
      def isNegative(x: N): Boolean
      def areEqual(x: N, y: N): Boolean
-     //compare?
 
      def doubleValue(x: N): Double
 }
 
 trait RealNumber[R] extends Number[R]
 
-/*trait Show[S] {
+trait Show[S] {
 
      def show(x: S): String
-}*/
+}
 
 
 object Number {
@@ -84,15 +83,15 @@ object Number {
      }
 
 
-     /*implicit class ShowOps[S: Show](current: S) {
+     implicit class ShowOps[S: Show](current: S) {
           val ev = implicitly[Show[S]]
 
           def show: String = ev.show(current)
-     }*/
+     }
 
 
 
-     implicit object IntIsRealNumber extends RealNumber[Int] /*with Show[Int] */{
+     implicit object IntIsRealNumber extends RealNumber[Int] with Show[Int] {
           val one: Int = 1
           val zero: Int = 0
 
@@ -120,7 +119,7 @@ object Number {
 
 
 
-     implicit object DoubleIsRealNumber extends RealNumber[Double] /*with Show[Double]*/ {
+     implicit object DoubleIsRealNumber extends RealNumber[Double] with Show[Double] {
           val one: Double = 1.0
           val zero: Double = 0.0
 
@@ -148,7 +147,7 @@ object Number {
 
      //implicit class Complex[N : Number](re: N, im: N)
 
-     implicit def ComplexIsNumber[R : RealNumber] = new Number[Complex[R]] /*with Show[Complex[R]]*/ {
+     implicit def ComplexIsNumber[R : RealNumber] = new Number[Complex[R]] with Show[Complex[R]] {
 
 
           type C = Complex[R]
@@ -168,7 +167,7 @@ object Number {
                Complex(x.re / newDenominator, x.im / newDenominator)
           }
 
-          //todo the inner class can return abs(): N not abs(): Complex[N] ?????????????
+          //todo the inner class can return abs(): N not abs(): Complex[N] ????????????? or make them return DOUBLE.
           def power(x: C, y: C): C = ???
           def squareRoot(x: C): C = ???
           //todo can the inner class return abs(): N ?
@@ -193,7 +192,7 @@ object Number {
 
      //todo: weird "can't find type $anon" error when this is implicit val - change to object and it works ?
 
-     implicit object RealIsNumber extends RealNumber[Real] /*with Show[Real]*/ {
+     implicit object RealIsNumber extends RealNumber[Real] with Show[Real] {
           val zero: Real = Real(0)
           val one: Real = Real(1)
 
@@ -219,7 +218,7 @@ object Number {
 
 
 
-     implicit object RationalIsRealNumber extends RealNumber[Rational] /*with Show[Rational]*/ {
+     implicit object RationalIsRealNumber extends RealNumber[Rational] with Show[Rational] {
 
           val zero: Rational = Rational(0, 1)
           val one: Rational = Rational(1, 1)
@@ -273,16 +272,16 @@ import Number._
 
 
 
-private[numeric] sealed trait ComplexNumberBuilder[T]{
+/*private[numeric] sealed trait ComplexNumberBuilder[T]{
      val re: T
      val im: T
-}
+}*/
 
 case class Complex[R:RealNumber](re:R, im:R) /*extends ComplexNumberBuilder[R]*/ {
      //private val ev: Number[Complex[R]] = implicitly[Number[Complex[R]]]
-     //private val s: Show[Complex[R]] = implicitly[Show[Complex[R]]]
 
-     override def toString = re.toString + " + " + im.toString + "i" //todo fix later
+     override def toString: String = Complex(re, im).show
+     //re.toString + " + " + im.toString + "i" // todo fix later
 }
 
 case class Real(double: Double) /*extends ComplexNumberBuilder[Real]*/ {
@@ -291,7 +290,7 @@ case class Real(double: Double) /*extends ComplexNumberBuilder[Real]*/ {
 
      //private val s: Show[Real] = implicitly[Show[Real]]
 
-     override def toString = double.toString //
+     override def toString = Real(double).show //double.toString //
 
      //todo - this asinstnace of cast seems patchy and weird ...?? -- use either 'this' or 'double' - ok?
      //implicit def +[R: RealNumber](imaginary: Imaginary[R]): Complex[R] = Complex(this.asInstanceOf[R], imaginary.im)
@@ -315,7 +314,7 @@ case class Rational(private val n: Int, private val d: Int) /*extends Real(n * 1
 
      //private val s: Show[Rational] = implicitly[Show[Rational]]
 
-     override def toString = num.toString + "/" + den.toString //.show(this)
+     override def toString: String = Rational(num, den).show // num.toString + "/" + den.toString //.show(this)
 }
 
 
