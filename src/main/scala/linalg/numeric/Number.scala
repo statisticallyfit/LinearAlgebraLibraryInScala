@@ -15,9 +15,12 @@ import scala.language.implicitConversions
   * todo: move Complex theta, polar ... functionality in same place with the main +, -, / code ...
   *
   * todo: interoperability: Complex + Real + Rational + Int + Double --- towrk
-  * todo: interoperability: 4 + 3*i notation should work.
   *
-  *
+  * Features:
+  * - rational number reducability upon creation
+  * - complex number .i creation
+  * - complex numbers can have rational arguments too, anything that implements the RealNumber typeclass.
+  * - printing occurs via neat Show trait, just like in Haskell.
   *
   *
   * note: Source for complex .i accessor:
@@ -61,6 +64,17 @@ object Show {
 
           def show: String = ev.show(current)
      }
+
+     implicit object IntHasShow extends Show[Int] {def show(x: Int): String = x.toString}
+     implicit object DoubleHasShow extends Show[Double] {def show(x: Double): String = x.toString}
+     implicit object RealHasShow extends Show[Real] { def show(x: Real): String = x.double.toString }
+     implicit object RationalHasShow extends Show[Rational] {
+          def show(x: Rational): String = x.num.toString + "/" + x.den.toString //todo fix later
+     }
+
+     implicit def ComplexHasShow[R : RealNumber] = new Show[Complex[R]] {
+          def show(x: Complex[R]): String = x.re.toString + " + " + x.im.toString + "i" //todo fix later
+     }
 }
 import Show._
 
@@ -92,7 +106,7 @@ object Number {
 
 
 
-     implicit object IntIsRealNumber extends RealNumber[Int] with Show[Int] {
+     implicit object IntIsRealNumber extends RealNumber[Int] /*with Show[Int]*/ {
           val one: Int = 1
           val zero: Int = 0
 
@@ -105,22 +119,17 @@ object Number {
           def absoluteValue(x: Int): Int = math.abs(x)
 
           def negate(x: Int): Int = -x
-          //def inverse(x: Int): Int = 1 / x //note won't get a reciprocal ...
 
           def isZero(x: Int): Boolean = x == 0
           def isNegative(x: Int): Boolean = x < 0
           def areEqual(x: Int, y: Int): Boolean = x == y
 
-          //def compare(x: Int) = minus(implicitly[Int], x)
-          //def compare(x: Int, y: Int) = x.compare(y)
-
           def doubleValue(x: Int): Double = x * 1.0
-          def show(x: Int): String = x.toString
      }
 
 
 
-     implicit object DoubleIsRealNumber extends RealNumber[Double] with Show[Double] {
+     implicit object DoubleIsRealNumber extends RealNumber[Double] /*with Show[Double]*/ {
           val one: Double = 1.0
           val zero: Double = 0.0
 
@@ -133,23 +142,18 @@ object Number {
           def absoluteValue(x: Double): Double = math.abs(x)
 
           def negate(x: Double): Double = -x
-          //def inverse(x: Double): Double = 1 / x //note won't get a reciprocal ...
 
           def isZero(x: Double): Boolean = x == 0
           def isNegative(x: Double): Boolean = x < 0
           def areEqual(x: Double, y: Double): Boolean = x == y
 
-          //def compare(x: Double) = implicitly[Number[Double]].compare(x)
-          //def compare(x: Double, y: Double): Int = x.compare(y)
-
           def doubleValue(x: Double): Double = x
-          def show(x: Double): String = x.toString
+          //def show(x: Double): String = x.toString
      }
 
-     //implicit class Complex[N : Number](re: N, im: N)
 
-     implicit def ComplexIsNumber[R : RealNumber] = new Number[Complex[R]] with Show[Complex[R]] {
 
+     implicit def ComplexIsNumber[R : RealNumber] = new Number[Complex[R]] /*with Show[Complex[R]]*/ {
 
           type C = Complex[R]
           val gen = implicitly[RealNumber[R]]
@@ -176,10 +180,6 @@ object Number {
 
           def negate(x: C): C = Complex(x.re.negate(), x.im.negate())
 
-          //todo how to mix in Ordered/Ordering? none fits the bill.
-          /*def compare(x: C): Int = (toDouble(implicitly[C]) - toDouble(x)).toInt
-          def compare(x: C, y: C): Int = x.compare(y)*/
-
           def areEqual(x: C, y: C): Boolean = gen.areEqual(x.re, y.re) && gen.areEqual(x.im, y.im)
           def isZero(x: C): Boolean = areEqual(x, zero)
           def isNegative(x: C): Boolean = x.re.isNegative && x.im.isNegative
@@ -187,13 +187,13 @@ object Number {
           def isImaginary(x: C): Boolean = !isReal(x)
 
           def doubleValue(x: C): Double = absoluteValue(x).re.toDouble
-          def show(x: C): String = x.re.toString + " + " + x.im.toString + "i" //todo fix later
+          //def show(x: C): String = x.re.toString + " + " + x.im.toString + "i"
      }
 
 
      //todo: weird "can't find type $anon" error when this is implicit val - change to object and it works ?
 
-     implicit object RealIsNumber extends RealNumber[Real] with Show[Real] {
+     implicit object RealIsNumber extends RealNumber[Real] /*with Show[Real]*/ {
           val zero: Real = Real(0)
           val one: Real = Real(1)
 
@@ -208,18 +208,17 @@ object Number {
 
           def negate(x: Real): Real = Real(-x.double)
 
-          ///todo   def compare(x: Real): Int = (implicitly[Real].value - x.value).toInt
           def areEqual(x: Real, y: Real): Boolean = x.double == y.double
           def isZero(x: Real): Boolean = areEqual(x, zero)
           def isNegative(x: Real): Boolean = x.double < 0
 
           def doubleValue(x: Real): Double = x.double
-          def show(x: Real): String = x.double.toString
+          //def show(x: Real): String = x.double.toString
      }
 
 
 
-     implicit object RationalIsRealNumber extends RealNumber[Rational] with Show[Rational] {
+     implicit object RationalIsRealNumber extends RealNumber[Rational] /*with Show[Rational]*/ {
 
           val zero: Rational = Rational(0, 1)
           val one: Rational = Rational(1, 1)
@@ -244,22 +243,22 @@ object Number {
                Rational(frac.getNumerator, frac.getDenominator)
           }
 
-          def absoluteValue(x: Rational): Rational = ??? //todo why error? Rational(x.num.abs(), x.den.abs())
+          def absoluteValue(x: Rational): Rational = Rational(math.abs(x.num), math.abs(x.den))
 
           def negate(x: Rational): Rational = Rational(x.num.negate(), x.num.negate())
-
-          //todo def compare(x: Rational): Int = (toDouble(implicitly[Rational]) - toDouble(x)).toInt
 
           def areEqual(x: Rational, y: Rational): Boolean = x.num == y.num && x.num == y.num
           def isZero(x: Rational): Boolean = areEqual(x, zero)
           def isNegative(x: Rational): Boolean = x.num == 0
 
           def doubleValue(x: Rational): Double = x.num * 1.0 / x.num
-          def show(x: Rational): String = x.num.toString + "/" + x.den.toString //todo fix later.
+          //def show(x: Rational): String = x.num.toString + "/" + x.den.toString
      }
 
 
-     ///---------------
+     ///---------------------------------------------------------------------------------------------
+     //note: removing the 'extends AnyVal' finally fixed all my problems!!!
+
      implicit class ToImaginary[R : RealNumber](private val imaginaryPart: R) /*extends AnyVal*/ {
           def i: Imaginary[R] = Imaginary(imaginaryPart)
      }
@@ -289,12 +288,7 @@ case class Real(double: Double) extends ComplexNumberCreator[Real] {
      val re: Real = Real(double)
      val im: Real = Real.ZERO
 
-     //private val s: Show[Real] = implicitly[Show[Real]]
-
-     override def toString = Real(double).show //double.toString //
-
-     //todo - this asinstnace of cast seems patchy and weird ...?? -- use either 'this' or 'double' - ok?
-     //implicit def +[R: RealNumber](imaginary: Imaginary[R]): Complex[R] = Complex(this.asInstanceOf[R], imaginary.im)
+     override def toString = Real(double).show
 }
 
 case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexNumberCreator[R] {
@@ -313,9 +307,7 @@ case class Rational(private val n: Int, private val d: Int) /*extends Real(n * 1
      val num: Int = reduced.getNumerator
      val den: Int = reduced.getDenominator
 
-     //private val s: Show[Rational] = implicitly[Show[Rational]]
-
-     override def toString: String = Rational(num, den).show // num.toString + "/" + den.toString //.show(this)
+     override def toString: String = Rational(num, den).show
 }
 
 
@@ -324,9 +316,7 @@ case class Rational(private val n: Int, private val d: Int) /*extends Real(n * 1
 object Complex {
      def ZERO[R](implicit gen: RealNumber[R]): Complex[R] = new Complex(gen.zero, gen.zero)
      def ONE[R](implicit gen: RealNumber[R]): Complex[R] = new Complex(gen.one, gen.zero)
-     //def i[N](implicit gen: RealNumber[N]): Complex[N] = Complex(gen.zero, gen.one)
 
-     //additional apply method - cannot override the automatically created one. Complex(_,_)
      def apply[R](realPart: R)(implicit gen: RealNumber[R]) = new Complex(realPart, gen.zero)
 
      /** --- Implicits --- */
@@ -378,7 +368,7 @@ object NumberTester extends App {
 
 
 //     println(Complex(Rational(1,2), new Real(3)))
-//     println(Complex(1, Rational(1,4)))
+//     println(Complex(1, Rational(1,4))) //todo interoperability aspect.
 
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i
      val b: Complex[Int] = 3 + 5.i
