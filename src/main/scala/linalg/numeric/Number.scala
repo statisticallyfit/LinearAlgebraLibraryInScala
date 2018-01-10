@@ -55,6 +55,14 @@ trait Show[S] {
 
      def show(x: S): String
 }
+object Show {
+     implicit class ShowOps[S: Show](current: S) {
+          val ev = implicitly[Show[S]]
+
+          def show: String = ev.show(current)
+     }
+}
+import Show._
 
 
 object Number {
@@ -80,13 +88,6 @@ object Number {
           /*override*/ def compare(other: N): Int = ev.minus(current, other).toDouble.toInt
 
           def toDouble: Double = ev.doubleValue(current)
-     }
-
-
-     implicit class ShowOps[S: Show](current: S) {
-          val ev = implicitly[Show[S]]
-
-          def show: String = ev.show(current)
      }
 
 
