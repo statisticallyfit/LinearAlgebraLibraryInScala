@@ -51,10 +51,10 @@ case class Vec[N : spire.algebra.Field](elems: N*){
 }*/
 
 
-trait Number[R <: N, N] extends Field[N] /*with Field[R]*/ {
+trait Number[N] extends Field[N] /*with Field[R]*/ {
 
      //inherited: add, multiply, divide, one, zero, negate, inverse
-     def one: N
+     /*def one: N
      def zero: N
 
      def plus(x: N, y: R): N
@@ -72,8 +72,12 @@ trait Number[R <: N, N] extends Field[N] /*with Field[R]*/ {
      def isNegative(x: N): Boolean
      def areEqual(x: N, y: N): Boolean
 
-     def doubleValue(x: N): Double
-     /*def plus(x: N, y: N): N
+     def doubleValue(x: N): Double*/
+
+     def one: N
+     def zero: N
+
+     def plus(x: N, y: N): N
      def minus(x: N, y: N): N = plus(x, negate(y))
      def times(x: N, y: N): N
      def divide(x: N, y: N): N
@@ -88,25 +92,33 @@ trait Number[R <: N, N] extends Field[N] /*with Field[R]*/ {
      def isNegative(x: N): Boolean
      def areEqual(x: N, y: N): Boolean
 
-     def doubleValue(x: N): Double*/
+     def doubleValue(x: N): Double
 }
 
-trait RealNumber[R <: N, N] extends Number[R, N]
+trait RealNumber[R] extends Number[R]
 
 
 
 object Number {
 
-     implicit class NumberOps[R <: N, N](current: N)(implicit n: Number[R, N]) /*extends Ordered[N]*/ {
-          //private val n = implicitly[Number[R, N]]
+     //todo implement Ordered trait for all number types to save me from having to depend onthis line.
+     
+     implicit class NumberOps[N: Number](current: N) /*extends Ordered[N]*/ {
+          private val n = implicitly[Number[N]]
           //private val r = implicitly[RealNumber[R]]
           //private val c = implicitly[Number[Complex[R]]]
 
-          def +(other: R): N = n.plus(current, other)
+          /*def +(other: R): N = n.plus(current, other)
           def -(other: R): N = n.minus(current, other)
           def *(other: R): N = n.times(current, other)
           def /(other: R): N = n.divide(current, other)
-          def ^(expo: R): N = n.power(current, expo)
+          def ^(expo: R): N = n.power(current, expo)*/
+
+          def +(other: N): N = n.plus(current, other)
+          def -(other: N): N = n.minus(current, other)
+          def *(other: N): N = n.times(current, other)
+          def /(other: N): N = n.divide(current, other)
+          def ^(expo: N): N = n.power(current, expo)
 
           def sqrt(): N = n.squareRoot(current)
           def abs(): N = n.absoluteValue(current)
@@ -117,7 +129,7 @@ object Number {
           def isZero: Boolean = n.isZero(current)
           def isNegative: Boolean = n.isNegative(current)
           def isEqualTo(other: N): Boolean = n.areEqual(current, other)
-          def compare(other: R): Int = n.minus(current, other).toDouble.toInt //todo
+          def compare(other: N): Int = n.minus(current, other).toDouble.toInt //todo
 
           def toDouble: Double = n.doubleValue(current)
      }
@@ -125,10 +137,10 @@ object Number {
 
 
 
-     implicit def ComplexIsNumber[R <: N, N](implicit gen: RealNumber[R, N]) = new Number[R, Complex[R]]  {
+     implicit def ComplexIsNumber[R : RealNumber] = new Number[Complex[R]]  {
 
           type C = Complex[R]
-          ///val gen = implicitly[RealNumber[R, Complex[R]]]
+          val gen = implicitly[RealNumber[R]]
 
           val zero: C = Complex(gen.zero, gen.zero)
           val one: C = Complex(gen.one, gen.zero)
