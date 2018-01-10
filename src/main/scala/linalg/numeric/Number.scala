@@ -84,7 +84,7 @@ object Number {
 
 
 
-     implicit object IntIsRealNumber extends RealNumber[Int] /*with Show[Int]*/ {
+     implicit object IntIsRealNumber extends RealNumber[Int]  {
           val one: Int = 1
           val zero: Int = 0
 
@@ -107,7 +107,7 @@ object Number {
 
 
 
-     implicit object DoubleIsRealNumber extends RealNumber[Double] /*with Show[Double]*/ {
+     implicit object DoubleIsRealNumber extends RealNumber[Double]  {
           val one: Double = 1.0
           val zero: Double = 0.0
 
@@ -126,12 +126,11 @@ object Number {
           def areEqual(x: Double, y: Double): Boolean = x == y
 
           def doubleValue(x: Double): Double = x
-          //def show(x: Double): String = x.toString
      }
 
 
 
-     implicit def ComplexIsNumber[R : RealNumber] = new Number[Complex[R]] /*with Show[Complex[R]]*/ {
+     implicit def ComplexIsNumber[R : RealNumber] = new Number[Complex[R]]  {
 
           type C = Complex[R]
           val gen = implicitly[RealNumber[R]]
@@ -165,13 +164,12 @@ object Number {
           def isImaginary(x: C): Boolean = !isReal(x)
 
           def doubleValue(x: C): Double = absoluteValue(x).re.toDouble
-          //def show(x: C): String = x.re.toString + " + " + x.im.toString + "i"
      }
 
 
      //todo: weird "can't find type $anon" error when this is implicit val - change to object and it works ?
 
-     implicit object RealIsNumber extends RealNumber[Real] /*with Show[Real]*/ {
+     implicit object RealIsNumber extends RealNumber[Real]  {
           val zero: Real = Real(0)
           val one: Real = Real(1)
 
@@ -191,12 +189,11 @@ object Number {
           def isNegative(x: Real): Boolean = x.double < 0
 
           def doubleValue(x: Real): Double = x.double
-          //def show(x: Real): String = x.double.toString
      }
 
 
 
-     implicit object RationalIsRealNumber extends RealNumber[Rational] /*with Show[Rational]*/ {
+     implicit object RationalIsRealNumber extends RealNumber[Rational]  {
 
           val zero: Rational = Rational(0, 1)
           val one: Rational = Rational(1, 1)
@@ -230,12 +227,11 @@ object Number {
           def isNegative(x: Rational): Boolean = x.num == 0
 
           def doubleValue(x: Rational): Double = x.num * 1.0 / x.num
-          //def show(x: Rational): String = x.num.toString + "/" + x.den.toString
      }
 
 
      ///---------------------------------------------------------------------------------------------
-     //note: removing the 'extends AnyVal' finally fixed all my problems!!!
+     //note: removing the 'extends AnyVal' finally fixed my final problems!!!
 
      implicit class ToImaginary[R : RealNumber](private val imaginaryPart: R) /*extends AnyVal*/ {
           def i: Imaginary[R] = Imaginary(imaginaryPart)
@@ -250,35 +246,43 @@ import Number._
 
 
 
-private[numeric] sealed trait ComplexNumberCreator[T]{
+private[numeric] sealed trait ComplexMaker[T]{
      val re: T
      val im: T
 }
 
-case class Complex[R:RealNumber](re:R, im:R) extends ComplexNumberCreator[R] {
-     //private val ev: Number[Complex[R]] = implicitly[Number[Complex[R]]]
-
+case class Complex[R:RealNumber](re:R, im:R) extends ComplexMaker[R] {
      override def toString: String = Complex(re, im).show
-     //re.toString + " + " + im.toString + "i" // todo fix later
 }
 
-case class Real(double: Double) extends ComplexNumberCreator[Real] {
+case class Real(double: Double) extends ComplexMaker[Real] {
      val re: Real = Real(double)
      val im: Real = Real.ZERO
 
      override def toString = Real(double).show
 }
 
-case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexNumberCreator[R] {
+case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexMaker[R] {
      val gen = implicitly[RealNumber[R]]
 
      val re: R = gen.zero
      val im: R = theImag
 
      implicit def i: Imaginary[R] = this
+
+     override def toString: String = im match {
+          case _: Rational => im.isNegative match {
+               case true => " - (" + im.negate().toString + ")" + "i"
+               case false => " + (" + im.toString + ")" + "i"
+          }
+          case _ => im.isNegative match {
+               case true => " - " + im.negate().toString + "i"
+               case false => " + " + im.toString + "i"
+          }
+     }
 }
 
-//todo - get ACTUAL interoperabilit ybetween the types, not this measely attempt that just fuses rationals and reals.
+//todo - get ACTUAL interoperability between the types, not this measly attempt that just fuses rationals and reals.
 
 case class Rational(private val n: Int, private val d: Int) /*extends Real(n * 1.0 / d)*/ {
      val reduced: Fraction = Fraction.getFraction(n, d).reduce()
