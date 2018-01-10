@@ -18,6 +18,10 @@ import scala.language.implicitConversions
   * todo: interoperability: 4 + 3*i notation should work.
   *
   *
+  *
+  *
+  * note: Source for complex .i accessor:
+  * https://stackoverflow.com/questions/17381896/scala-simple-notation-of-imaginary-number
   */
 
 
@@ -44,17 +48,19 @@ trait Number[N] extends Field[N] {
      //compare?
 
      def doubleValue(x: N): Double
-     def show(x: N): String
 }
 
 trait RealNumber[R] extends Number[R]
 
+/*trait Show[S] {
 
-import RealNumber._
+     def show(x: S): String
+}*/
 
-object RealNumber {
 
-     implicit class NumberOps[N : Number](current: N) extends Ordered[N] {
+object Number {
+
+     implicit class NumberOps[N : Number](current: N) extends Ordered[N]  {
           val ev = implicitly[Number[N]]
 
           def +(other: N): N = ev.plus(current, other)
@@ -75,12 +81,18 @@ object RealNumber {
           /*override*/ def compare(other: N): Int = ev.minus(current, other).toDouble.toInt
 
           def toDouble: Double = ev.doubleValue(current)
-          //override def toString: String = ev.show(current) //todo which this would work implicitly!
      }
 
 
+     /*implicit class ShowOps[S: Show](current: S) {
+          val ev = implicitly[Show[S]]
 
-     implicit object IntIsRealNumber extends RealNumber[Int]{
+          def show: String = ev.show(current)
+     }*/
+
+
+
+     implicit object IntIsRealNumber extends RealNumber[Int] /*with Show[Int] */{
           val one: Int = 1
           val zero: Int = 0
 
@@ -104,12 +116,11 @@ object RealNumber {
 
           def doubleValue(x: Int): Double = x * 1.0
           def show(x: Int): String = x.toString
-
      }
 
 
 
-     implicit object DoubleIsRealNumber extends RealNumber[Double] {
+     implicit object DoubleIsRealNumber extends RealNumber[Double] /*with Show[Double]*/ {
           val one: Double = 1.0
           val zero: Double = 0.0
 
@@ -117,8 +128,8 @@ object RealNumber {
           def times(x: Double, y: Double): Double = x * y
           def divide(x: Double, y: Double): Double = x / y
 
-          def power(x: Double, y: Double): Double = math.pow(x, y).toInt
-          def squareRoot(x: Double): Double = math.sqrt(x).toInt  //this chops off
+          def power(x: Double, y: Double): Double = math.pow(x, y)
+          def squareRoot(x: Double): Double = math.sqrt(x)  //this chops off
           def absoluteValue(x: Double): Double = math.abs(x)
 
           def negate(x: Double): Double = -x
@@ -137,7 +148,7 @@ object RealNumber {
 
      //implicit class Complex[N : Number](re: N, im: N)
 
-     implicit def ComplexIsNumber[R : RealNumber] = new Number[Complex[R]]{
+     implicit def ComplexIsNumber[R : RealNumber] = new Number[Complex[R]] /*with Show[Complex[R]]*/ {
 
 
           type C = Complex[R]
@@ -180,41 +191,35 @@ object RealNumber {
      }
 
 
+     //todo: weird "can't find type $anon" error when this is implicit val - change to object and it works ?
 
-     implicit val RealIsRealNumber = new RealNumber[Real] {
+     implicit object RealIsNumber extends RealNumber[Real] /*with Show[Real]*/ {
           val zero: Real = Real(0)
           val one: Real = Real(1)
 
-          def plus(x: Real, y: Real): Real = Real(x.real + y.real)
-          def times(x: Real, y: Real): Real = Real(x.real * y.real)
-          def divide(x: Real, y: Real): Real = Real(x.real / y.real)
+          def plus(x: Real, y: Real): Real = Real(x.double + y.double)
+          def times(x: Real, y: Real): Real = Real(x.double * y.double)
+          def divide(x: Real, y: Real): Real = Real(x.double / y.double)
 
           //the inner class can return abs(): N not abs(): Complex[N]
-          def power(x: Real, y: Real): Real = Real(math.pow(x.real, y.real))
-          def squareRoot(x: Real): Real = Real(math.sqrt(x.real))
-          def absoluteValue(x: Real): Real = Real(math.abs(x.real))
+          def power(x: Real, y: Real): Real = Real(math.pow(x.double, y.double))
+          def squareRoot(x: Real): Real = Real(math.sqrt(x.double))
+          def absoluteValue(x: Real): Real = Real(math.abs(x.double))
 
-          def negate(x: Real): Real = Real(-x.real)
+          def negate(x: Real): Real = Real(-x.double)
 
           ///todo   def compare(x: Real): Int = (implicitly[Real].value - x.value).toInt
-          def areEqual(x: Real, y: Real): Boolean = x.real == y.real
+          def areEqual(x: Real, y: Real): Boolean = x.double == y.double
           def isZero(x: Real): Boolean = areEqual(x, zero)
-          def isNegative(x: Real): Boolean = x.real < 0
+          def isNegative(x: Real): Boolean = x.double < 0
 
-          def doubleValue(x: Real): Double = x.real
-          def show(x: Real): String = x.real.toString
+          def doubleValue(x: Real): Double = x.double
+          def show(x: Real): String = x.double.toString
      }
 
 
 
-     implicit val RationalIsRealNumber = new RealNumber[Rational] {
-          //val f: Fraction = Fraction.getFraction()
-          //todo about reducing: options are ...
-          //   1. have my own GCD
-          //   2. use apache fraction
-          //   3. either of the above can happen in the class (with this code) or all here.
-          //todo: rational also needs to refresh the frac: move neg sign in denom up top, and cancel
-          // two neg signs
+     implicit object RationalIsRealNumber extends RealNumber[Rational] /*with Show[Rational]*/ {
 
           val zero: Rational = Rational(0, 1)
           val one: Rational = Rational(1, 1)
@@ -252,8 +257,17 @@ object RealNumber {
           def doubleValue(x: Rational): Double = x.num * 1.0 / x.num
           def show(x: Rational): String = x.num.toString + "/" + x.den.toString //todo fix later.
      }
-}
 
+
+     ///---------------
+     /*implicit class ToImaginary[R : RealNumber](private val imaginaryPart: R) extends AnyVal {
+          def i: Imaginary[R] = Imaginary(imaginaryPart)
+     }
+     implicit class ToComplexMixed[R: RealNumber](private val realPart: R) extends  AnyVal {
+          def +(that: Imaginary[R]) = Complex(realPart, that.im)
+     }*/
+}
+import Number._
 
 
 
@@ -264,54 +278,56 @@ private[numeric] sealed trait ComplexNumberBuilder[T]{
      val im: T
 }
 
-case class Complex[R:RealNumber](re:R, im:R){
-     override def toString = implicitly[Number[Complex[R]]].show(this)
+case class Complex[R:RealNumber](re:R, im:R) /*extends ComplexNumberBuilder[R]*/ {
+     //private val ev: Number[Complex[R]] = implicitly[Number[Complex[R]]]
+     //private val s: Show[Complex[R]] = implicitly[Show[Complex[R]]]
+
+     override def toString = re.toString + " + " + im.toString + "i" //todo fix later
 }
 
-case class Real(real: Double) extends ComplexNumberBuilder[Double] {
-     val re: Double = real
+case class Real(double: Double) /*extends ComplexNumberBuilder[Real]*/ {
+     val re: Double = double
      val im: Double = 0.0
-     override def toString = implicitly[RealNumber[Real]].show(this)
+
+     //private val s: Show[Real] = implicitly[Show[Real]]
+
+     override def toString = double.toString //
+
+     //todo - this asinstnace of cast seems patchy and weird ...?? -- use either 'this' or 'double' - ok?
+     //implicit def +[R: RealNumber](imaginary: Imaginary[R]): Complex[R] = Complex(this.asInstanceOf[R], imaginary.im)
 }
 
-
-object TEMP {
-     implicit def fromRealNumberAndImagToComplex[R](real: R) extends AnyVal {
-          def +(imaginary: Imaginary[R]): Complex[R] = new Complex(real, imaginary.im)
-     }
-}
-import TEMP._
-case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexNumberBuilder[R]{
+/*case class Imaginary[R: RealNumber](private val theImag: R) /*extends ComplexNumberBuilder[R]*/ {
      val gen = implicitly[RealNumber[R]]
 
      val re: R = gen.zero
      val im: R = theImag
-}
 
+     implicit def i: Imaginary[R] = this
+}*/
 
+//todo - get ACTUAL interoperabilit ybetween the types, not this measely attempt that just fuses rationals and reals.
 
-case class Rational(private val n: Int, private val d: Int) extends Real(n * 1.0 / d) {
+case class Rational(private val n: Int, private val d: Int) /*extends Real(n * 1.0 / d)*/ {
      val reduced: Fraction = Fraction.getFraction(n, d).reduce()
      val num: Int = reduced.getNumerator
      val den: Int = reduced.getDenominator
 
-     override def toString = implicitly[RealNumber[Rational]].show(this)
+     //private val s: Show[Rational] = implicitly[Show[Rational]]
+
+     override def toString = num.toString + "/" + den.toString //.show(this)
 }
 
 
 
 
 object Complex {
-     /*case class Imaginary[N : RealNumber](im: N)
-     implicit class ConvertToImaginary[N: RealNumber](val im: N) extends AnyVal {
-          def j: Imaginary[N] = Imaginary(im)
-     }*/
-
-
+     def ZERO[R](implicit gen: RealNumber[R]): Complex[R] = new Complex(gen.zero, gen.zero)
+     def ONE[R](implicit gen: RealNumber[R]): Complex[R] = new Complex(gen.one, gen.zero)
      //def i[N](implicit gen: RealNumber[N]): Complex[N] = Complex(gen.zero, gen.one)
 
      //additional apply method - cannot override the automatically created one. Complex(_,_)
-     def apply[N](realPart: N)(implicit gen: RealNumber[N]) = new Complex(realPart, gen.zero)
+     def apply[R](realPart: R)(implicit gen: RealNumber[R]) = new Complex(realPart, gen.zero)
 
      /** --- Implicits --- */
      /*implicit def fromDouble(double: Double): Complex[Double] = new Complex(double, 0)
@@ -319,7 +335,6 @@ object Complex {
      implicit def fromReal(real: Real): Complex[Real] = new Complex(real, Real.ZERO)
      implicit def fromRational(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)*/
 }
-import Complex._
 
 object Real {
      val ZERO: Real = new Real(0)
@@ -360,26 +375,22 @@ import Rational._*/
 
 
 object NumberTester extends App {
-     val I: Complex[Int] = Complex.i[Int]
 
-     println(Complex(Rational(1,2), new Real(3)))
 
-     //val b = 4.+(Real(3)) //todo
-     //val a: Complex[Int] = 4 + 3 * I
-     //val c: Complex[Int] =
-     val d = Real(1) + Rational(2, 5) //+ Complex(1, 2) //todo : interoperability
-     //val m = Complex[Int](1,2) + 3       //todo interoperability.
+//     println(Complex(Rational(1,2), new Real(3)))
+//     println(Complex(1, Rational(1,4)))
 
-     val c1: Complex[Int] = Complex(8, 2)
-     val c2: Complex[Int] = Complex(9, 3)
-     val c3 = c1 + c2
+     /*val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i
+     val b: Complex[Int] = 3 + 5.i
 
-     println("got here")
-     //println(c3)
-     println(c1 + c2)
-     //println(c3)
-     println(c1 < c2)
+     println(a)
+     println(b)
+     println((8 + 2.i) + (9 + 2.i))
+     println((8 + 2.i) - (9 + 2.i))
+     println((8 + 2.i) < (9 + 2.i))*/
 
      println(new Rational(4, 8))
      println(Rational(4, 8) + Rational(5, 15))
+     println(Complex(1,2))
+     println(Complex(1,2) + Complex(3,4))
 }
