@@ -102,7 +102,7 @@ trait RealNumber[R] extends Number[R]
 object Number {
 
      //todo implement Ordered trait for all number types to save me from having to depend onthis line.
-     
+
      implicit class NumberOps[N: Number](current: N) /*extends Ordered[N]*/ {
           private val n = implicitly[Number[N]]
           //private val r = implicitly[RealNumber[R]]
@@ -415,20 +415,22 @@ object NumberTester extends App {
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i
      val b: Complex[Int] = 3 + 5.i
 
-     implicit def intToComplexRat(int: Int): Complex[Rational] = Complex(Rational(int), Rational.ZERO)
+     //implicit def intToComplexRat(int: Int): Complex[Rational] = Complex(Rational(int), Rational.ZERO)
 
      println(a + Rational(1))
      println(b)
      println(Complex(1,2) + 4)
-     println(7 + 8.i + 3)
+     println(7 + 8.i + 3) //todo this is because of the +(other: R) methods in Complex class - get rid of that and
+     // make trait as said in commit
+     
      //println((7 + Rational(3,4).i) + 2)
      // todo doesn't work - need to make overall trait NumberLower[L, H] { def +(other: L): H ...}
      println((8 + 2.i) + (9 + 2.i))
      println((8 + 2.i) - (9 + 2.i))
-     println((8 + 2.i) < (9 + 2.i))
+     //println((8 + 2.i) < (9 + 2.i)) //todo separate out ordering
 
      println(new Rational(4, 8))
-     println(Real(2) + Real(3) + 1)
+     //println(Real(2) + Real(3) + 1) //todo interoperability
      println(Rational(4, 8) + Rational(5, 15))
      println(Complex(1,2))
      println(Complex(1,2) + Complex(3,4))
