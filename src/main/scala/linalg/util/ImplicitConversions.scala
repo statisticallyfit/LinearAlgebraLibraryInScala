@@ -42,7 +42,7 @@ object Show {
 
 object ImplicitConversions {
 
-     implicit def genToComplex[N](number: N)(implicit gen: Number[N]): Complex[N] = number match {
+     implicit def genToComplex[N](number: N)(implicit gen: RealNumber[N]): Complex[N] = number match {
 
           case rational: Rational => Complex(rational.asInstanceOf[N], gen.zero)
           case real: Real => Complex(real.asInstanceOf[N], gen.zero)
@@ -50,6 +50,7 @@ object ImplicitConversions {
                //Complex(complex.re.asInstanceOf[N], complex.im.asInstanceOf[N])
      }
 
+     implicit def intToComplex(int: Int): Complex[Int] = Complex(int, 0)
      /*implicit def intToRational(int: Int): Rational = Rational(int, 1)
 
      implicit def doubleToRational(double: Double): Rational ={
