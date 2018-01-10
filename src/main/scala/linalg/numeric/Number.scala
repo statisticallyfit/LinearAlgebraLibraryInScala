@@ -284,7 +284,7 @@ case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexMaker
 
 //todo - get ACTUAL interoperability between the types, not this measly attempt that just fuses rationals and reals.
 
-case class Rational(private val n: Int, private val d: Int) /*extends Real(n * 1.0 / d)*/ {
+case class Rational(private val n: Int, private val d: Int)  {
      val reduced: Fraction = Fraction.getFraction(n, d).reduce()
      val num: Int = reduced.getNumerator
      val den: Int = reduced.getDenominator
@@ -302,10 +302,10 @@ object Complex {
      def apply[R](realPart: R)(implicit gen: RealNumber[R]) = new Complex(realPart, gen.zero)
 
      /** --- Implicits --- */
-     /*implicit def fromDouble(double: Double): Complex[Double] = new Complex(double, 0)
+     implicit def fromDouble(double: Double): Complex[Double] = new Complex(double, 0)
      implicit def fromInt(int: Int): Complex[Int] = new Complex(int, 0)
      implicit def fromReal(real: Real): Complex[Real] = new Complex(real, Real.ZERO)
-     implicit def fromRational(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)*/
+     implicit def fromRational(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)
 }
 
 object Real {
@@ -313,10 +313,10 @@ object Real {
      val ONE: Real = new Real(1)
 
      /** --- Implicits --- */
-     /*implicit def fromDouble(double: Double): Real = new Real(double)
+     implicit def fromDouble(double: Double): Real = new Real(double)
      implicit def fromInt(int: Int): Real = new Real(int)
-     implicit def fromComplex[N : Number](complex: Complex[N]): Real = new Real(complex.toDouble)
-     implicit def fromRational(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)*/
+     implicit def fromComplex[R : RealNumber](complex: Complex[R]): Real = new Real(complex.toDouble)
+     implicit def fromRational(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)
 }
 
 object Rational {
@@ -332,15 +332,15 @@ object Rational {
      }
 
      /** --- Implicits --- */
-     /*implicit def fromDouble(double: Double): Rational = Rational(double)
+     implicit def fromDouble(double: Double): Rational = Rational(double)
      implicit def fromInt(int: Int): Real = new Real(int)
-     implicit def fromComplex[N : Number](complex: Complex[N]): Real = new Real(complex.toDouble)
-     implicit def fromReal(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)*/
+     implicit def fromComplex[R : RealNumber](complex: Complex[R]): Real = new Real(complex.toDouble)
+     implicit def fromReal(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)
 }
 
-/*import Complex._
+import Complex._
 import Real._
-import Rational._*/
+import Rational._
 
 
 
@@ -355,7 +355,9 @@ object NumberTester extends App {
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i
      val b: Complex[Int] = 3 + 5.i
 
-     println(a)
+     implicit def intToComplexRat(int: Int): Complex[Rational] = Complex(Rational(int), Rational.ZERO)
+
+     println(a + 1)
      println(b)
      println((8 + 2.i) + (9 + 2.i))
      println((8 + 2.i) - (9 + 2.i))
