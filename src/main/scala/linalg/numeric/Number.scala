@@ -260,12 +260,12 @@ object Number {
 
 
      ///---------------
-     /*implicit class ToImaginary[R : RealNumber](private val imaginaryPart: R) extends AnyVal {
+     implicit class ToImaginary[R : RealNumber](private val imaginaryPart: R) /*extends AnyVal*/ {
           def i: Imaginary[R] = Imaginary(imaginaryPart)
      }
-     implicit class ToComplexMixed[R: RealNumber](private val realPart: R) extends  AnyVal {
+     implicit class ToComplexMixed[R: RealNumber](private val realPart: R) /*extends  AnyVal*/ {
           def +(that: Imaginary[R]) = Complex(realPart, that.im)
-     }*/
+     }
 }
 import Number._
 
@@ -273,21 +273,21 @@ import Number._
 
 
 
-/*private[numeric] sealed trait ComplexNumberBuilder[T]{
+private[numeric] sealed trait ComplexNumberCreator[T]{
      val re: T
      val im: T
-}*/
+}
 
-case class Complex[R:RealNumber](re:R, im:R) /*extends ComplexNumberBuilder[R]*/ {
+case class Complex[R:RealNumber](re:R, im:R) extends ComplexNumberCreator[R] {
      //private val ev: Number[Complex[R]] = implicitly[Number[Complex[R]]]
 
      override def toString: String = Complex(re, im).show
      //re.toString + " + " + im.toString + "i" // todo fix later
 }
 
-case class Real(double: Double) /*extends ComplexNumberBuilder[Real]*/ {
-     val re: Double = double
-     val im: Double = 0.0
+case class Real(double: Double) extends ComplexNumberCreator[Real] {
+     val re: Real = Real(double)
+     val im: Real = Real.ZERO
 
      //private val s: Show[Real] = implicitly[Show[Real]]
 
@@ -297,14 +297,14 @@ case class Real(double: Double) /*extends ComplexNumberBuilder[Real]*/ {
      //implicit def +[R: RealNumber](imaginary: Imaginary[R]): Complex[R] = Complex(this.asInstanceOf[R], imaginary.im)
 }
 
-/*case class Imaginary[R: RealNumber](private val theImag: R) /*extends ComplexNumberBuilder[R]*/ {
+case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexNumberCreator[R] {
      val gen = implicitly[RealNumber[R]]
 
      val re: R = gen.zero
      val im: R = theImag
 
      implicit def i: Imaginary[R] = this
-}*/
+}
 
 //todo - get ACTUAL interoperabilit ybetween the types, not this measely attempt that just fuses rationals and reals.
 
@@ -380,14 +380,14 @@ object NumberTester extends App {
 //     println(Complex(Rational(1,2), new Real(3)))
 //     println(Complex(1, Rational(1,4)))
 
-     /*val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i
+     val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i
      val b: Complex[Int] = 3 + 5.i
 
      println(a)
      println(b)
      println((8 + 2.i) + (9 + 2.i))
      println((8 + 2.i) - (9 + 2.i))
-     println((8 + 2.i) < (9 + 2.i))*/
+     println((8 + 2.i) < (9 + 2.i))
 
      println(new Rational(4, 8))
      println(Rational(4, 8) + Rational(5, 15))
