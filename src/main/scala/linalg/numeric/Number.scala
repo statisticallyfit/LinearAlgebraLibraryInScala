@@ -2,6 +2,7 @@ package linalg.numeric
 
 
 import linalg.theory._
+import linalg.util.ImplicitConversions._
 import org.apache.commons.lang3.math.Fraction
 
 import scala.language.implicitConversions
@@ -12,6 +13,9 @@ import scala.language.implicitConversions
   * todo make class Polar to interact with Complex.
   *
   * todo: move Complex theta, polar ... functionality in same place with the main +, -, / code ...
+  *
+  * todo: somehow fix that the N parameter in Complex must be a Real subtype - how to do with typeclasses?
+  *
   *
   */
 
@@ -72,7 +76,7 @@ object Number {
 
 
 
-     implicit object IntNumber extends Number[Int] {
+     implicit object IntNumber extends Number[Int]{
           val one: Int = 1
           val zero: Int = 0
 
@@ -96,6 +100,7 @@ object Number {
 
           def doubleValue(x: Int): Double = x * 1.0
           def show(x: Int): String = x.toString
+
      }
 
 
@@ -128,14 +133,14 @@ object Number {
 
      //implicit class Complex[N : Number](re: N, im: N)
 
-     implicit def ComplexNumber[N : Number] = new Number[Complex[N]]{
+     implicit def ComplexNumber[R <: Real] = new Number[Complex[R]]{
 
-          type C = Complex[N]
-          val gen = implicitly[Number[N]]
+          type C = Complex[R]
+          val gen = implicitly[R]
 
           val zero: C = Complex(gen.zero, gen.zero)
           val one: C = Complex(gen.one, gen.zero)
-          private val genTwo: N = gen.one + gen.one
+          private val genTwo: R = gen.one + gen.one
 
           def plus(x: C, y: C): C = Complex(x.re + y.re, x.im + y.im)
           def times(x: C, y: C): C = Complex(x.re * y.im - y.re * x.im, x.re * y.re + y.im * x.im)
@@ -247,29 +252,89 @@ object Number {
 
 
 
-case class Complex[N : Number](re: N, im: N) { override def toString = implicitly[Number[Complex[N]]].show(this) }
+
+
+
+case class Complex[R <: Real](re: R, im: R) { override def toString = implicitly[Number[Complex[R]]].show(this) }
 
 case class Real(value: Double) { override def toString = implicitly[Number[Real]].show(this) }
 
-case class Rational(private val n: Int, private val d: Int) {
+case class Rational(private val n: Int, private val d: Int) extends Real(n * 1.0 / d) {
      val reduced: Fraction = Fraction.getFraction(n, d).reduce()
      val num: Int = reduced.getNumerator
      val den: Int = reduced.getDenominator
 
      override def toString = implicitly[Number[Rational]].show(this)
 }
-//todo: did not make Rational a case class since need to replace the apply method - decide if helps to auto reduce.
-/*object Rational {
-     def apply(n: Int, d: Int): Rational = {
-          val reduced: Fraction = Fraction.getFraction(n, d).reduce()
-          new Rational(reduced.getNumerator, reduced.getDenominator)
+
+
+
+
+object Complex {
+     case class Imaginary[N : Number](im: N)
+     implicit class ConvertToImaginary[N: Number](val im: N) extends AnyVal {
+          def j: Imaginary[N] = Imaginary(im)
      }
-     def unapply(rational: Rational): Option[(Int, Int)] = Some(rational.num, rational.den)
+
+
+     def i[N](implicit gen: Number[N]): Complex[N] = Complex(gen.zero, gen.one)
+
+     //additional apply method - cannot override the automatically created one. Complex(_,_)
+     def apply[N](realPart: N)(implicit gen: Number[N]) = new Complex(realPart, gen.zero)
+
+     /** --- Implicits --- */
+     /*implicit def fromDouble(double: Double): Complex[Double] = new Complex(double, 0)
+     implicit def fromInt(int: Int): Complex[Int] = new Complex(int, 0)
+     implicit def fromReal(real: Real): Complex[Real] = new Complex(real, Real.ZERO)
+     implicit def fromRational(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)*/
+}
+import Complex._
+/*
+object Real {
+     val ZERO: Real = new Real(0)
+     val ONE: Real = new Real(1)
+
+     /** --- Implicits --- */
+     implicit def fromDouble(double: Double): Real = new Real(double)
+     implicit def fromInt(int: Int): Real = new Real(int)
+     implicit def fromComplex[N : Number](complex: Complex[N]): Real = new Real(complex.toDouble)
+     implicit def fromRational(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)
+}
+
+object Rational {
+     val ZERO: Rational = new Rational(0, 1)
+     val ONE: Rational = new Rational(1, 1)
+
+     /** --- Applies --- */
+     def apply(numerator: Int): Rational = new Rational(numerator, 1)
+
+     def apply(fracAsDouble: Double): Rational = {
+          val f = Fraction.getFraction(fracAsDouble).reduce()
+          new Rational(f.getNumerator, f.getDenominator)
+     }
+
+     /** --- Implicits --- */
+     implicit def fromDouble(double: Double): Rational = Rational(double)
+     implicit def fromInt(int: Int): Real = new Real(int)
+     implicit def fromComplex[N : Number](complex: Complex[N]): Real = new Real(complex.toDouble)
+     implicit def fromReal(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)
 }*/
+
+/*import Complex._
+import Real._
+import Rational._*/
+
+
 
 
 
 object NumberTester extends App {
+     val I: Complex[Int] = Complex.i[Int]
+
+     //val b = 4.+(Real(3)) //todo
+     //val a: Complex[Int] = 4 + 3 * I
+     //val c: Complex[Int] =
+
      val c1: Complex[Int] = Complex(8, 2)
      val c2: Complex[Int] = Complex(9, 3)
      val c3 = c1 + c2
