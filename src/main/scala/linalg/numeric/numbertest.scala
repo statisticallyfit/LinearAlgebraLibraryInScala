@@ -17,13 +17,12 @@ trait GeneralNumber[F, T] {
      def minus(from: F, to: T): T
      def times(from: F, to: T): T
      def divide(from: F, to: T): T
-     def power(from: F, to: T): T
+     //tododef power(from: T, to: F): T
      def areEqual(from: F, to: T): Boolean
-
-
 }
 
 trait Number[N] extends GeneralNumber[N, N] {
+     def power(x: N, y: N): N
      def squareRoot(x: N): N
      def absoluteValue(x: N): N
      def negate(x: N): N
@@ -62,32 +61,64 @@ trait RealNumber[R] extends Number[R]
 
 object Number {
 
-     implicit class ConvertFrom[F, T](val from: F)(implicit gen: GeneralNumber[F, T]){
+
+
+     // ------------------------------------------------------------------------------------------------
+     implicit class GeneralNumberOps[F, T](from: F)(implicit gen: GeneralNumber[F, T]){
           def +(to: T): T = gen.plus(from, to)
           def -(to: T): T = gen.minus(from, to)
           def *(to: T): T = gen.times(from, to)
           def /(to: T): T = gen.divide(from, to)
-          def ^(to: T): T = gen.power(from, to)
+          //def ^(to: T): T = gen.power(from, to)
           def isEqual(to: T): Boolean = gen.areEqual(from, to)
      }
 
-     implicit class ConvertTo[F, T](val to: T)(implicit gen: GeneralNumber[F, T], num: Number[T]){
-          def +(from: F): T = gen.plus(from, to)
-          def -(from: F): T = gen.minus(from, to)
-          def *(from: F): T = gen.times(from, to)
-          def /(from: F): T = gen.divide(from, to)
-          def ^(from: F): T = gen.power(from, to)
-          def isEqual(from: F): Boolean = gen.areEqual(from, to)
+     implicit def ConversionComplex[R : RealNumber] = new GeneralNumber[R, Complex[R]] {
 
-          def sqrt(): T = num.squareRoot(to)
-          def abs(): T = num.absoluteValue(to)
-          def negate(): T = num.negate(to)
-          def inverse(): T = num.negate(to)
-          def isZero: Boolean = num.isZero(to)
-          def isNegative: Boolean = num.isNegative(to)
-          def toDouble: Double = num.doubleValue(to)
-          def toInt: Int = num.doubleValue(to).toInt // todo gets chopped off.
+          type C = Complex[R]
+          val gen = implicitly[RealNumber[R]]
+
+          val zero: C = Complex(gen.zero, gen.zero)
+          val one: C = Complex(gen.one, gen.zero)
+
+          def plus(x: R, y: C): C = Complex(x + y.re, y.im)
+          def minus(x: R, y: C): C = Complex(x - y.re, y.im)
+          def times(x: R, y: C): C = Complex(x * y.re, x * y.im)
+          def divide(x: R, y: C): C = Complex(y.re / x, y.im / x)
+          def power(x: C, y: R): C = ??? //todo implement
+          def areEqual(x: R, y: C): Boolean = false
      }
+
+     implicit def ConversionReal[R: RealNumber] = new GeneralNumber[R, Real] {
+
+          val zero: Real = Real.ZERO
+          val one: Real = Real.ONE
+
+          def plus(x: R, y: Real): Real = Real(x.toDouble + y.double)
+          def minus(x: R, y: Real): Real = Real(x.toDouble - y.double)
+          def times(x: R, y: Real): Real = Real(x.toDouble * y.double)
+          def divide(x: R, y: Real): Real = Real(x.toDouble / y.double)
+          def power(x: Real, y: R): Real = Real(math.pow(x.double, y.toDouble))
+          def areEqual(x: R, y: Real): Boolean = x.toDouble == y.double
+     }
+
+     implicit def ConversionRational[R: RealNumber] = new GeneralNumber[R, Rational] {
+
+          val zero: Rational = Rational.ZERO
+          val one: Rational = Rational.ONE
+
+          def plus(x: R, y: Rational): Rational = Rational(x.toDouble + y.toDouble)
+          def minus(x: R, y: Rational): Rational = Rational(x.toDouble - y.toDouble)
+          def times(x: R, y: Rational): Rational = Rational(x.toDouble * y.toDouble)
+          def divide(x: R, y: Rational): Rational = Rational(x.toDouble / y.toDouble)
+          def power(x: Rational, y: R): Rational = Rational(math.pow(x.toDouble, y.toDouble))
+          def areEqual(x: R, y: Rational): Boolean = x.toDouble == y.toDouble
+     }
+
+
+
+
+
 
      implicit class NumberOps[N: Number](current: N) /*extends Ordered[N]*/ {
 
@@ -115,7 +146,9 @@ object Number {
           def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!
      }
 
-     implicit def ComplexIsNumber[R : RealNumber] = new GeneralNumber[R, Complex[R]] with Number[Complex[R]] {
+
+
+     implicit def ComplexIsNumber[R : RealNumber]: Number[Complex[R]] = new Number[Complex[R]]  {
 
           type C = Complex[R]
           val gen = implicitly[RealNumber[R]]
@@ -125,9 +158,8 @@ object Number {
           private val genTwo: R = gen.one + gen.one
 
 
-          def plus(x: R, y: C): C = Complex(x + y.re, y.im)
-
-          /*def plus(x: C, y: C): C = Complex(x.re + y.re, x.im + y.im)
+          def plus(x: C, y: C): C = Complex(x.re + y.re, x.im + y.im)
+          def minus(x: C, y: C): C = plus(x, negate(y))
           def times(x: C, y: C): C = Complex(x.re * y.im - y.re * x.im, x.re * y.re + y.im * x.im)
           def divide(x: C, y: C): C = {
                val newNumerator: C = times(x, y)
@@ -135,6 +167,7 @@ object Number {
                //todo assert(y.abs().im.isZero)
                Complex(x.re / newDenominator, x.im / newDenominator)
           }
+          def inverse(x :C): C = divide(one, x)
 
           //todo the inner class can return abs(): N not abs(): Complex[N] ????????????? or make them return DOUBLE.
           def power(x: C, y: C): C = ???
@@ -150,9 +183,8 @@ object Number {
           def isReal(x: C): Boolean = x.im.isZero
           def isImaginary(x: C): Boolean = !isReal(x)
 
-          def doubleValue(x: C): Double = absoluteValue(x).re.toDouble*/
+          def doubleValue(x: C): Double = absoluteValue(x).re.toDouble
      }
-
 
      //todo: weird "can't find type $anon" error when this is implicit val - change to object and it works ?
 
@@ -161,8 +193,10 @@ object Number {
           val one: Real = Real(1)
 
           def plus(x: Real, y: Real): Real = Real(x.double + y.double)
+          def minus(x: Real, y: Real): Real = plus(x, negate(y)) //todo why cannot use dot operator?
           def times(x: Real, y: Real): Real = Real(x.double * y.double)
           def divide(x: Real, y: Real): Real = Real(x.double / y.double)
+          def inverse(x: Real): Real = divide(one, x)
 
           //the inner class can return abs(): N not abs(): Complex[N]
           def power(x: Real, y: Real): Real = Real(math.pow(x.double, y.double))
@@ -170,14 +204,11 @@ object Number {
           def absoluteValue(x: Real): Real = Real(math.abs(x.double))
 
           def negate(x: Real): Real = Real(-x.double)
-
           def areEqual(x: Real, y: Real): Boolean = x.double == y.double
           def isZero(x: Real): Boolean = areEqual(x, zero)
           def isNegative(x: Real): Boolean = x.double < 0
-
           def doubleValue(x: Real): Double = x.double
      }
-
 
 
      implicit object RationalIsRealNumber extends RealNumber[Rational]  {
@@ -185,13 +216,12 @@ object Number {
           val zero: Rational = Rational(0, 1)
           val one: Rational = Rational(1, 1)
 
-
           def plus(x: Rational, y: Rational): Rational =
                Rational(x.num*y.den + y.num*x.den, x.den * y.den)
-
+          def minus(x: Rational, y: Rational): Rational = plus(x, negate(y))
           def times(x: Rational, y: Rational): Rational = Rational(x.num * y.num, x.den * y.den)
-
           def divide(x: Rational, y: Rational): Rational = Rational(x.num * y.den, x.den * y.num)
+          def inverse(x: Rational): Rational = divide(one, x)
 
           //the inner class can return abs(): N not abs(): Complex[N]
           def power(x: Rational, y: Rational): Rational = {
@@ -207,9 +237,7 @@ object Number {
           }
 
           def absoluteValue(x: Rational): Rational = Rational(math.abs(x.num), math.abs(x.den))
-
           def negate(x: Rational): Rational = Rational(-x.num, -x.den)
-
           def areEqual(x: Rational, y: Rational): Boolean = x.num == y.num && x.den == y.den
           def isZero(x: Rational): Boolean = areEqual(x, zero)
           def isNegative(x: Rational): Boolean = x.num < 0
@@ -222,11 +250,11 @@ object Number {
           val one: Int = 1
           val zero: Int = 0
 
-
           def plus(x: Int, y: Int): Int = x + y
+          def minus(x: Int, y: Int): Int = x - y
           def times(x: Int, y: Int): Int = x * y
           def divide(x: Int, y: Int): Int = x / y
-
+          def inverse(x: Int): Int = divide(one, x) //todo gets chopped off
           def power(x: Int, y: Int): Int = math.pow(x, y).toInt
           def squareRoot(x: Int): Int = math.sqrt(x).toInt  //this chops off
           def absoluteValue(x: Int): Int = math.abs(x)
@@ -246,11 +274,11 @@ object Number {
           val one: Double = 1.0
           val zero: Double = 0.0
 
-
           def plus(x: Double, y: Double): Double = x + y
+          def minus(x: Double, y: Double): Double = x - y
           def times(x: Double, y: Double): Double = x * y
           def divide(x: Double, y: Double): Double = x / y
-
+          def inverse(x: Double): Double = divide(one, x)
           def power(x: Double, y: Double): Double = math.pow(x, y)
           def squareRoot(x: Double): Double = math.sqrt(x)
           def absoluteValue(x: Double): Double = math.abs(x)
@@ -263,6 +291,7 @@ object Number {
 
           def doubleValue(x: Double): Double = x
      }
+
 
 }
 import Number._
@@ -280,7 +309,7 @@ import Number._
      def power(from: F, to: T): T
      def areEqual(from: F, to: T): Boolean
 }*/
-object From {
+/*object From {
      implicit def GeneralRealToComplex[R: RealNumber]: From[R, Complex[R]] = new From[R, Complex[R]]{
           def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)
           def minus(from: R, to: Complex[R]): Complex[R] = Complex(from - to.re, to.im)
@@ -305,7 +334,7 @@ object From {
           def ^(from: F): T = conv.power(from, to)
           def isEqual(from: F): Boolean = conv.areEqual(from, to)
      }
-}
+}*/
 //import NumberGeneral._
 
 
