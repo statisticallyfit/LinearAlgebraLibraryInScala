@@ -472,7 +472,7 @@ object NumberTester extends App {
           def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)
 
      }
-     implicit def IntToReal: Conversion[Int, Real] = new Conversion[Int, Real]{
+     /*implicit def IntToReal: Conversion[Int, Real] = new Conversion[Int, Real]{
           def plus(from: Int, to: Real): Real = Real(from) + to
      }
      implicit def DoubleToReal: Conversion[Double, Real] = new Conversion[Double, Real]{
@@ -480,7 +480,7 @@ object NumberTester extends App {
      }
      implicit def RationalToReal: Conversion[Rational, Real] = new Conversion[Rational, Real]{
           def plus(from: Rational, to: Real): Real = Real(from.toDouble) + to
-     }
+     }*/
      //implicit def DoubleToRational
      /*implicit def GeneralRealToReal[R: RealNumber]: Conversion[R, Real] = new Conversion[R, Real] {
           def plus(from: R, to: Real): Real = Real(from.toDouble) + to
@@ -495,18 +495,18 @@ object NumberTester extends App {
      //todo: the interoperability tests
      //println(a + 1, 1 + a) //todo do not work! why not??? can't infer type?
      println(a + Rational(1))
+     println(Rational(33) + a)
      println((1 + 3.i) + 1)
      println(1 + (1 + 3.i))
      println(23 + Real(23))
      println(Real(23) + 23)
-     println(Rational(33) + a)
      println(Real(1) + Rational(2))
      println(Rational(2) + Real(1))
-     /*println(Real(2) + Rational(3, 2) + (6 + 7.i))
+     println(Real(2) + Rational(3, 2) + (6 + 7.i))
      println(Real(2) + Real(3) + 1 + 5.0 + Rational(8,7) + Complex(3,4) + (5 + 8.i) + 1 + 6 + 7.i)
      println(555 + Real(2) + Real(3) + 1 + 5.0 + Rational(8,7) + Complex(3,4) + (5 + 8.i))
      println(Complex(Rational(1,2), new Real(3)))
-     println(Complex(1, Rational(1,4)))*/
+     println(Complex(1, Rational(1,4)))
      //just happens because of R: RealNumber.
 
 
