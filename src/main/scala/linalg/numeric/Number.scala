@@ -316,67 +316,45 @@ import Conversion._
 
 
 
-private[numeric] trait ComplexLike2[L, U]{
-     def real(r: U): L
-     def imaginary(i: U): L
-     /*val re: T
-     val im: T*/
+private[numeric] trait ComplexLike[T]{
+     val re: T
+     val im: T
 }
-private[numeric] trait ComplexLike1[T] extends ComplexLike2[T, T]
 
 
 object ComplexLike {
      //mechanism: takes something that implements RealNumber and gives it .i accessor, returning Imaginary.
-     implicit class ToImaginary[R : RealNumber](private val imaginaryPart: R)(implicit like: ComplexLike1[R]){
+     implicit class ToImaginary[R : RealNumber](private val imaginaryPart: R){
           def i: Imaginary[R] = Imaginary(imaginaryPart)
      }
      //mechanism: takes something that implements RealNumber and makes it addable with Imaginary (which BTW cannot
      // implement Number because i*i = -1, not imaginary)
-     implicit class ToComplex[R: RealNumber](private val realPart: R)(implicit like: ComplexLike2[R, Imaginary[R]]) {
-          def +(that: Imaginary[R]) = Complex(realPart, like.imaginary(that))//that.im)
-          def -(that: Imaginary[R]) = Complex(realPart, like.imaginary(that).negate())//that.im)
-     }
-
-     // ---------------
-
-     implicit object RealIsComplexLike extends ComplexLike1[Real] {
-          def real(r: Real): Real = r
-          def imaginary(i: Real): Real = Real.ZERO
-     }
-     implicit object RationalIsComplexLike extends ComplexLike1[Rational] {
-          def real(r: Rational): Rational = r
-          def imaginary(i: Rational): Rational = Rational.ZERO
-     }
-     implicit def ComplexIsComplexLike[R: RealNumber]: ComplexLike2[R, Complex[R]] = new ComplexLike2[R, Complex[R]]{
-          def real(c: Complex[R]): R = c.re
-          def imaginary(c: Complex[R]): R = c.im
-     }
-     implicit def ImaginaryIsComplexLike[R: RealNumber]: ComplexLike2[R, Imaginary[R]] = new ComplexLike2[R, Imaginary[R]]{
-          val gen = implicitly[RealNumber[R]]
-
-          def real(i: Imaginary[R]): R = gen.zero
-          def imaginary(i: Imaginary[R]) = i.im
+     implicit class ToComplex[R: RealNumber](private val realPart: R) {
+          def +(that: Imaginary[R]) = Complex(realPart, that.im)
+          def -(that: Imaginary[R]) = Complex(realPart, that.im)
      }
 }
 import ComplexLike._
 
-case class Complex[R:RealNumber](re:R, im:R) /*extends ComplexLike[R]*/ {
+
+
+case class Complex[R:RealNumber](re:R, im:R) extends ComplexLike[R] {
 
      override def toString: String = Complex(re, im).show
 }
 
-case class Real(double: Double) /*extends ComplexLike[Real]*/ {
-     /*val re: Real = this
-     val im: Real = Real.ZERO*/
+case class Real(double: Double) extends ComplexLike[Real] {
+     val re: Real = this
+     val im: Real = Real.ZERO
 
      override def toString = Real(double).show
 }
 
-case class Imaginary[R: RealNumber](im: R) /*extends ComplexLike[R]*/ {
+case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexLike[R] {
      private val gen = implicitly[RealNumber[R]]
 
-     /*val re: R = gen.zero
-     val im: R = theImag*/
+     val re: R = gen.zero
+     val im: R = theImag
 
      implicit def i: Imaginary[R] = this
 
@@ -390,27 +368,16 @@ case class Imaginary[R: RealNumber](im: R) /*extends ComplexLike[R]*/ {
                case false => " + " + im.toString + "i"
           }
      }
-
-     /*override def toString: String = im match {
-          case _: Rational => im.isNegative match {
-               case true => " - (" + im.negate().toString + ")" + "i"
-               case false => " + (" + im.toString + ")" + "i"
-          }
-          case _ => im.isNegative match {
-               case true => " - " + im.negate().toString + "i"
-               case false => " + " + im.toString + "i"
-          }
-     }*/
 }
 
 
-case class Rational(private val n: Int, private val d: Int) /*extends ComplexLike[Rational]*/ {
+case class Rational(private val n: Int, private val d: Int) extends ComplexLike[Rational] {
      val reduced: Fraction = Fraction.getFraction(n, d).reduce()
      val num: Int = reduced.getNumerator
      val den: Int = reduced.getDenominator
 
-     /*val re: Rational = this
-     val im: Rational = Rational.ZERO*/
+     val re: Rational = this
+     val im: Rational = Rational.ZERO
 
      override def toString: String = Rational(num, den).show
 }
@@ -449,7 +416,7 @@ object Rational {
 object NumberTester extends App {
 
      import Number._
-     import ComplexLike._ 
+     import ComplexLike._
 
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i + Rational(1)
      val b: Complex[Int] = 3 + 5.i + 3
