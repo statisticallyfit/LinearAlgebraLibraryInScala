@@ -81,17 +81,6 @@ trait RealNumber[R] extends Number[R] /*with ComplexMaker[R]*/
 
 
 
-
-trait Conversion[F, T] {
-     def plus(from: F, to: T): T
-     //def plus(to: T, from: F): T
-
-     //def minus()
-}
-
-
-
-
 object Number {
 
      implicit class NumberOps[N: Number](current: N) /*extends Ordered[N]*/ {
@@ -300,16 +289,39 @@ import Number._
 
 
 
+//represents a conversion between numbers
+trait Conversion[F, T] {
+     def plus(from: F, to: T): T
+     def minus(from: F, to: T): T
+     def times(from: F, to: T): T
+     def divide(from: F, to: T): T
+     def power(from: F, to: T): T
+     def areEqual(from: F, to: T): Boolean
+}
 object Conversion {
      implicit def GeneralRealToComplex[R: RealNumber]: Conversion[R, Complex[R]] = new Conversion[R, Complex[R]]{
           def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)
-
+          def minus(from: R, to: Complex[R]): Complex[R] = Complex(from - to.re, to.im)
+          def times(from: R, to: Complex[R]): Complex[R] = Complex(from * to.re, from * to.im)
+          def divide(from: R, to: Complex[R]): Complex[R] = Complex(to.re / from, to.im / from)
+          def power(from: R, to: Complex[R]): Complex[R] = ??? //todo
+          def areEqual(from: R, to: Complex[R]): Boolean = false
      }
      implicit class ConvertFrom[F, T](val from: F)(implicit conv: Conversion[F, T]){
           def +(to: T): T = conv.plus(from, to)
+          def -(to: T): T = conv.minus(from, to)
+          def *(to: T): T = conv.times(from, to)
+          def /(to: T): T = conv.divide(from, to)
+          def ^(to: T): T = conv.power(from, to)
+          def isEqual(to: T): Boolean = conv.areEqual(from, to)
      }
      implicit class ConvertTo[F, T](val to: T)(implicit conv: Conversion[F, T]){
           def +(from: F): T = conv.plus(from, to)
+          def -(from: F): T = conv.minus(from, to)
+          def *(from: F): T = conv.times(from, to)
+          def /(from: F): T = conv.divide(from, to)
+          def ^(from: F): T = conv.power(from, to)
+          def isEqual(from: F): Boolean = conv.areEqual(from, to)
      }
 }
 import Conversion._
@@ -320,8 +332,6 @@ private[numeric] trait ComplexLike[T]{
      val re: T
      val im: T
 }
-
-
 object ComplexLike {
      //mechanism: takes something that implements RealNumber and gives it .i accessor, returning Imaginary.
      implicit class ToImaginary[R : RealNumber](private val imaginaryPart: R){
@@ -338,10 +348,8 @@ import ComplexLike._
 
 
 
-case class Complex[R:RealNumber](re:R, im:R) extends ComplexLike[R] {
 
-     override def toString: String = Complex(re, im).show
-}
+
 
 case class Real(double: Double) extends ComplexLike[Real] {
      val re: Real = this
@@ -349,6 +357,24 @@ case class Real(double: Double) extends ComplexLike[Real] {
 
      override def toString = Real(double).show
 }
+
+
+case class Rational(private val n: Int, private val d: Int) extends ComplexLike[Rational] {
+     val reduced: Fraction = Fraction.getFraction(n, d).reduce()
+     val num: Int = reduced.getNumerator
+     val den: Int = reduced.getDenominator
+
+     val re: Rational = this
+     val im: Rational = Rational.ZERO
+
+     override def toString: String = Rational(num, den).show
+}
+
+
+case class Complex[R:RealNumber](re:R, im:R) extends ComplexLike[R] {
+     override def toString: String = Complex(re, im).show
+}
+
 
 case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexLike[R] {
      private val gen = implicitly[RealNumber[R]]
@@ -370,17 +396,6 @@ case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexLike[
      }
 }
 
-
-case class Rational(private val n: Int, private val d: Int) extends ComplexLike[Rational] {
-     val reduced: Fraction = Fraction.getFraction(n, d).reduce()
-     val num: Int = reduced.getNumerator
-     val den: Int = reduced.getDenominator
-
-     val re: Rational = this
-     val im: Rational = Rational.ZERO
-
-     override def toString: String = Rational(num, den).show
-}
 
 
 
@@ -415,14 +430,11 @@ object Rational {
 
 object NumberTester extends App {
 
-     import Number._
-     import ComplexLike._
 
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i + Rational(1)
      val b: Complex[Int] = 3 + 5.i + 3
 
 
-     //todo: the interoperability tests
      //println(a + 1, 1 + a) //todo do not work! why not??? can't infer type?
      println(a)
      println(b)
