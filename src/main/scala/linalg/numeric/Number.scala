@@ -79,24 +79,30 @@ trait Number[N] extends Field[N] /*with ComplexMaker[N] -- takes entire type -wr
 trait RealNumber[R] extends Number[R] /*with ComplexMaker[R]*/
 
 
-private[numeric] sealed trait ComplexMaker[T]{
+
+
+private[numeric] sealed trait ComplexLike[T]{
      /*def makeRealPart(r: T): T
      def makeImaginaryPart(i: T): T */
      val re: T
      val im: T
 }
 
-/*object ComplexMaker {
 
-
-}*/
 
 
 object Number {
 
      //todo implement Ordered trait for all number types to save me from having to depend onthis line.
+     /*trait Interop[T] {
+          def +(other: T): T
+          def -(other: T): T
+          def *(other: T): T
+          def /(other: T): T
+          def ^(exp: T): T
+     }*/
 
-     implicit class NumberOps[N: Number](current: N) /*extends Ordered[N]*/ {
+     implicit class NumberOps[N: Number](current: N) /*extends Ordered[N]*/ /*extends Interop[N]*/ {
 
           private val number = implicitly[Number[N]]
 
@@ -122,15 +128,6 @@ object Number {
           def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!
      }
 
-
-
-     /*implicit def ImaginaryIsComplexMaker[R: RealNumber]: ComplexMaker[R] = new ComplexMaker[R]{
-
-          val gen = implicitly[RealNumber[R]]
-
-          def makeRealPart(re: R): R = gen.zero
-          def makeImaginaryPart(im: R): R = im
-     }*/
 
 
      implicit def ComplexIsNumber[R : RealNumber]: Number[Complex[R]] = new Number[Complex[R]]  {
@@ -242,13 +239,13 @@ object Number {
 
           def absoluteValue(x: Rational): Rational = Rational(math.abs(x.num), math.abs(x.den))
 
-          def negate(x: Rational): Rational = Rational(x.num.negate(), x.num.negate())
+          def negate(x: Rational): Rational = Rational(-x.num, -x.den)
 
-          def areEqual(x: Rational, y: Rational): Boolean = x.num == y.num && x.num == y.num
+          def areEqual(x: Rational, y: Rational): Boolean = x.num == y.num && x.den == y.den
           def isZero(x: Rational): Boolean = areEqual(x, zero)
-          def isNegative(x: Rational): Boolean = x.num == 0
+          def isNegative(x: Rational): Boolean = x.num < 0
 
-          def doubleValue(x: Rational): Double = x.num * 1.0 / x.num
+          def doubleValue(x: Rational): Double = x.num * 1.0 / x.den
      }
 
 
@@ -307,18 +304,20 @@ object Number {
      }
 
 
-     ///---------------------------------------------------------------------------------------------
-     //note: removing the 'extends AnyVal' finally fixed my final problems!!!
 
+
+     //mechanism: takes something that implements RealNumber and gives it .i accessor, returning Imaginary.
      implicit class ToImaginary[R : RealNumber](private val imaginaryPart: R)/*(implicit make: ComplexMaker[R])*/{
           def i: Imaginary[R] = Imaginary(imaginaryPart)
      }
+     //mechanism: takes something that implements RealNumber and makes it addable with Imaginary (which BTW cannot
+     // implement Number because i*i = -1, not imaginary)
      implicit class ToComplexMixed[R: RealNumber](private val realPart: R)/*(implicit make: ComplexMaker[R])*/ {
           def +(that: Imaginary[R]) = Complex(realPart, that.im)//that.im)
+          def -(that: Imaginary[R]) = Complex(realPart, that.im.negate())//that.im)
      }
 }
 import Number._
-
 
 
 
@@ -328,7 +327,7 @@ import Number._
      val im: T
 }*/
 
-case class Complex[R:RealNumber](re:R, im:R) extends ComplexMaker[R] {
+case class Complex[R:RealNumber](re:R, im:R) extends ComplexLike[R] {
 
      //todo testing interoperability
      /*def +(other: R): Complex[R] = Complex(re + other, im)
@@ -339,7 +338,7 @@ case class Complex[R:RealNumber](re:R, im:R) extends ComplexMaker[R] {
      override def toString: String = Complex(re, im).show
 }
 
-case class Real(double: Double) extends ComplexMaker[Real] {
+case class Real(double: Double) extends /*Complex(double, 0)*/  ComplexLike[Real] {
      val re: Real = this
      val im: Real = Real.ZERO
 
@@ -350,7 +349,7 @@ case class Real(double: Double) extends ComplexMaker[Real] {
      override def toString = Real(double).show
 }
 
-case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexMaker[R] {
+case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexLike[R] {
      private val gen = implicitly[RealNumber[R]]
 
      val re: R = gen.zero
@@ -371,7 +370,7 @@ case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexMaker
 }
 
 
-case class Rational(private val n: Int, private val d: Int) extends ComplexMaker[Rational] {
+case class Rational(private val n: Int, private val d: Int) extends /*Real(n*1.0 / d)*/ ComplexLike[Rational] {
      val reduced: Fraction = Fraction.getFraction(n, d).reduce()
      val num: Int = reduced.getNumerator
      val den: Int = reduced.getDenominator
@@ -453,15 +452,57 @@ object NumberTester extends App {
      //import Interoperability._
 
 
+     import Number._
 
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i
      val b: Complex[Int] = 3 + 5.i //+3
 
-     //implicit def intToComplexRat(int: Int): Complex[Rational] = Complex(Rational(int), Rational.ZERO)
+
+     //implicit def ratToReal(rat: Rational): Real = Real(rat.toDouble)
+     trait Conversion[F, T] {
+          def plus(from: F, to: T): T
+          //def plus(to: T, from: F): T
+
+          //def minus()
+     }
+     /*implicit object RationalToReal extends Conversion[Rational, Real] {
+          def plus(from: Rational, to: Real): Real = Real(from.toDouble) + to
+     }*/
+     implicit def GeneralRealToComplex[R: RealNumber]: Conversion[R, Complex[R]] = new Conversion[R, Complex[R]]{
+          def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)
+
+     }
+     implicit def IntToReal: Conversion[Int, Real] = new Conversion[Int, Real]{
+          def plus(from: Int, to: Real): Real = Real(from) + to
+     }
+     implicit def DoubleToReal: Conversion[Double, Real] = new Conversion[Double, Real]{
+          def plus(from: Double, to: Real): Real = Real(from) + to
+     }
+     implicit def RationalToReal: Conversion[Rational, Real] = new Conversion[Rational, Real]{
+          def plus(from: Rational, to: Real): Real = Real(from.toDouble) + to
+     }
+     //implicit def DoubleToRational
+     /*implicit def GeneralRealToReal[R: RealNumber]: Conversion[R, Real] = new Conversion[R, Real] {
+          def plus(from: R, to: Real): Real = Real(from.toDouble) + to
+     }*/
+     implicit class ConvertFrom[F, T](val from: F)(implicit conv: Conversion[F, T]){
+          def +(to: T): T = conv.plus(from, to)
+     }
+     implicit class ConvertTo[F, T](val to: T)(implicit conv: Conversion[F, T]){
+          def +(from: F): T = conv.plus(from, to)
+     }
 
      //todo: the interoperability tests
-     /*println(a + Rational(1))
-     println(Real(2) + Rational(3, 2) + (6 + 7.i))
+     //println(a + 1, 1 + a) //todo do not work! why not??? can't infer type?
+     println(a + Rational(1))
+     println((1 + 3.i) + 1)
+     println(1 + (1 + 3.i))
+     println(23 + Real(23))
+     println(Real(23) + 23)
+     println(Rational(33) + a)
+     println(Real(1) + Rational(2))
+     println(Rational(2) + Real(1))
+     /*println(Real(2) + Rational(3, 2) + (6 + 7.i))
      println(Real(2) + Real(3) + 1 + 5.0 + Rational(8,7) + Complex(3,4) + (5 + 8.i) + 1 + 6 + 7.i)
      println(555 + Real(2) + Real(3) + 1 + 5.0 + Rational(8,7) + Complex(3,4) + (5 + 8.i))
      println(Complex(Rational(1,2), new Real(3)))
