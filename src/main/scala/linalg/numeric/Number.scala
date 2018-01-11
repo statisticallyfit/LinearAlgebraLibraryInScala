@@ -24,6 +24,7 @@ import scala.language.implicitConversions
   *
   * todo: make trait Equality that inherits from Ordered[N] and make equality typeclass instance for
   *
+  *
   * Features:
   * - rational number reducability upon creation
   * - complex number .i creation
@@ -54,26 +55,6 @@ case class Vec[N : spire.algebra.Field](elems: N*){
 trait Number[N] extends Field[N] /*with Field[R]*/ {
 
      //inherited: add, multiply, divide, one, zero, negate, inverse
-     /*def one: N
-     def zero: N
-
-     def plus(x: N, y: R): N
-     def minus(x: N, y: R): N = plus(x, negate(y))
-     def times(x: N, y: R): N
-     def divide(x: N, y: R): N
-     def power(x: N, y: R): N
-     def squareRoot(x: N): N
-     def absoluteValue(x: N): N
-
-     def negate(x: N): N
-     def inverse(x: N): N
-
-     def isZero(x: N): Boolean
-     def isNegative(x: N): Boolean
-     def areEqual(x: N, y: N): Boolean
-
-     def doubleValue(x: N): Double*/
-
      def one: N
      def zero: N
 
@@ -95,49 +76,144 @@ trait Number[N] extends Field[N] /*with Field[R]*/ {
      def doubleValue(x: N): Double
 }
 
-trait RealNumber[R] extends Number[R]
+trait RealNumber[R] extends Number[R] /*with ComplexMaker[R]*/
 
 
+private[numeric] sealed trait ComplexMaker[T]{
+     val re: T
+     val im: T
+}
+
+/*
+trait ConversionTo[FROM /*<: TO*/, TO] { //todo why not conforming?
+
+     def plus(x: TO, y: FROM): TO
+     def minus(x: TO, y: FROM): TO //= plus(x, negate(y))
+     def times(x: TO, y: FROM): TO
+     def divide(x: TO, y: FROM): TO
+     def power(x: TO, y: FROM): TO
+
+     def areEqual(x: TO, y: FROM): Boolean
+}
+
+trait ConversionFrom[FROM <: TO, TO] {
+     def plus(x: TO, y: FROM): FROM
+     def minus(x: TO, y: FROM): FROM //= plus(x, negate(y))
+     def times(x: TO, y: FROM): FROM
+     def divide(x: TO, y: FROM): FROM
+     def power(x: TO, y: FROM): FROM
+
+     def areEqual(x: TO, y: FROM): Boolean
+}
+
+
+
+object Interoperability {
+     import Number._
+
+     implicit class Interoperability1[R: RealNumber, N: Number](current: N)(implicit convert: ConversionTo[R, N]){
+
+          def +(constant: R): N = convert.plus(current, constant)
+          def -(constant: R): N = convert.minus(current, constant)
+          def *(constant: R): N = convert.times(current, constant)
+          def /(constant: R): N = convert.divide(current, constant)
+          def ^(constant: R): N = convert.power(current, constant)
+
+          def isEqual(constant: R): Boolean = convert.areEqual(current, constant)
+     }
+     implicit class Interoperability2[R: RealNumber, N: Number](constant: R)(implicit convert: ConversionTo[R, N]){
+
+          def +(current: N): N = convert.plus(current, constant)
+          def -(current: N): N = convert.minus(current, constant)
+          def *(current: N): N = convert.times(current, constant)
+          def /(current: N): N = convert.divide(current, constant)
+          def ^(current: N): N = convert.power(current, constant)
+
+          //def isEqual(current: R): Boolean = convert.areEqual(current, constant)
+     }
+
+     implicit def ComplexIsInteroperable[R: RealNumber]: ConversionTo[R, Complex[R]] = new ConversionTo[R, Complex[R]]{
+
+          type C = Complex[R]
+
+          def plus(x: C, y: R): C = Complex(x.re + y, x.im)
+          def minus(x: C, y: R): C = Complex(x.re - y, x.im)
+          def times(x: C, y: R): C = Complex(x.re * y, x.im * y)
+          def divide(x: C, y: R): C = Complex(x.re / y,  x.im / y)
+          def power(x: C, y: R): C = ??? //Complex(x.re + y, x.im)
+
+          def areEqual(x: C, y: R): Boolean = false  //todo need to fix this??
+     }
+
+     implicit def RealIsInteroperable[R : RealNumber]: ConversionTo[R, Real] = new ConversionTo[R, Real] {
+          def plus(x: Real, y: R): Real = Real(x.double + y.toDouble)
+          def minus(x: Real, y: R): Real = Real(x.double - y.toDouble)
+          def times(x: Real, y: R): Real = Real(x.double * y.toDouble)
+          def divide(x: Real, y: R): Real = Real(x.double / y.toDouble)
+          def power(x: Real, y: R): Real = Real(math.pow(x.double, y.toDouble))
+
+          def areEqual(x: Real, y: R): Boolean = x.double == y.toDouble
+     }
+
+     implicit def RationalIsInteroperable[R : RealNumber]: ConversionTo[R, Rational] = new ConversionTo[R, Rational] {
+          def plus(x: Rational, y: R): Rational = Rational(x.toDouble + y.toDouble)
+          def minus(x: Rational, y: R): Rational = Rational(x.toDouble - y.toDouble)
+          def times(x: Rational, y: R): Rational = Rational(x.toDouble * y.toDouble)
+          def divide(x: Rational, y: R): Rational = Rational(x.toDouble / y.toDouble)
+          def power(x: Rational, y: R): Rational = Rational(math.pow(x.toDouble, y.toDouble))
+
+          def areEqual(x: Rational, y: R): Boolean = x.toDouble == y.toDouble
+     }
+     //todo need to do this for Int and Double?? -- can't since need to case match ... make specific function.
+//     implicit def IntIsInteroperable[R : RealNumber] = new ConversionFrom[R, Int] {
+//          def plus(x: Int, y: R): R =
+//          def minus(x: Int, y: R): R = Real(x.double - y.toDouble)
+//          def times(x: Int, y: R): R = Real(x.double * y.toDouble)
+//          def divide(x: Int, y: R): R = Real(x.double / y.toDouble)
+//          def power(x: Int, y: R): R = Real(math.pow(x.double, y.toDouble))
+//
+//          def areEqual(x: Int, y: R): Boolean = x.double == y.toDouble
+//     }
+//     implicit def DoubleIsInteroperable[R: RealNumber] = new ConversionTo[R, Double]{
+//
+//     }
+}
+import Interoperability._*/
 
 object Number {
 
      //todo implement Ordered trait for all number types to save me from having to depend onthis line.
 
      implicit class NumberOps[N: Number](current: N) /*extends Ordered[N]*/ {
-          private val n = implicitly[Number[N]]
-          //private val r = implicitly[RealNumber[R]]
-          //private val c = implicitly[Number[Complex[R]]]
 
-          /*def +(other: R): N = n.plus(current, other)
-          def -(other: R): N = n.minus(current, other)
-          def *(other: R): N = n.times(current, other)
-          def /(other: R): N = n.divide(current, other)
-          def ^(expo: R): N = n.power(current, expo)*/
+          private val number = implicitly[Number[N]]
 
-          def +(other: N): N = n.plus(current, other)
-          def -(other: N): N = n.minus(current, other)
-          def *(other: N): N = n.times(current, other)
-          def /(other: N): N = n.divide(current, other)
-          def ^(expo: N): N = n.power(current, expo)
+          def +(other: N): N = number.plus(current, other)
+          def -(other: N): N = number.minus(current, other)
+          def *(other: N): N = number.times(current, other)
+          def /(other: N): N = number.divide(current, other)
+          def ^(expo: N): N = number.power(current, expo)
 
-          def sqrt(): N = n.squareRoot(current)
-          def abs(): N = n.absoluteValue(current)
+          def sqrt(): N = number.squareRoot(current)
+          def abs(): N = number.absoluteValue(current)
 
-          def negate(): N = n.negate(current)
-          def inverse(): N = n.inverse(current)
+          def negate(): N = number.negate(current)
+          def inverse(): N = number.inverse(current)
 
-          def isZero: Boolean = n.isZero(current)
-          def isNegative: Boolean = n.isNegative(current)
-          def isEqualTo(other: N): Boolean = n.areEqual(current, other)
-          def compare(other: N): Int = n.minus(current, other).toDouble.toInt //todo
+          def isZero: Boolean = number.isZero(current)
+          def isNegative: Boolean = number.isNegative(current)
+          def isEqualTo(other: N): Boolean = number.areEqual(current, other)
 
-          def toDouble: Double = n.doubleValue(current)
+          //todo def compare(other: N): Int = number.minus(current, other).toDouble.toInt //todo
+
+          def toDouble: Double = number.doubleValue(current)
+          def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!
      }
 
 
 
 
-     implicit def ComplexIsNumber[R : RealNumber] = new Number[Complex[R]]  {
+     implicit def ComplexIsNumber[R : RealNumber]: Number[Complex[R]] = new Number[Complex[R]]  {
 
           type C = Complex[R]
           val gen = implicitly[RealNumber[R]]
@@ -146,11 +222,8 @@ object Number {
           val one: C = Complex(gen.one, gen.zero)
           private val genTwo: R = gen.one + gen.one
 
-          //def plusO(x: C, y: R): C = Complex(x.re + y, x.im)
+
           def plus(x: C, y: C): C = Complex(x.re + y.re, x.im + y.im)
-
-          //def minusReal(x: C, y: R): C = Complex(x.re - y, x.im)
-
           def times(x: C, y: C): C = Complex(x.re * y.im - y.re * x.im, x.re * y.re + y.im * x.im)
           def divide(x: C, y: C): C = {
                val newNumerator: C = times(x, y)
@@ -213,6 +286,7 @@ object Number {
                Rational(x.num*y.den + y.num*x.den, x.den * y.den)
 
           def times(x: Rational, y: Rational): Rational = Rational(x.num * y.num, x.den * y.den)
+
           def divide(x: Rational, y: Rational): Rational = Rational(x.num * y.den, x.den * y.num)
 
           //the inner class can return abs(): N not abs(): Complex[N]
@@ -301,29 +375,35 @@ import Number._
 
 
 
-private[numeric] sealed trait ComplexMaker[T]{
+/*private[numeric] sealed trait ComplexMaker[T]{
      val re: T
      val im: T
-}
+}*/
 
-case class Complex[R:RealNumber](re:R, im:R) extends ComplexMaker[R] {
+case class Complex[R:RealNumber](re:R, im:R) /*extends ComplexMaker[R]*/ {
+
+     //todo testing interoperability
      def +(other: R): Complex[R] = Complex(re + other, im)
      def -(other: R): Complex[R] = Complex(re - other, im)
-     def *(other: R): Complex[R] = Complex(re * other, im * other)
-     def /(other: R): Complex[R] = Complex(re / other, im / other)
+     /*def *(other: R): Complex[R] = Complex(re * other, im * other)
+     def /(other: R): Complex[R] = Complex(re / other, im / other)*/
 
      override def toString: String = Complex(re, im).show
 }
 
-case class Real(double: Double) extends ComplexMaker[Real] {
+case class Real(double: Double) /*extends ComplexMaker[Real]*/ {
      val re: Real = this
      val im: Real = Real.ZERO
+
+     //todo testing interoperability
+     def +[R: RealNumber](other: R): Real = Real(double + other.toDouble)
+     def -[R: RealNumber](other: R): Real = Real(double - other.toDouble)
 
      override def toString = Real(double).show
 }
 
-case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexMaker[R] {
-     val gen = implicitly[RealNumber[R]]
+case class Imaginary[R: RealNumber](private val theImag: R) /*extends ComplexMaker[R]*/ {
+     private val gen = implicitly[RealNumber[R]]
 
      val re: R = gen.zero
      val im: R = theImag
@@ -342,12 +422,14 @@ case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexMaker
      }
 }
 
-//todo - get ACTUAL interoperability between the types, not this measly attempt that just fuses rationals and reals.
 
 case class Rational(private val n: Int, private val d: Int)  {
      val reduced: Fraction = Fraction.getFraction(n, d).reduce()
      val num: Int = reduced.getNumerator
      val den: Int = reduced.getDenominator
+
+     //todo testing interoperability
+     def +[R: RealNumber](other: R): Rational = Rational(num*1.0 / den + other.toDouble)
 
      override def toString: String = Rational(num, den).show
 }
@@ -359,13 +441,19 @@ object Complex {
      def ZERO[R](implicit gen: RealNumber[R]): Complex[R] = new Complex(gen.zero, gen.zero)
      def ONE[R](implicit gen: RealNumber[R]): Complex[R] = new Complex(gen.one, gen.zero)
 
-     def apply[R](realPart: R)(implicit gen: RealNumber[R]) = new Complex(realPart, gen.zero)
+     def apply[R](realPart: R)(implicit gen: RealNumber[R]): Complex[R] = new Complex(realPart, gen.zero)
+
+     /*def ZERO[R](implicit gen: RealNumber[R], ev: ConversionTo[R, Complex[R]]): Complex[R] = new Complex(gen.zero, gen.zero)
+     def ONE[R](implicit gen: RealNumber[R], ev: ConversionTo[R, Complex[R]]): Complex[R] = new Complex(gen.one, gen.zero)
+
+     def apply[R](realPart: R)(implicit gen: RealNumber[R], ev: ConversionTo[R, Complex[R]]) =
+          new Complex(realPart, gen.zero)*/
 
      /** --- Implicits --- */
-     implicit def fromDouble(double: Double): Complex[Double] = new Complex(double, 0)
+     /*implicit def fromDouble(double: Double): Complex[Double] = new Complex(double, 0)
      implicit def fromInt(int: Int): Complex[Int] = new Complex(int, 0)
      implicit def fromReal(real: Real): Complex[Real] = new Complex(real, Real.ZERO)
-     implicit def fromRational(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)
+     implicit def fromRational(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)*/
 }
 
 object Real {
@@ -373,10 +461,10 @@ object Real {
      val ONE: Real = new Real(1)
 
      /** --- Implicits --- */
-     implicit def fromDouble(double: Double): Real = new Real(double)
+     /*implicit def fromDouble(double: Double): Real = new Real(double)
      implicit def fromInt(int: Int): Real = new Real(int)
      implicit def fromComplex[R : RealNumber](complex: Complex[R]): Real = new Real(complex.toDouble)
-     implicit def fromRational(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)
+     implicit def fromRational(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)*/
 }
 
 object Rational {
@@ -390,17 +478,20 @@ object Rational {
           val f = Fraction.getFraction(fracAsDouble).reduce()
           new Rational(f.getNumerator, f.getDenominator)
      }
+     /*def apply[R: RealNumber](numerator: Int)(implicit ev: ConversionTo[R, Rational]): Rational =
+          new Rational(numerator, 1)
+
+     def apply[R: RealNumber](fracAsDouble: Double)(implicit ev: ConversionTo[R, Rational]): Rational = {
+          val f = Fraction.getFraction(fracAsDouble).reduce()
+          new Rational(f.getNumerator, f.getDenominator)
+     }*/
 
      /** --- Implicits --- */
-     implicit def fromDouble(double: Double): Rational = Rational(double)
+     /*implicit def fromDouble(double: Double): Rational = Rational(double)
      implicit def fromInt(int: Int): Real = new Real(int)
      implicit def fromComplex[R : RealNumber](complex: Complex[R]): Real = new Real(complex.toDouble)
-     implicit def fromReal(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)
+     implicit def fromReal(rational: Rational): Complex[Rational] = new Complex(rational, Rational.ZERO)*/
 }
-
-//import Complex._
-//import Real._
-//import Rational._
 
 
 
@@ -408,29 +499,30 @@ object Rational {
 
 object NumberTester extends App {
 
+     //import Interoperability._
 
-//     println(Complex(Rational(1,2), new Real(3)))
-//     println(Complex(1, Rational(1,4))) //todo interoperability aspect.
+
 
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i
      val b: Complex[Int] = 3 + 5.i
 
      //implicit def intToComplexRat(int: Int): Complex[Rational] = Complex(Rational(int), Rational.ZERO)
 
-     println(a + Rational(1))
-     println(b)
-     println(Complex(1,2) + 4)
-     println(7 + 8.i + 3) //todo this is because of the +(other: R) methods in Complex class - get rid of that and
-     // make trait as said in commit
-     
-     //println((7 + Rational(3,4).i) + 2)
+     //todo: the interoperability tests
+     /*println(a + Rational(1))
+     println(Real(2) + Real(3) + 1 + 5.0 + Rational(8,7) + Complex(3,4) + (5 + 8.i) + 1 + 6 + 7.i)
+     println(555 + Real(2) + Real(3) + 1 + 5.0 + Rational(8,7) + Complex(3,4) + (5 + 8.i))
+     println(Complex(Rational(1,2), new Real(3)))
+     println(Complex(1, Rational(1,4)))*/
+     //just happens because of R: RealNumber.
+
+
      // todo doesn't work - need to make overall trait NumberLower[L, H] { def +(other: L): H ...}
      println((8 + 2.i) + (9 + 2.i))
      println((8 + 2.i) - (9 + 2.i))
      //println((8 + 2.i) < (9 + 2.i)) //todo separate out ordering
 
      println(new Rational(4, 8))
-     //println(Real(2) + Real(3) + 1) //todo interoperability
      println(Rational(4, 8) + Rational(5, 15))
      println(Complex(1,2))
      println(Complex(1,2) + Complex(3,4))
