@@ -1,3 +1,4 @@
+/*
 package linalg.numeric
 
 
@@ -461,4 +462,4 @@ object NumberTester extends App {
      println(Rational(4, 8) + Rational(5, 15))
      println(Complex(1,2))
      println(Complex(1,2) + Complex(3,4))
-}
+}*/
