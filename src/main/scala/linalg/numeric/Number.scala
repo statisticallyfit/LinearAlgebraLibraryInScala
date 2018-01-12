@@ -29,6 +29,8 @@ import scala.language.implicitConversions
   * - complex numbers can have rational arguments too, anything that implements the RealNumber typeclass.
   * - printing occurs via neat Show trait, just like in Haskell.
   * - interoperability between Complex[R] and R types.
+  * - trigonometric Real and Double types
+  * - complex roots of unity and nth roots functions.
   *
   *
   * note: Source for complex .i accessor:
@@ -83,7 +85,9 @@ trait Root[H, L]{
      def squareRoot(base: H): H // = nRoot(base, two)
 }
 
-trait RealLike[R] extends Number[R] with Absolute[R, R] with Root[R, R]
+trait RealLike[R] extends Number[R] with Absolute[R, R] with Root[R, R] with Trig[R] {
+     def create(x: Int): R
+}
 
 
 object Number {
@@ -136,8 +140,12 @@ object Number {
      }
 
 
+
+
      //todo: weird "can't find type $anon" error when this is implicit val - change to object and it works ?
      implicit object RealIsNumber extends RealLike[Real]  {
+
+          /** Real part */
           val zero: Real = Real.ZERO
           val one: Real = Real.ONE
           private val two: Real = plus(one, one)
@@ -145,23 +153,44 @@ object Number {
           def plus(x: Real, y: Real): Real = Real(x.double + y.double)
           def times(x: Real, y: Real): Real = Real(x.double * y.double)
           def divide(x: Real, y: Real): Real = Real(x.double / y.double)
-
           def power(base: Real, exp: Real): Real = Real(math.pow(base.double, exp.double))
           def nRoot(base: Real, n: Real): Real = power(base, divide(one, n))
           def squareRoot(base: Real): Real = nRoot(base, two)
-
           def absoluteValue(x: Real): Real = Real(math.abs(x.double))
-
           def negate(x: Real): Real = Real(-x.double)
           def areEqual(x: Real, y: Real): Boolean = x.double == y.double
           def isZero(x: Real): Boolean = areEqual(x, zero)
           def isNegative(x: Real): Boolean = x.double < 0
           def doubleValue(x: Real): Double = x.double
+
+          def create(x: Int): Real = Real(x)
+
+
+          /** Trig part **/
+          val E: Real = Real(scala.math.E)
+          val PI: Real = Real(scala.math.Pi)
+
+          def sin(x: Real): Real = Real(math.sin(x.double))
+          def cos(x: Real): Real = Real(math.cos(x.double))
+          def tan(x: Real): Real = Real(math.tan(x.double))
+          def csc(x: Real): Real = divide(Real.ONE, sin(x))
+          def sec(x: Real): Real = divide(Real.ONE, cos(x))
+          def cot(x: Real): Real = divide(Real.ONE, tan(x))
+
+          def arcsin(x: Real): Real = Real(math.asin(x.double))
+          def arccos(x: Real): Real = Real(math.acos(x.double))
+          def arctan(x: Real): Real = Real(math.atan(x.double))
+          def arccsc(x: Real): Real = divide(Real.ONE, arcsin(x))
+          def arcsec(x: Real): Real = divide(Real.ONE, arccos(x))
+          def arccot(x: Real): Real = divide(Real.ONE, arctan(x))
+
+          def theta(y: Real, x: Real): Real = Real(math.tan(y.double / x.double))
      }
 
 
      implicit object RationalIsRealNumber extends RealLike[Rational]  {
 
+          /** Real part */
           val zero: Rational = Rational(0)
           val one: Rational = Rational(1)
           private val two: Rational = plus(one, one)
@@ -178,10 +207,34 @@ object Number {
           def isZero(x: Rational): Boolean = areEqual(x, zero)
           def isNegative(x: Rational): Boolean = x.num < 0
           def doubleValue(x: Rational): Double = x.num * 1.0 / x.den
+
+          def create(x: Int): Rational = Rational(x)
+
+
+          /** Trig part **/
+          val E: Rational = Rational(scala.math.E)
+          val PI: Rational = Rational(scala.math.Pi) // this is what spire does too, because these are finit     e.
+
+          def sin(x: Rational): Rational = Rational(math.sin(doubleValue(x)))
+          def cos(x: Rational): Rational = Rational(math.cos(doubleValue(x)))
+          def tan(x: Rational): Rational = Rational(math.tan(doubleValue(x)))
+          def csc(x: Rational): Rational = divide(Rational.ONE, sin(x))
+          def sec(x: Rational): Rational = divide(Rational.ONE, cos(x))
+          def cot(x: Rational): Rational = divide(Rational.ONE, tan(x))
+
+          def arcsin(x: Rational): Rational = Rational(math.asin(doubleValue(x)))
+          def arccos(x: Rational): Rational = Rational(math.acos(doubleValue(x)))
+          def arctan(x: Rational): Rational = Rational(math.atan(doubleValue(x)))
+          def arccsc(x: Rational): Rational = divide(Rational.ONE, arcsin(x))
+          def arcsec(x: Rational): Rational = divide(Rational.ONE, arccos(x))
+          def arccot(x: Rational): Rational = divide(Rational.ONE, arctan(x))
+
+          def theta(y: Rational, x: Rational): Rational = Rational(math.tan(doubleValue(x) / doubleValue(x)))
      }
 
 
      implicit object IntIsRealNumber extends RealLike[Int]  {
+          /** Real part **/
           val one: Int = 1
           val zero: Int = 0
 
@@ -197,10 +250,33 @@ object Number {
           def isNegative(x: Int): Boolean = x < 0
           def areEqual(x: Int, y: Int): Boolean = x == y
           def doubleValue(x: Int): Double = x * 1.0
+
+          def create(x: Int): Int = x
+
+          /** Trig part **/
+          val E: Int = 2
+          val PI: Int = 3 //just approximations! - note: int is not good for calculations
+
+          def sin(x: Int): Int = math.sin(x).toInt
+          def cos(x: Int): Int = math.cos(x).toInt
+          def tan(x: Int): Int = math.tan(x).toInt
+          def csc(x: Int): Int = (1.0 / sin(x)).toInt
+          def sec(x: Int): Int = (1.0 / cos(x)).toInt
+          def cot(x: Int): Int = (1.0 / tan(x)).toInt
+
+          def arcsin(x: Int): Int = math.asin(x).toInt
+          def arccos(x: Int): Int = math.acos(x).toInt
+          def arctan(x: Int): Int = math.atan(x).toInt
+          def arccsc(x: Int): Int = (1.0 / arcsin(x)).toInt
+          def arcsec(x: Int): Int = (1.0 / arccos(x)).toInt
+          def arccot(x: Int): Int = (1.0 / arctan(x)).toInt
+
+          def theta(y: Int, x: Int): Int = math.tan(y / x).toInt
      }
 
 
      implicit object DoubleIsRealNumber extends RealLike[Double]  {
+          /** Real part **/
           val one: Double = 1.0
           val zero: Double = 0.0
 
@@ -216,6 +292,28 @@ object Number {
           def isNegative(x: Double): Boolean = x < 0
           def areEqual(x: Double, y: Double): Boolean = x == y
           def doubleValue(x: Double): Double = x
+
+          def create(x: Int): Double = x * 1.0
+
+          /** Trig part **/
+          val E: Double = scala.math.E
+          val PI: Double = scala.math.Pi
+
+          def sin(x: Double): Double = math.sin(x)
+          def cos(x: Double): Double = math.cos(x)
+          def tan(x: Double): Double = math.tan(x)
+          def csc(x: Double): Double = 1.0 / sin(x)
+          def sec(x: Double): Double = 1.0 / cos(x)
+          def cot(x: Double): Double = 1.0 / tan(x)
+
+          def arcsin(x: Double): Double = math.asin(x)
+          def arccos(x: Double): Double = math.acos(x)
+          def arctan(x: Double): Double = math.atan(x)
+          def arccsc(x: Double): Double = 1.0 / arcsin(x)
+          def arcsec(x: Double): Double = 1.0 / arccos(x)
+          def arccot(x: Double): Double = 1.0 / arctan(x)
+
+          def theta(y: Double, x: Double): Double = math.tan(y / x)
      }
 
 
@@ -239,7 +337,10 @@ object Number {
           def power(base: Complex[R], exp: R): Complex[R] =
                Complex(Complex.magnitude(base) ^ exp, Complex.angle(base) * exp)
 
-          def nRoot(base: Complex[R], n: R): Complex[R] = power(base, one / n)
+          def nRoot(base: Complex[R], n: R): Complex[R] = {
+               val (modulusRoot, listRoots): (R, List[R]) = Complex.nthRootComplex(base, n)
+               Complex(modulusRoot, listRoots(0)) //just returning first root for convenience.
+          }
 
           def squareRoot(base: Complex[R]): Complex[R] = nRoot(base, one / two)
      }
@@ -273,8 +374,8 @@ import Number._
 
 trait Trig[T] {
 
-     /*val e: T
-     val pi: T*/ //todo should I support?
+     val E: T
+     val PI: T
 
      def sin(x: T): T
      def cos(x: T): T
@@ -293,64 +394,6 @@ trait Trig[T] {
      //returns the theta component of polar (r, theta) of the x-y coordinate (x: T, y: T)
      def theta(y: T, x: T): T
 }
-object Trig {
-
-     implicit object RationalHasTrig extends Trig[Rational] {
-          def sin(x: Rational): Rational = Rational(math.sin(x.toDouble))
-          def cos(x: Rational): Rational = Rational(math.cos(x.toDouble))
-          def tan(x: Rational): Rational = Rational(math.tan(x.toDouble))
-          def csc(x: Rational): Rational = Rational.ONE / sin(x)
-          def sec(x: Rational): Rational = Rational.ONE / cos(x)
-          def cot(x: Rational): Rational = Rational.ONE / tan(x)
-
-          def arcsin(x: Rational): Rational = Rational(math.asin(x.toDouble))
-          def arccos(x: Rational): Rational = Rational(math.acos(x.toDouble))
-          def arctan(x: Rational): Rational = Rational(math.atan(x.toDouble))
-          def arccsc(x: Rational): Rational = Rational.ONE / arcsin(x)
-          def arcsec(x: Rational): Rational = Rational.ONE / arccos(x)
-          def arccot(x: Rational): Rational = Rational.ONE / arctan(x)
-
-          def theta(y: Rational, x: Rational): Rational = Rational(math.tan(y.toDouble / x.toDouble))
-     }
-
-     implicit object RealHasTrig extends Trig[Real] {
-          def sin(x: Real): Real = Real(math.sin(x.double))
-          def cos(x: Real): Real = Real(math.cos(x.double))
-          def tan(x: Real): Real = Real(math.tan(x.double))
-          def csc(x: Real): Real = Real.ONE / sin(x)
-          def sec(x: Real): Real = Real.ONE / cos(x)
-          def cot(x: Real): Real = Real.ONE / tan(x)
-
-          def arcsin(x: Real): Real = Real(math.asin(x.double))
-          def arccos(x: Real): Real = Real(math.acos(x.double))
-          def arctan(x: Real): Real = Real(math.atan(x.double))
-          def arccsc(x: Real): Real = Real.ONE / arcsin(x)
-          def arcsec(x: Real): Real = Real.ONE / arccos(x)
-          def arccot(x: Real): Real = Real.ONE / arctan(x)
-
-          def theta(y: Real, x: Real): Real = Real(math.tan(y.double / x.double))
-     }
-     //todo - need int has trig? cannot... if not have it then will implicit Trig of int not work when calculating
-     // theta?
-     implicit object DoubleHasTrig extends Trig[Double] {
-          def sin(x: Double): Double = math.sin(x)
-          def cos(x: Double): Double = math.cos(x)
-          def tan(x: Double): Double = math.tan(x)
-          def csc(x: Double): Double = 1.0 / sin(x)
-          def sec(x: Double): Double = 1.0 / cos(x)
-          def cot(x: Double): Double = 1.0 / tan(x)
-
-          def arcsin(x: Double): Double = math.asin(x)
-          def arccos(x: Double): Double = math.acos(x)
-          def arctan(x: Double): Double = math.atan(x)
-          def arccsc(x: Double): Double = 1.0 / arcsin(x)
-          def arcsec(x: Double): Double = 1.0 / arccos(x)
-          def arccot(x: Double): Double = 1.0 / arctan(x)
-
-          def theta(y: Double, x: Double): Double = math.tan(y / x)
-     }
-}
-
 
 // ---------------------------------------------------------------------------------------------------------
 
@@ -364,24 +407,26 @@ trait Conversion[F, T] {
      def minus(from: F, to: T): T
      def times(from: F, to: T): T
      def divide(from: F, to: T): T
-     def power(from: F, to: T): T
+     def power(base: T, exp: F): T
      def areEqual(from: F, to: T): Boolean
 }
 object Conversion {
-     implicit def GeneralRealToComplex[R: RealLike]: Conversion[R, Complex[R]] = new Conversion[R, Complex[R]]{
+     /*(implicit p: Root[Complex[R], R])*/
+     implicit def GeneralRealToComplex[R: RealLike/*: Trig*/] = new Conversion[R, Complex[R]]{
           def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)
           def minus(from: R, to: Complex[R]): Complex[R] = Complex(from - to.re, to.im)
           def times(from: R, to: Complex[R]): Complex[R] = Complex(from * to.re, from * to.im)
           def divide(from: R, to: Complex[R]): Complex[R] = Complex(to.re / from, to.im / from)
-          def power(from: R, to: Complex[R]): Complex[R] = ??? //todo
+          def power(base: Complex[R], exp: R): Complex[R] = base ^ exp
           def areEqual(from: R, to: Complex[R]): Boolean = false
      }
+     //spire.math.pi
      implicit class ConvertFrom[F, T](val from: F)(implicit conv: Conversion[F, T]){
           def +(to: T): T = conv.plus(from, to)
           def -(to: T): T = conv.minus(from, to)
           def *(to: T): T = conv.times(from, to)
           def /(to: T): T = conv.divide(from, to)
-          def ^(to: T): T = conv.power(from, to)
+          def ^(exp: T): T = conv.power(exp, from)
           def isEqual(to: T): Boolean = conv.areEqual(from, to)
      }
      implicit class ConvertTo[F, T](val to: T)(implicit conv: Conversion[F, T]){
@@ -389,7 +434,7 @@ object Conversion {
           def -(from: F): T = conv.minus(from, to)
           def *(from: F): T = conv.times(from, to)
           def /(from: F): T = conv.divide(from, to)
-          def ^(from: F): T = conv.power(from, to)
+          def ^(exp: F): T = conv.power(to, exp)
           def isEqual(from: F): Boolean = conv.areEqual(from, to)
      }
 }
@@ -494,16 +539,27 @@ object Complex {
      def magnitude[R: RealLike](z: Complex[R]): R = (z.re * z.re + z.im * z.im).sqrt()
 
      //just returns the value of theta for the complex number: theta = arctan(b / a), where c = a + bi
-     def angle[R: RealLike](z: Complex[R])(implicit trig: Trig[R]): R = {
-          //println("Spire's theta: " + new spire.math.Complex[R](z.re, z.im).arg)
+     def angle[R: RealLike](z: Complex[R])(implicit trig: Trig[R]): R = trig.theta(z.re, z.im)
 
-          trig.theta(z.re, z.im)
+     /** Returns the nth root of a complex number - in tuple form = (modulus root n, list of all roots) */
+     def nthRootComplex[R](z: Complex[R], n: R)(implicit gen: RealLike[R], t: Trig[R]): (R, List[R]) ={
+          val two: R = gen.one + gen.one
+          val polarComplex: Complex[R] = polar(z)
+          val (modulus, theta): (R, R) = (polarComplex.re, polarComplex.im)
+
+          val theNRoots: List[R] = List.tabulate[R](n.toInt)(k => (theta + two * gen.create(k) * t.PI) / n)
+
+          (modulus.nRoot(n), theNRoots)
      }
 
-     def rootsOfUnity[R: RealLike](z: Complex[R]): Complex[R] = ??? //todo
+     def nthRootsOfUnity[R](z: Complex[R], n: R)(implicit gen: RealLike[R], t: Trig[R]): List[R] = {
+          val two: R = gen.one + gen.one
+          List.tabulate[R](n.toInt)(k => (two * gen.create(k) * t.PI) / n)
+     }
 
      def conjugate[R: RealLike](z: Complex[R]): Complex[R] = Complex(z.re, z.im.negate())
 }
+
 
 object Real {
      val ZERO: Real = new Real(0)
