@@ -11,16 +11,7 @@ import scala.language.implicitConversions
 
 /**
   *
-  * note: if things get too hard, just make trait Numerical and make spire's Complex, Rational, Real etc implement
-  * note: that Numerical in typeclass form then make Vector[N : Numerical]
-  *
-  *
-  * todo: make trait Trig, and mix in appropriately (decide if need it - complex: if must stay angle as N or as Double)
-  *
-  * todo: do Complex theta, polar ... functionality in the Complex object.
-  *
   * todo: make trait Equality that inherits from Ordered[N] and make equality typeclass instance for
-  * todo: typeclassify the ComplexLike pattern instead of using inheritance.
   *
   *
   * Features:
@@ -31,6 +22,7 @@ import scala.language.implicitConversions
   * - interoperability between Complex[R] and R types.
   * - trigonometric Real and Double types
   * - complex roots of unity and nth roots functions.
+  *  - Trig implementations - making RealLike extend Trig so when we declare Reals we must declare Trigs too.
   *
   *
   * note: Source for complex .i accessor:
