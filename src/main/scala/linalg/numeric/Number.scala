@@ -78,19 +78,24 @@ trait Number[N] extends Field[N] /*with ComplexMaker[N] -- takes entire type -wr
 trait RealNumber[R] extends Number[R]
 
 
-
+//todo how to typeclassify this?
+/*trait Equality[E] extends Ordered[E] {
+     def ==(e: E): Boolean
+}*/
 
 
 object Number {
+
 
      //TODO IMPORTANT - here tomorrow
      //todo try this: have Number[F, T] and inside use both plus(F, T): T and plus(T, T): T
      //todo then the implicit numberops takes the from: F and implements and then another one takes to: T and
      // implements.
      //note: then we can have abs(): F
-     implicit class NumberOps[N: Number](current: N) /*extends Ordered[N]*/ {
+     implicit class NumberOps[N: Number](current: N) /*extends Equality[N]*/ {
 
           private val number = implicitly[Number[N]]
+          //private val eq = implicitly[Equality[N]]
 
           def +(other: N): N = number.plus(current, other)
           def -(other: N): N = number.minus(current, other)
@@ -106,8 +111,7 @@ object Number {
 
           def isZero: Boolean = number.isZero(current)
           def isNegative: Boolean = number.isNegative(current)
-          def isEqualTo(other: N): Boolean = number.areEqual(current, other)
-          //def compare(other: N): Int = number.minus(current, other).toDouble.toInt
+          def isEqual(other: N): Boolean = number.areEqual(current, other)
 
           def toDouble: Double = number.doubleValue(current)
           def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!
