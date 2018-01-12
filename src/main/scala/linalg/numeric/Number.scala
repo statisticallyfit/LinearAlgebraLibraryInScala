@@ -29,28 +29,17 @@ import scala.language.implicitConversions
   * https://stackoverflow.com/questions/17381896/scala-simple-notation-of-imaginary-number
   */
 
-//note or can just have Vec[F : Field]
-/*object FieldImplicits {
-     implicit class FieldOps[F : spire.algebra.Field](current: F) {
-          val ev = implicitly[Field[F]]
-
-          def +(other: F): F = ev.plus(current, other)
-     }
+trait Equal[E]  {
+     def equal(x: E, y: E): Boolean
+     def lessThan(x: E, y: E): Boolean
+     def greaterThan(x: E, y: E): Boolean = lessThan(y, x)
+     def lessThanOrEqual(x: E, y: E): Boolean = lessThan(x, y) || equal(x, y)
+     def greaterThanOrEqual(x: E, y: E): Boolean = greaterThan(x, y) || equal(x, y)
 }
-import FieldImplicits._
 
-case class Vec[N : spire.algebra.Field](elems: N*){
-     def +(other: Vec[N]): Vec[N] = new Vec(elems.zip(other.elems).map(p => p._1 + p._2):_*)
 
-}*/
-//todo how to typeclassify this?
-/*trait Equality[E] extends Ordered[E] {
-     def ==(e: E): Boolean
-}*/
+trait Number[N] extends Field[N] with Equal[N] {
 
-trait Number[N] extends Field[N] /*with ComplexMaker[N] -- takes entire type -wrtong - not inner type!*/ {
-
-     //inherited: add, multiply, divide, one, zero, negate, inverse
      val one: N
      val zero: N
 
@@ -62,7 +51,6 @@ trait Number[N] extends Field[N] /*with ComplexMaker[N] -- takes entire type -wr
      def inverse(x: N): N
      def isZero(x: N): Boolean
      def isNegative(x: N): Boolean
-     def areEqual(x: N, y: N): Boolean
 
      def doubleValue(x: N): Double
 }
@@ -89,8 +77,9 @@ object Number {
      //todo try this: have Number[F, T] and inside use both plus(F, T): T and plus(T, T): T
      //todo then the implicit numberops takes the from: F and implements and then another one takes to: T and
      // implements.
-     implicit class NumberOps[N: Number](current: N) /*extends Equality[N]*/ {
+     implicit class NumberOps[N: Number](current: N)  {
 
+          /** Number part */
           private val number = implicitly[Number[N]]
 
           def +(other: N): N = number.plus(current, other)
@@ -101,10 +90,21 @@ object Number {
           def inverse(): N = number.inverse(current)
           def isZero: Boolean = number.isZero(current)
           def isNegative: Boolean = number.isNegative(current)
-          def isEqual(other: N): Boolean = number.areEqual(current, other)
           def toDouble: Double = number.doubleValue(current)
           def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!
+
+          /** Equality part */
+          private val eq = implicitly[Equal[N]] //note: not necessary, can just use number
+
+          def ===(other: N): Boolean = eq.equal(current, other)
+          def !==(other: N): Boolean = ! eq.equal(current, other)
+          def <(other: N): Boolean = eq.lessThan(current, other)
+          def >(other: N): Boolean = eq.greaterThan(current, other)
+          def <=(other: N): Boolean = eq.lessThanOrEqual(current, other)
+          def >=(other: N): Boolean = eq.greaterThanOrEqual(current, other)
      }
+
+
 
      implicit class TrigOps[T: Trig](current: T) {
           private val trig = implicitly[Trig[T]]
@@ -133,6 +133,7 @@ object Number {
           type C = Complex[R]
           val gen = implicitly[RealLike[R]]
 
+          /** Number part */
           val zero: C = Complex.ZERO[R]
           val one: C = Complex.ONE[R]
 
@@ -144,12 +145,15 @@ object Number {
                Complex(prod.re / absDenom, prod.im / absDenom)
           }
           def negate(x: C): C = Complex(x.re.negate(), x.im.negate())
-          def areEqual(x: C, y: C): Boolean = gen.areEqual(x.re, y.re) && gen.areEqual(x.im, y.im)
-          def isZero(x: C): Boolean = areEqual(x, zero)
+          def isZero(x: C): Boolean = equal(x, zero)
           def isNegative(x: C): Boolean = x.re.isNegative && x.im.isNegative
           def isReal(x: C): Boolean = x.im.isZero
           def isImaginary(x: C): Boolean = !isReal(x)
           def doubleValue(x: C): Double = Complex.magnitude(x).toDouble
+
+          /** Equality part */
+          def equal(x: C, y: C): Boolean = x.re == y.re && x.im == y.im
+          def lessThan(x: C, y: C): Boolean = x.re < y.re || (x.re == y.re && x.im < y.im)
      }
 
 
@@ -171,12 +175,16 @@ object Number {
           def squareRoot(base: Real): Real = nRoot(base, two)
           def absoluteValue(x: Real): Real = Real(math.abs(x.double))
           def negate(x: Real): Real = Real(-x.double)
-          def areEqual(x: Real, y: Real): Boolean = x.double == y.double
-          def isZero(x: Real): Boolean = areEqual(x, zero)
+          def isZero(x: Real): Boolean = equal(x, zero)
           def isNegative(x: Real): Boolean = x.double < 0
           def doubleValue(x: Real): Double = x.double
 
           def create(x: Int): Real = Real(x)
+
+
+          /** Equality part */
+          def equal(x: Real, y: Real): Boolean = x.double == y.double
+          def lessThan(x: Real, y: Real): Boolean = x.double < y.double
 
 
           /** Trig part **/
@@ -224,6 +232,11 @@ object Number {
           def create(x: Int): Rational = Rational(x)
 
 
+          /** Equality part **/
+          def equal(x: Rational, y: Rational): Boolean = x.num * y.den == y.num * x.den
+          def lessThan(x: Rational, y: Rational): Boolean = x.num * y.den < y.num * x.den
+
+
           /** Trig part **/
           val E: Rational = Rational(scala.math.E)
           val PI: Rational = Rational(scala.math.Pi) // this is what spire does too, because these are finit     e.
@@ -266,6 +279,12 @@ object Number {
 
           def create(x: Int): Int = x
 
+
+          /** Equality part **/
+          def equal(x: Int, y: Int): Boolean = x == y
+          def lessThan(x: Int, y: Int): Boolean = x < y
+
+
           /** Trig part **/
           val E: Int = 2
           val PI: Int = 3 //just approximations! - note: int is not good for calculations
@@ -307,6 +326,12 @@ object Number {
           def doubleValue(x: Double): Double = x
 
           def create(x: Int): Double = x * 1.0
+
+
+          /** Equality part **/
+          def equal(x: Double, y: Double): Boolean = x == y
+          def lessThan(x: Double, y: Double): Boolean = x < y
+
 
           /** Trig part **/
           val E: Double = scala.math.E
@@ -469,7 +494,7 @@ object ComplexLike {
      // implement Number because i*i = -1, not imaginary)
      implicit class ToComplex[R: RealLike](private val realPart: R) {
           def +(that: Imaginary[R]) = Complex(realPart, that.im)
-          def -(that: Imaginary[R]) = Complex(realPart, that.im)
+          def -(that: Imaginary[R]) = Complex(realPart, that.im.negate())
      }
 }
 import ComplexLike._
@@ -480,17 +505,15 @@ import ComplexLike._
 // ---------------------------------------------------------------------------------------------------------
 
 
-case class Real(double: Double) extends Ordered[Real] with ComplexLike[Real] {
+case class Real(double: Double) extends ComplexLike[Real] {
      val re: Real = this
      val im: Real = Real.ZERO
 
-     def ==(other: Real): Boolean = this.compare(other) == 0
-     override def compare(other: Real): Int = double.compare(other.double)
      override def toString = Real(double).show
 }
 
 
-case class Rational(private val n: Int, private val d: Int) extends Ordered[Rational] with ComplexLike[Rational] {
+case class Rational(private val n: Int, private val d: Int) extends ComplexLike[Rational] {
      val reduced: Fraction = Fraction.getFraction(n, d).reduce()
      val num: Int = reduced.getNumerator
      val den: Int = reduced.getDenominator
@@ -498,22 +521,16 @@ case class Rational(private val n: Int, private val d: Int) extends Ordered[Rati
      val re: Rational = this
      val im: Rational = Rational.ZERO
 
-     def ==(other: Rational): Boolean = this.compare(other) == 0
-     override def compare(other: Rational): Int = num * other.den - den * other.num
      override def toString: String = Rational(num, den).show
 }
 
 
-case class Complex[R:RealLike](re:R, im:R) extends Ordered[Complex[R]] with ComplexLike[R] {
-     def ==(other: Complex[R]): Boolean = re == other.re && im == other.im
-     override def compare(other: Complex[R]): Int = Complex(re, im).toDouble.compare(other.toDouble)
+case class Complex[R:RealLike](re:R, im:R) extends ComplexLike[R] {
      override def toString: String = Complex(re, im).show
-     //todo check if compare modulus comparison approach makes sense - if it does actually compare a < b then c < d etc
-     //todo maybe not - make your own trait with <, <=, ==, etc.
 }
 
 
-case class Imaginary[R: RealLike](private val theImag: R) extends Ordered[Imaginary[R]] with ComplexLike[R] {
+case class Imaginary[R: RealLike](private val theImag: R) extends ComplexLike[R] {
      private val gen = implicitly[RealLike[R]]
 
      val re: R = gen.zero
@@ -521,8 +538,6 @@ case class Imaginary[R: RealLike](private val theImag: R) extends Ordered[Imagin
 
      implicit def i: Imaginary[R] = this
 
-     def ==(other: Imaginary[R]): Boolean = this.compare(other) == 0
-     override def compare(other: Imaginary[R]): Int = im.toDouble.compare(other.im.toDouble)
      override def toString: String = im match {
           case _: Rational => im.isNegative match {
                case true => " - (" + im.negate().toString + ")" + "i"
@@ -601,10 +616,14 @@ object NumberTester extends App {
 
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i + Rational(1)
      val b: Complex[Int] = 3 + 5.i + 3
-     val c: Complex[Int] = 1 + 2.i
+     val c: Complex[Int] = 1 - 2.i
 
+     println(c)
      println(b < c)
-
+     println(b === c)
+     println((4 + 3.i) === (4 + 3.i))
+     println((2 + 5.i) < (2 + 7.i))
+     println((2 + 5.i) < (2 - 5.i))
 
      println(a)
      println(b)
