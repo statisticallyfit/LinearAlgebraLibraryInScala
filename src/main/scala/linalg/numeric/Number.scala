@@ -231,10 +231,10 @@ object Number {
           def abs(): L = pos.absoluteValue(current)
      }
 
-     implicit def ComplexHasRoot[R: RealLike] = new Root[Complex[R], R]{
+     implicit def ComplexHasRoot[R: RealLike: Trig] = new Root[Complex[R], R]{
           private val one = implicitly[RealLike[R]].one
-          private val t = implicitly[Trig[R]]
           private val two = one + one
+          //private val t = implicitly[Trig[R]]
 
           def power(base: Complex[R], exp: R): Complex[R] =
                Complex(Complex.magnitude(base) ^ exp, Complex.angle(base) * exp)
