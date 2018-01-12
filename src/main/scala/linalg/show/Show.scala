@@ -25,7 +25,7 @@ object Show {
           }
      }
 
-     implicit def ComplexHasShow[R : RealNumber] = new Show[Complex[R]] {
+     implicit def ComplexHasShow[R : RealLike] = new Show[Complex[R]] {
           def show(x: Complex[R]): String = x.re.toString + Imaginary(x.im).toString
      }
 }
