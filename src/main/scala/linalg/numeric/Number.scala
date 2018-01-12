@@ -107,8 +107,7 @@ object Number {
           def isZero: Boolean = number.isZero(current)
           def isNegative: Boolean = number.isNegative(current)
           def isEqualTo(other: N): Boolean = number.areEqual(current, other)
-
-          //todo def compare(other: N): Int = number.minus(current, other).toDouble.toInt //todo
+          //def compare(other: N): Int = number.minus(current, other).toDouble.toInt
 
           def toDouble: Double = number.doubleValue(current)
           def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!
@@ -144,6 +143,7 @@ object Number {
           def negate(x: C): C = Complex(x.re.negate(), x.im.negate())
 
           def areEqual(x: C, y: C): Boolean = gen.areEqual(x.re, y.re) && gen.areEqual(x.im, y.im)
+         // def comparator(x: C, y: C): Int = x.toDouble.compare(y.toDouble)
           def isZero(x: C): Boolean = areEqual(x, zero)
           def isNegative(x: C): Boolean = x.re.isNegative && x.im.isNegative
           def isReal(x: C): Boolean = x.im.isZero
@@ -270,17 +270,17 @@ object Number {
 
           private val ord = implicitly[Ordering[O]]
 
-          def
-     }*/
-     implicit def ComplexIsOrdered[R: RealNumber] = new Ordering[Complex[R]].Ops{
-          def compare(x: Complex[R], y: Complex[R]): Int = (x - y).toInt
+          def compare(that: O): Int = ord.compare(current, that)
+     }
+     implicit def ComplexIsOrdered[R: RealNumber] = new Ordering[Complex[R]] {
+          def compare(x: Complex[R], y: Complex[R]): Int = x.toDouble.compare(y.toDouble)
      }
      implicit object RealIsOrdered extends Ordering[Real]{
-          def compare(x: Real, y: Real): Int = (x - y).toInt //todo chops off
+          def compare(x: Real, y: Real): Int = x.double.compare(y.double)
      }
      implicit object RationalIsOrdered extends Ordering[Rational]{
-          def compare(x: Rational, y: Rational): Int = (x - y).toInt //todo chops off
-     }
+          def compare(x: Rational, y: Rational): Int = x.num * y.den - x.den * y.num
+     }*/
 }
 import Number._
 
@@ -350,15 +350,17 @@ import ComplexLike._
 
 
 
-case class Real(double: Double) extends ComplexLike[Real] {
+case class Real(double: Double) extends Ordered[Real] with ComplexLike[Real] {
      val re: Real = this
      val im: Real = Real.ZERO
 
+     def ==(other: Real): Boolean = this.compare(other) == 0
+     override def compare(other: Real): Int = double.compare(other.double)
      override def toString = Real(double).show
 }
 
 
-case class Rational(private val n: Int, private val d: Int) extends ComplexLike[Rational] {
+case class Rational(private val n: Int, private val d: Int) extends Ordered[Rational] with ComplexLike[Rational] {
      val reduced: Fraction = Fraction.getFraction(n, d).reduce()
      val num: Int = reduced.getNumerator
      val den: Int = reduced.getDenominator
@@ -366,16 +368,20 @@ case class Rational(private val n: Int, private val d: Int) extends ComplexLike[
      val re: Rational = this
      val im: Rational = Rational.ZERO
 
+     def ==(other: Rational): Boolean = this.compare(other) == 0
+     override def compare(other: Rational): Int = num * other.den - den * other.num
      override def toString: String = Rational(num, den).show
 }
 
 
-case class Complex[R:RealNumber](re:R, im:R) extends ComplexLike[R] {
+case class Complex[R:RealNumber](re:R, im:R) extends Ordered[Complex[R]] with ComplexLike[R] {
+     def ==(other: Complex[R]): Boolean = this.compare(other) == 0
+     override def compare(other: Complex[R]): Int = Complex(re, im).toDouble.compare(other.toDouble)
      override def toString: String = Complex(re, im).show
 }
 
 
-case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexLike[R] {
+case class Imaginary[R: RealNumber](private val theImag: R) extends Ordered[Imaginary[R]] with ComplexLike[R] {
      private val gen = implicitly[RealNumber[R]]
 
      val re: R = gen.zero
@@ -383,6 +389,8 @@ case class Imaginary[R: RealNumber](private val theImag: R) extends ComplexLike[
 
      implicit def i: Imaginary[R] = this
 
+     def ==(other: Imaginary[R]): Boolean = this.compare(other) == 0
+     override def compare(other: Imaginary[R]): Int = im.toDouble.compare(other.im.toDouble)
      override def toString: String = im match {
           case _: Rational => im.isNegative match {
                case true => " - (" + im.negate().toString + ")" + "i"
