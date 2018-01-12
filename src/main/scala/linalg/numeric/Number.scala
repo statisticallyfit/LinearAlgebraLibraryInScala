@@ -114,6 +114,27 @@ object Number {
           def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!
      }
 
+     implicit class TrigOps[T: Trig](current: T) {
+          private val trig = implicitly[Trig[T]]
+
+          /*val E: T = trig.E // note - I don't want objects to access these with '.' operator, nor theta.
+          val PI: T = trig.PI*/
+
+          def sin(): T = trig.sin(current)
+          def cos(): T = trig.cos(current)
+          def tan(): T = trig.tan(current)
+          def csc(): T = trig.csc(current)
+          def sec(): T = trig.sec(current)
+          def cot(): T = trig.cot(current)
+
+          def arcsin(): T = trig.arcsin(current)
+          def arccos(): T = trig.arccos(current)
+          def arctan(): T = trig.arctan(current)
+          def arccsc(): T = trig.arccsc(current)
+          def arcsec(): T = trig.arcsec(current)
+          def arccot(): T = trig.arccot(current)
+     }
+
 
      implicit def ComplexIsNumber[R : RealLike]: Number[Complex[R]] = new Number[Complex[R]]  {
 
@@ -534,7 +555,7 @@ object Complex {
 
 
      // --- Operations ---
-     def polar[R: RealLike](z: Complex[R])(implicit t: Trig[R]): Complex[R] = Complex(magnitude(z), angle(z))
+     def polar[R: RealLike](z: Complex[R]): Complex[R] = Complex(magnitude(z), angle(z))
 
      def magnitude[R: RealLike](z: Complex[R]): R = (z.re * z.re + z.im * z.im).sqrt()
 
@@ -542,19 +563,19 @@ object Complex {
      def angle[R: RealLike](z: Complex[R])(implicit trig: Trig[R]): R = trig.theta(z.re, z.im)
 
      /** Returns the nth root of a complex number - in tuple form = (modulus root n, list of all roots) */
-     def nthRootComplex[R](z: Complex[R], n: R)(implicit gen: RealLike[R], t: Trig[R]): (R, List[R]) ={
+     def nthRootComplex[R](z: Complex[R], n: R)(implicit gen: RealLike[R], trig: Trig[R]): (R, List[R]) ={
           val two: R = gen.one + gen.one
           val polarComplex: Complex[R] = polar(z)
           val (modulus, theta): (R, R) = (polarComplex.re, polarComplex.im)
 
-          val theNRoots: List[R] = List.tabulate[R](n.toInt)(k => (theta + two * gen.create(k) * t.PI) / n)
+          val theNRoots: List[R] = List.tabulate[R](n.toInt)(k => (theta + two * gen.create(k) * trig.PI) / n)
 
           (modulus.nRoot(n), theNRoots)
      }
 
-     def nthRootsOfUnity[R](z: Complex[R], n: R)(implicit gen: RealLike[R], t: Trig[R]): List[R] = {
+     def nthRootsOfUnity[R](z: Complex[R], n: R)(implicit gen: RealLike[R], trig: Trig[R]): List[R] = {
           val two: R = gen.one + gen.one
-          List.tabulate[R](n.toInt)(k => (two * gen.create(k) * t.PI) / n)
+          List.tabulate[R](n.toInt)(k => (two * gen.create(k) * trig.PI) / n)
      }
 
      def conjugate[R: RealLike](z: Complex[R]): Complex[R] = Complex(z.re, z.im.negate())
