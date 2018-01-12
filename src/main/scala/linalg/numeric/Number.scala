@@ -3,15 +3,15 @@ package linalg.numeric
 
 import linalg.show.Show._
 import linalg.theory._
-import linalg.util.ImplicitConversions._
 import org.apache.commons.lang3.math.Fraction
 
 import scala.language.implicitConversions
 
 
 /**
-  *
-  * todo: make trait Equality that inherits from Ordered[N] and make equality typeclass instance for
+  * A basic Number system that supports trigonometry, equality and different number types: Complex, Real, Rational,
+  * Int, Double.
+  * Functionality is implemented using a typeclass pattern to preserve cleanliness and maintainability.
   *
   *
   * Features:

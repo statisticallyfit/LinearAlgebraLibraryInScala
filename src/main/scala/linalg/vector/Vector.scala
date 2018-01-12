@@ -1,3 +1,19 @@
+package linalg.vector
+
+
+
+import linalg.theory._
+
+
+
+//todo: then make trait MatrixLike[M] and implement adjoint, ... all matrix-type stuff.
+//make square matrix and the rest do the same. or inherit from matrix???
+//todo then Independence[L] and Basis[B] traits to have functions basis() ...- the typeclass way.
+
+trait VectorLike[V] extends Field[V] /*with HilbertSpace[ --- and banachspace*/{
+
+}
+
 //package linalg.vector
 //
 //
