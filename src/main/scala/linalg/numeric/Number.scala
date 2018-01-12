@@ -169,9 +169,9 @@ object Number {
           def plus(x: Rational, y: Rational): Rational = Rational(x.num*y.den + y.num*x.den, x.den*y.den)
           def times(x: Rational, y: Rational): Rational = Rational(x.num * y.num, x.den * y.den)
           def divide(x: Rational, y: Rational): Rational = Rational(x.num * y.den, x.den * y.num)
-          def power(x: Rational, y: Rational): Rational = Rational(math.pow(doubleValue(x), doubleValue(y)))
-          def nRoot()
-          def squareRoot(base: Rational): Rational = nRoot(base, divide(one, ))
+          def power(base: Rational, exp: Rational): Rational = Rational(math.pow(doubleValue(base), doubleValue(exp)))
+          def nRoot(base: Rational, n: Rational): Rational = power(base, divide(one, n))
+          def squareRoot(base: Rational): Rational = nRoot(base, two)
           def absoluteValue(x: Rational): Rational = Rational(math.abs(x.num), math.abs(x.den))
           def negate(x: Rational): Rational = Rational(-x.num, -x.den)
           def areEqual(x: Rational, y: Rational): Boolean = x.num == y.num && x.den == y.den
@@ -185,45 +185,36 @@ object Number {
           val one: Int = 1
           val zero: Int = 0
 
-
           def plus(x: Int, y: Int): Int = x + y
           def times(x: Int, y: Int): Int = x * y
           def divide(x: Int, y: Int): Int = x / y
-
-          def power(x: Int, y: Int): Int = math.pow(x, y).toInt
-          def squareRoot(x: Int): Int = math.sqrt(x).toInt  //this chops off
+          def power(base: Int, exp: Int): Int = math.pow(base, exp).toInt //not chopped off
+          def nRoot(base: Int, n: Int): Int = math.pow(base, 1.0 / n).toInt //todo gets chopped off
+          def squareRoot(base: Int): Int = nRoot(base, 2)
           def absoluteValue(x: Int): Int = math.abs(x)
-
           def negate(x: Int): Int = -x
-
           def isZero(x: Int): Boolean = x == 0
           def isNegative(x: Int): Boolean = x < 0
           def areEqual(x: Int, y: Int): Boolean = x == y
-
           def doubleValue(x: Int): Double = x * 1.0
      }
-
 
 
      implicit object DoubleIsRealNumber extends RealLike[Double]  {
           val one: Double = 1.0
           val zero: Double = 0.0
 
-
           def plus(x: Double, y: Double): Double = x + y
           def times(x: Double, y: Double): Double = x * y
           def divide(x: Double, y: Double): Double = x / y
-
-          def power(x: Double, y: Double): Double = math.pow(x, y)
-          def squareRoot(x: Double): Double = math.sqrt(x)
+          def power(base: Double, exp: Double): Double = math.pow(base, exp)
+          def squareRoot(base: Double): Double = math.sqrt(base)
+          def nRoot(base: Double, n: Double): Double = power(base, 1/n)
           def absoluteValue(x: Double): Double = math.abs(x)
-
           def negate(x: Double): Double = -x
-
           def isZero(x: Double): Boolean = x == 0
           def isNegative(x: Double): Boolean = x < 0
           def areEqual(x: Double, y: Double): Boolean = x == y
-
           def doubleValue(x: Double): Double = x
      }
 
@@ -242,6 +233,7 @@ object Number {
 
      implicit def ComplexHasRoot[R: RealLike] = new Root[Complex[R], R]{
           private val one = implicitly[RealLike[R]].one
+          private val t = implicitly[Trig[R]]
           private val two = one + one
 
           def power(base: Complex[R], exp: R): Complex[R] =
