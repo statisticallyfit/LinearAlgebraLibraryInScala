@@ -170,22 +170,14 @@ object Number {
 
 
      implicit def ComplexIsNumber[R: RealLike: Equal: Trig](implicit rr: Root[R,R],
-                                                            rc: Root[Complex[R], R],
-                                                            pos: Absolute[R,R],
-                                                            e: Equal[Complex[R]]) = new Number[Complex[R]]
+                                                            pos: Absolute[R,R]) = new Number[Complex[R]]
+
           with Equal[Complex[R]] with Root[Complex[R], R] with Absolute[Complex[R], R] {
 
 
           type C = Complex[R]
           val realLike = implicitly[RealLike[R]]
-          /*val rr = implicitly[Root[R,R]]
-          val ab = implicitly[Absolute[R, R]]
-          val rc = implicitly[Root[Complex[R], R]]
-          val eq = implicitly[Equal[Complex[R]]]
-          import rr._
-          import ab._
-          import rc._
-          import eq._*/
+
 
           /** Number part */
           val zero: C = Complex.ZERO[R]
@@ -200,7 +192,7 @@ object Number {
                Complex(prod.re / absDenom, prod.im / absDenom)
           }
           def negate(x: C): C = Complex(x.re.negate(), x.im.negate())
-          def isZero(x: C): Boolean = e.equal(x, zero)
+          def isZero(x: C): Boolean = equal(x, zero)
           def isNegative(x: C): Boolean = x.re.isNegative && x.im.isNegative
           def isReal(x: C): Boolean = x.im.isZero
           def isImaginary(x: C): Boolean = !isReal(x)
@@ -445,43 +437,37 @@ trait Conversion[F, T] {
      def times(from: F, to: T): T
      def divide(from: F, to: T): T
      def power(base: T, exp: F): T
-     def areEqual(from: F, to: T): Boolean
 }
 object Conversion {
      /*(implicit p: Root[Complex[R], R])*/
-     implicit def GeneralRealToComplex[R: RealLike](implicit rc: Root[Complex[R],R],
-                                                    rr: Root[R,R],
-                                                    e: Equal[Complex[R]],
-                                                    ar: Absolute[R,R],
-                                                    ac: Absolute[Complex[R], R]) = new Conversion[R, Complex[R]]{
+     implicit def GeneralRealToComplex[R](implicit r: RealLike[R],
+                                                    e:Equal[R], a: Absolute[R,R],
+                                                    rt: Root[R, R], t: Trig[R]) = new Conversion[R, Complex[R]]{
 
           def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)
           def minus(from: R, to: Complex[R]): Complex[R] = Complex(from - to.re, to.im)
           def times(from: R, to: Complex[R]): Complex[R] = Complex(from * to.re, from * to.im)
           def divide(from: R, to: Complex[R]): Complex[R] = Complex(to.re / from, to.im / from)
-          def power(base: Complex[R], exp: R): Complex[R] = base ^ exp
-          def areEqual(from: R, to: Complex[R]): Boolean = false
+          def power(base: Complex[R], exp: R): Complex[R] = implicitly[Root[Complex[R], R]].power(base, exp)
      }
      //spire.math.pi
-     implicit class ConvertFrom[F, T](val from: F)(implicit conv: Conversion[F, T],
+     implicit class ConvertFrom[F, T](val from: F)(implicit conv: Conversion[F, T]/*,
                                                    rc: Root[T,F], rr: Root[F,F], e: Equal[T],
-                                                   ar: Absolute[F,F], ac: Absolute[T,F]){
+                                                   ar: Absolute[F,F], ac: Absolute[T,F]*/){
           def +(to: T): T = conv.plus(from, to)
           def -(to: T): T = conv.minus(from, to)
           def *(to: T): T = conv.times(from, to)
           def /(to: T): T = conv.divide(from, to)
           def ^(exp: T): T = conv.power(exp, from)
-          def isEqual(to: T): Boolean = conv.areEqual(from, to)
      }
-     implicit class ConvertTo[F, T](val to: T)(implicit conv: Conversion[F, T],
+     implicit class ConvertTo[F, T](val to: T)(implicit conv: Conversion[F, T]/*,
                                                rc: Root[T,F], rr: Root[F,F], e: Equal[T],
-                                               ar: Absolute[F,F], ac: Absolute[T,F]){
+                                               ar: Absolute[F,F], ac: Absolute[T,F]*/){
           def +(from: F): T = conv.plus(from, to)
           def -(from: F): T = conv.minus(from, to)
           def *(from: F): T = conv.times(from, to)
           def /(from: F): T = conv.divide(from, to)
           def ^(exp: F): T = conv.power(to, exp)
-          def isEqual(from: F): Boolean = conv.areEqual(from, to)
      }
 }
 import Conversion._
@@ -495,20 +481,19 @@ private[numeric] trait ComplexLike[T]{
 }
 object ComplexLike {
      //mechanism: takes something that implements RealNumber and gives it .i accessor, returning Imaginary.
-     implicit class ToImaginary[R : RealLike](private val imaginaryPart: R)(implicit rr: Root[R,R],
-                                                                            rc: Root[Imaginary[R],R],
-                                                                            ar: Absolute[R,R],
-                                                                            ac: Absolute[Imaginary[R],R],
-                                                                            e: Equal[Imaginary[R]]){
+     implicit class ToImaginary[R](private val imaginaryPart: R)(implicit r: RealLike[R],
+                                                                 e:Equal[R], a: Absolute[R,R],
+                                                                 rt: Root[R, R], t: Trig[R]){
+
           def i: Imaginary[R] = Imaginary(imaginaryPart)
      }
+
      //mechanism: takes something that implements RealNumber and makes it addable with Imaginary (which BTW cannot
      // implement Number because i*i = -1, not imaginary)
-     implicit class ToComplex[R: RealLike](private val realPart: R)(implicit rr: Root[R,R],
-                                                                    rc: Root[Imaginary[R],R],
-                                                                    ar: Absolute[R,R],
-                                                                    ac: Absolute[Imaginary[R],R],
-                                                                    e: Equal[Imaginary[R]]) {
+     implicit class ToComplex[R](private val realPart: R)(implicit r: RealLike[R],
+                                                          e:Equal[R], a: Absolute[R,R],
+                                                          rt: Root[R, R], t: Trig[R]) {
+
           def +(that: Imaginary[R]) = Complex(realPart, that.im)
           def -(that: Imaginary[R]) = Complex(realPart, that.im.negate())
      }
