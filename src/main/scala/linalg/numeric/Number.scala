@@ -439,6 +439,21 @@ trait Conversion[F, T] {
      def power(base: T, exp: F): T
 }
 object Conversion {
+     //mechanism: takes something that implements RealNumber and gives it .i accessor, returning Imaginary.
+     implicit class ToImaginary[R: RealLike](private val imaginaryPart: R){
+
+          def i: Imaginary[R] = Imaginary(imaginaryPart)
+     }
+
+     //mechanism: takes something that implements RealNumber and makes it addable with Imaginary (which BTW cannot
+     // implement Number because i*i = -1, not imaginary)
+     implicit class ToComplex[R: RealLike](private val realPart: R)/*(implicit compLike: ComplexLike[Imaginary[R], R])*/ {
+
+          def +(that: Imaginary[R]) = Complex(realPart, that.im) //compLike.imag(that)) //can just do that.im
+          def -(that: Imaginary[R]) = Complex(realPart, that.im.negate()) //compLike.imag(that).negate())
+     }
+
+     // ---------------------------------------------------------------------------------------------
 
      implicit def GeneralRealToComplex[R: RealLike](implicit rt: Root[Complex[R], R]) =
           new Conversion[R, Complex[R]]{
@@ -468,95 +483,30 @@ object Conversion {
 import Conversion._
 
 
-// ---------------------------------------------------------------------------------------------------------
-
-private[numeric] trait ComplexLike[C, R]{
-     def real(r: C): R
-     def imag(i: C): R
-     /*val re: T
-     val im: T*/
-}
-object ComplexLike {
-     //mechanism: takes something that implements RealNumber and gives it .i accessor, returning Imaginary.
-     implicit class ToImaginary[R: RealLike](private val imaginaryPart: R){
-
-          def i: Imaginary[R] = Imaginary(imaginaryPart)
-     }
-
-     //mechanism: takes something that implements RealNumber and makes it addable with Imaginary (which BTW cannot
-     // implement Number because i*i = -1, not imaginary)
-     implicit class ToComplex[R: RealLike](private val realPart: R)/*(implicit compLike: ComplexLike[Imaginary[R], R])*/ {
-
-          def +(that: Imaginary[R]) = Complex(realPart, that.im) //compLike.imag(that)) //can just do that.im
-          def -(that: Imaginary[R]) = Complex(realPart, that.im.negate()) //compLike.imag(that).negate())
-     }
-
-     //
-     /*implicit object RealIsComplexLike extends ComplexLike[Real, Real] {
-          def real(r: Real): Real = r
-          def imag(i: Real): Real = Real.ZERO
-     }
-     implicit object RationalIsComplexLike extends ComplexLike[Rational, Rational] {
-          def real(r: Rational): Rational = r
-          def imag(i: Rational): Rational = Rational.ZERO
-     }
-     implicit object DoubleIsComplexLike extends ComplexLike[Double, Double] {
-          def real(r: Double): Double = r
-          def imag(i: Double): Double = 0.0
-     }
-     implicit object IntIsComplexLike extends ComplexLike[Int, Int] {
-          def real(r: Int): Int = r
-          def imag(i: Int): Int = 0
-     }
-     implicit def ComplexIsComplexLike[R: RealLike] = new ComplexLike[Complex[R], R] {
-          def real(c: Complex[R]): R = c.re
-          def imag(c: Complex[R]): R = c.im
-     }
-     implicit def ImaginaryIsComplexLike[R: RealLike] = new ComplexLike[Imaginary[R], R] {
-          val gen = implicitly[RealLike[R]]
-
-          def real(i: Imaginary[R]): R = gen.zero
-          def imag(i: Imaginary[R]): R = i.im
-     }*/
-}
-import ComplexLike._
-
-
-
 
 // ---------------------------------------------------------------------------------------------------------
 
 
-case class Real(double: Double) /*extends ComplexLike[Real]*/ {
-     /*val re: Real = this
-     val im: Real = Real.ZERO*/
-
+case class Real(double: Double) {
      override def toString = Real(double).show
 }
 
 
-case class Rational(private val n: Int, private val d: Int) /*extends ComplexLike[Rational, Rational] */{
+case class Rational(private val n: Int, private val d: Int) {
      val reduced: Fraction = Fraction.getFraction(n, d).reduce()
      val num: Int = reduced.getNumerator
      val den: Int = reduced.getDenominator
-
-     /*val re: Rational = this
-     val im: Rational = Rational.ZERO*/
 
      override def toString: String = Rational(num, den).show
 }
 
 
-case class Complex[R:RealLike](re:R, im:R) /*extends ComplexLike[Complex[R], R]*/ {
+case class Complex[R:RealLike](re:R, im:R) {
      override def toString: String = Complex(re, im).show
 }
 
 
-case class Imaginary[R: RealLike](im: R) /*extends ComplexLike[Imaginary[R], R]*/ {
-     //private val gen = implicitly[RealLike[R]]
-
-     /*val re: R = gen.zero
-     val im: R = imaginaryValue*/
+case class Imaginary[R: RealLike](im: R) {
 
      implicit def i: Imaginary[R] = this
 
