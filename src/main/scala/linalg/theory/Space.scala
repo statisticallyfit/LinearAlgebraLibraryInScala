@@ -7,30 +7,47 @@ import scala.collection.mutable.ListBuffer
 import scala.reflect.runtime.universe._
 
 //------------------------------------------------------------------------------------------------------
+/**
+  * A vector space is a set V together with two binary operations that combine
+  * two entities to yield a third, called vector addition and scalar multiplication.
+  * Vector spaces fall into two categories: A vector space V is said to be ﬁnite-dimensional if there is a finite set
+  * of vectors in V that spans V and is said to be inﬁnite-dimensional if no such set exists.
+  */
+//todo is it weird that if V is Field, then F is not? Want to show that F is Field also...
+//todo - can't inherit field twice for Field[F]
+trait VectorSpace[V, F] extends Field[V] { //extends /*Field[F] with*/ Dimension[V] {
+
+     //this: Field[F] with Dimension[V] =>
+     //this: AbelianGroup[V] with Dimension[V, F] =>
+     //note must logically also say 'with basisvecspace' but not practically possible for row/colnull spaces
+     //note inherited from abelian group: +,-,opposite, zero
+     //note inherited from dimension: dimension()
+
+     // The result of applying this function to a scalar, c, in F and v in V is denoted cv.
+     def scale(constant: F): V
+     def scale(constant: Double): V
+}
+
+
+//TODO tomorrow look at spire's methods: https://github.com/non/spire/blob/f86dfda4fb3029f23c023c940ea61dde51e4a0f1/core/shared/src/main/scala/spire/algebra/InnerProductSpace.scala
+
+trait InnerProductSpace[I, F] extends VectorSpace[I, F] with Field[F] {
+     //this: Field[F] with Dimension[I] =>
+     //todo - define methods? innerProduct()???
+}
 
 
 /**
   * A Banach space, B, is a complete normed vector space such that every Cauchy sequence (with respect
   * to the metric d(x, y) = |x - y|) in B has a limit in B.
   */
-trait BanachSpace[B, F] extends VectorSpace[B, F] /*with Normal[B, F]*/ {
-
-     this: Field[F] with Dimension[B] =>
+trait BanachSpace[B, F] extends VectorSpace[B, F] with NormedVectorSpace[B, F] {
 
      // |⋅| : B → F
      //norm assigns a strictly positive length or size to all vectors in the vector space, other than the zero vector.
      def norm(v: B): F //note calculates the 2-norm
      def normalize(v: B): B
      def isNormalized(v: B): Boolean
-}
-
-
-
-//------------------------------------------------------------------------------------------------------
-
-trait InnerProductSpace[I, F] extends VectorSpace[I, F]{
-     this: Field[F] with Dimension[I] =>
-     //todo - define methods? innerProduct()???
 }
 
 
@@ -41,7 +58,7 @@ trait InnerProductSpace[I, F] extends VectorSpace[I, F]{
   */
 trait HilbertSpace[H, F] extends InnerProductSpace[H, F] {
 
-     this: Field[F] with Dimension[H] with BanachSpace[H, F] =>
+     //this: Field[F] with Dimension[H] with BanachSpace[H, F] =>
 
      //∠ : H × H → F
      // Inner product formalizes the geometrical notions such as the length of a vector and the angle between two vectors.
@@ -55,59 +72,24 @@ trait HilbertSpace[H, F] extends InnerProductSpace[H, F] {
 
 //------------------------------------------------------------------------------------------------------
 
-/**
-  * A vector space is a set V together with two binary operations that combine
-  * two entities to yield a third, called vector addition and scalar multiplication.
-  * Vector spaces fall into two categories: A vector space V is said to be ﬁnite-dimensional if there is a finite set
-  * of vectors in V that spans V and is said to be inﬁnite-dimensional if no such set exists.
-  */
-trait VectorSpace[V, F] { //extends /*Field[F] with*/ Dimension[V] {
 
-     this: Field[F] with Dimension[V] =>
-     //this: AbelianGroup[V] with Dimension[V, F] =>
-     //note must logically also say 'with basisvecspace' but not practically possible for row/colnull spaces
-     //note inherited from abelian group: +,-,opposite, zero
-     //note inherited from dimension: dimension()
 
-     // The result of applying this function to a scalar, c, in F and v in V is denoted cv.
-     def scale(constant: F): V
-     def scale(constant: Double): V
+trait Basis[V, N] /*extends Orthonormal[V] with Span[Basis[V, F], F]*/ {
+
+     //this: VectorSpace[B, N] with Span[B, N] with LinearIndependence[B, N] =>
+
+     //note ifvecset cols are linearly independent, then the vecset is a basis for vecpsace V^n,
+     // if not return None.
+     // which means this vecset is not a basis for the V^n vecspace. prereq is isBasisOfSpaceWith function
+     def basis(): Option[V]
+     //def isBasisOfSpaceWith(dim: Int): Boolean //todo do we really need this?
 }
-
-
-
-
-////note M ~ for matrix
-//trait BasisSpace[M, F <: Field[F]] {
-//
-//     this: VectorSpace[M, F] with LinearIndependence[M, F] =>
-//
-//     //checks whether this space/set is basis of vector space of Real/Rational/orComplex just by
-//     // checking its dimension
-//     // example: this vspace/set is basis of R^4 if the basis has 4 elements in each vector && vectors
-//     // are linindep.
-//     //note Any n independent vecs in R^n are basis for R^n, and also as basis for R^n has n independent
-//     // vectors in R^n
-//     def isBasisOfSpaceWith(dim: Int): Boolean
-//     def basis(): M
-//}
-//
-//trait Basis[S, N <: Number[N]] /*extends Orthonormal[V] with Span[Basis[V, F], F]*/ {
-//
-//     this: VectorSpace[S, N] with Span[S, N] with LinearIndependence[S, N] =>
-//
-//     //note ifvecset cols are linearly independent, then the vecset is a basis for vecpsace V^n,
-//     // if not return None.
-//     // which means this vecset is not a basis for the V^n vecspace. prereq is isBasisOfSpaceWith function
-//     def basis(): Option[S]
-//     def isBasisOfSpaceWith(dim: Int): Boolean
-//}
 
 
 trait Dimension[V]{
      //this: VectorSpace[V, _]/* with Field[F] */=>
 
-     def dimension(space: V): Int
+     def dimension(vectorSpace: V): Int
 }
 
 
@@ -123,42 +105,32 @@ trait Dimension[V]{
 //// normal.
 //
 //
-//
-//trait Normal[B/* <: VectorSpace[V, N]*/, F <: Field[F]] {
-//     this: BanachSpace[B, F] =>
-//
-//     def norm(): F
-//     def normalize(): B
-//     def isNormalized(): Boolean
-//}
-//
-//trait OrthogonalTo[V, F <: Field[F]] {
-//     this: VectorSpace[V, F] =>
-//
-//     def isOrthogonalTo(that: V): Boolean
-//}
-//
-//trait OrthogonalIdentity[V, F <: Field[F]] {
-//     this: VectorSpace[V, F] =>
-//
-//     def isOrthogonal(): Boolean
-//}
-//
-//trait Orthogonal[V, F <: Field[F]] extends OrthogonalTo[V, F] with OrthogonalIdentity[V, F] {
-//     this: VectorSpace[V, F] =>
-//
-//     def orthogonalize(): V
-//}
-//
-//trait Orthonormal[B <: BanachSpace[B, F], F <: Field[F]] extends Orthogonal[B, F] with Normal[B, F] {
-//     this: VectorSpace[B, F] with BanachSpace[B, F]  =>
-//
-//     def orthonormalize(): B = orthogonalize().normalize()
-//}
+//TODO //todo - started showing type parameter type is Field ....????
 
-// TODO
-/*trait LinearSubspace extends VectorSpace[LinearSubspace]
-trait Subspace extends VectorSpace[Subspace]  //def isSubspaceOf(another: )*/
+trait NormedVectorSpace[V, F] extends BanachSpace[V, F] with Field[F] {
+
+     def norm(n: V): F
+     def normalize(n: V): V
+     def isNormalized(n: V): Boolean
+}
+
+
+trait Orthogonal[V, F] extends VectorSpace[V, F] with Field[F] {
+
+     def isOrthogonal(v: V): Boolean
+     def areOrthogonal(v1: V, v2: V): Boolean
+     def orthogonalize(v: V): V
+}
+
+trait Orthonormal[V, F] extends Orthogonal[V, F] with NormedVectorSpace[V, F] with Field[F] {
+
+     def orthonormalize(v: V): V = normalize( orthogonalize(v) )
+}
+
+// TODO look at methods in linear algbera spire
+trait LinearSubspace[S, F] extends VectorSpace[S, F]
+
+trait Subspace[S, F] extends VectorSpace[S, F]  //def isSubspaceOf(another: )
 //------------------------------------------------------------------------------------------------------
 
 

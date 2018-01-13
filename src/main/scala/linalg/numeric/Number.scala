@@ -29,9 +29,7 @@ import scala.language.implicitConversions
   * https://stackoverflow.com/questions/17381896/scala-simple-notation-of-imaginary-number
   */
 
-trait Number[N] extends Field[N] /*with Equal[N]*/ {
-
-     //this: Equal[N] =>
+trait Number[N] extends Field[N]  {
 
      val zero: N
      val one: N
@@ -93,8 +91,7 @@ trait Trig[T] {
 
 
 
-trait RealLike[R] extends Number[R] /*with Absolute[R, R] with Root[R, R] with Trig[R]*/ {
-     //this: Equal[R] with Absolute[R, R] with Root[R, R] with Trig[R] =>
+trait RealLike[R] extends Number[R] {
 
      def from(x: Int): R
 }
@@ -106,7 +103,6 @@ object Number {
 
      implicit class NumberOps[N: Number](current: N)  {
 
-          /** Number part */
           private val number = implicitly[Number[N]]
 
           def +(other: N): N = number.plus(current, other)
@@ -133,7 +129,6 @@ object Number {
      }
 
      implicit class EqualityOps[E: Equal](current: E){
-          /** Equality part */
           private val eq = implicitly[Equal[E]]
 
           def :==:(other: E): Boolean = eq.equal(current, other)
