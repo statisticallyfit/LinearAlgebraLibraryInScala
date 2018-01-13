@@ -194,7 +194,7 @@ object Number {
           def negate(x: C): C = Complex(x.re.negate(), x.im.negate())
           def isZero(x: C): Boolean = equal(x, zero)
           def isNegative(x: C): Boolean = x.re.isNegative && x.im.isNegative
-          def isReal(x: C): Boolean = x.im.isZero
+          def isReal(x: C): Boolean = x.im.isZero //todo make this visible in complex class or object.
           def isImaginary(x: C): Boolean = !isReal(x)
           def doubleValue(x: C): Double = Complex.magnitude(x).toDouble
           def from(x: Int): C = Complex(realLike.from(x))
@@ -439,30 +439,25 @@ trait Conversion[F, T] {
      def power(base: T, exp: F): T
 }
 object Conversion {
-     /*(implicit p: Root[Complex[R], R])*/
-     implicit def GeneralRealToComplex[R](implicit r: RealLike[R],
-                                                    e:Equal[R], a: Absolute[R,R],
-                                                    rt: Root[R, R], t: Trig[R]) = new Conversion[R, Complex[R]]{
+
+     implicit def GeneralRealToComplex[R: RealLike](implicit rt: Root[Complex[R], R]) =
+          new Conversion[R, Complex[R]]{
 
           def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)
           def minus(from: R, to: Complex[R]): Complex[R] = Complex(from - to.re, to.im)
           def times(from: R, to: Complex[R]): Complex[R] = Complex(from * to.re, from * to.im)
           def divide(from: R, to: Complex[R]): Complex[R] = Complex(to.re / from, to.im / from)
-          def power(base: Complex[R], exp: R): Complex[R] = implicitly[Root[Complex[R], R]].power(base, exp)
+          def power(base: Complex[R], exp: R): Complex[R] = base ^ exp
      }
-     //spire.math.pi
-     implicit class ConvertFrom[F, T](val from: F)(implicit conv: Conversion[F, T]/*,
-                                                   rc: Root[T,F], rr: Root[F,F], e: Equal[T],
-                                                   ar: Absolute[F,F], ac: Absolute[T,F]*/){
+
+     implicit class ConvertFrom[F, T](val from: F)(implicit conv: Conversion[F, T]){
           def +(to: T): T = conv.plus(from, to)
           def -(to: T): T = conv.minus(from, to)
           def *(to: T): T = conv.times(from, to)
           def /(to: T): T = conv.divide(from, to)
           def ^(exp: T): T = conv.power(exp, from)
      }
-     implicit class ConvertTo[F, T](val to: T)(implicit conv: Conversion[F, T]/*,
-                                               rc: Root[T,F], rr: Root[F,F], e: Equal[T],
-                                               ar: Absolute[F,F], ac: Absolute[T,F]*/){
+     implicit class ConvertTo[F, T](val to: T)(implicit conv: Conversion[F, T]){
           def +(from: F): T = conv.plus(from, to)
           def -(from: F): T = conv.minus(from, to)
           def *(from: F): T = conv.times(from, to)
@@ -475,28 +470,54 @@ import Conversion._
 
 // ---------------------------------------------------------------------------------------------------------
 
-private[numeric] trait ComplexLike[T]{
-     val re: T
-     val im: T
+private[numeric] trait ComplexLike[C, R]{
+     def real(r: C): R
+     def imag(i: C): R
+     /*val re: T
+     val im: T*/
 }
 object ComplexLike {
      //mechanism: takes something that implements RealNumber and gives it .i accessor, returning Imaginary.
-     implicit class ToImaginary[R](private val imaginaryPart: R)(implicit r: RealLike[R],
-                                                                 e:Equal[R], a: Absolute[R,R],
-                                                                 rt: Root[R, R], t: Trig[R]){
+     implicit class ToImaginary[R: RealLike](private val imaginaryPart: R){
 
           def i: Imaginary[R] = Imaginary(imaginaryPart)
      }
 
      //mechanism: takes something that implements RealNumber and makes it addable with Imaginary (which BTW cannot
      // implement Number because i*i = -1, not imaginary)
-     implicit class ToComplex[R](private val realPart: R)(implicit r: RealLike[R],
-                                                          e:Equal[R], a: Absolute[R,R],
-                                                          rt: Root[R, R], t: Trig[R]) {
+     implicit class ToComplex[R: RealLike](private val realPart: R)/*(implicit compLike: ComplexLike[Imaginary[R], R])*/ {
 
-          def +(that: Imaginary[R]) = Complex(realPart, that.im)
-          def -(that: Imaginary[R]) = Complex(realPart, that.im.negate())
+          def +(that: Imaginary[R]) = Complex(realPart, that.im) //compLike.imag(that)) //can just do that.im
+          def -(that: Imaginary[R]) = Complex(realPart, that.im.negate()) //compLike.imag(that).negate())
      }
+
+     //
+     /*implicit object RealIsComplexLike extends ComplexLike[Real, Real] {
+          def real(r: Real): Real = r
+          def imag(i: Real): Real = Real.ZERO
+     }
+     implicit object RationalIsComplexLike extends ComplexLike[Rational, Rational] {
+          def real(r: Rational): Rational = r
+          def imag(i: Rational): Rational = Rational.ZERO
+     }
+     implicit object DoubleIsComplexLike extends ComplexLike[Double, Double] {
+          def real(r: Double): Double = r
+          def imag(i: Double): Double = 0.0
+     }
+     implicit object IntIsComplexLike extends ComplexLike[Int, Int] {
+          def real(r: Int): Int = r
+          def imag(i: Int): Int = 0
+     }
+     implicit def ComplexIsComplexLike[R: RealLike] = new ComplexLike[Complex[R], R] {
+          def real(c: Complex[R]): R = c.re
+          def imag(c: Complex[R]): R = c.im
+     }
+     implicit def ImaginaryIsComplexLike[R: RealLike] = new ComplexLike[Imaginary[R], R] {
+          val gen = implicitly[RealLike[R]]
+
+          def real(i: Imaginary[R]): R = gen.zero
+          def imag(i: Imaginary[R]): R = i.im
+     }*/
 }
 import ComplexLike._
 
@@ -506,36 +527,36 @@ import ComplexLike._
 // ---------------------------------------------------------------------------------------------------------
 
 
-case class Real(double: Double) extends ComplexLike[Real] {
-     val re: Real = this
-     val im: Real = Real.ZERO
+case class Real(double: Double) /*extends ComplexLike[Real]*/ {
+     /*val re: Real = this
+     val im: Real = Real.ZERO*/
 
      override def toString = Real(double).show
 }
 
 
-case class Rational(private val n: Int, private val d: Int) extends ComplexLike[Rational] {
+case class Rational(private val n: Int, private val d: Int) /*extends ComplexLike[Rational, Rational] */{
      val reduced: Fraction = Fraction.getFraction(n, d).reduce()
      val num: Int = reduced.getNumerator
      val den: Int = reduced.getDenominator
 
-     val re: Rational = this
-     val im: Rational = Rational.ZERO
+     /*val re: Rational = this
+     val im: Rational = Rational.ZERO*/
 
      override def toString: String = Rational(num, den).show
 }
 
 
-case class Complex[R:RealLike](re:R, im:R) extends ComplexLike[R] {
+case class Complex[R:RealLike](re:R, im:R) /*extends ComplexLike[Complex[R], R]*/ {
      override def toString: String = Complex(re, im).show
 }
 
 
-case class Imaginary[R: RealLike](private val theImag: R) extends ComplexLike[R] {
-     private val gen = implicitly[RealLike[R]]
+case class Imaginary[R: RealLike](im: R) /*extends ComplexLike[Imaginary[R], R]*/ {
+     //private val gen = implicitly[RealLike[R]]
 
-     val re: R = gen.zero
-     val im: R = theImag
+     /*val re: R = gen.zero
+     val im: R = imaginaryValue*/
 
      implicit def i: Imaginary[R] = this
 
@@ -566,11 +587,10 @@ object Complex {
 
 
      // --- Operations ---
-     def polar[R: RealLike](z: Complex[R])(implicit rc: Root[Complex[R], R],
-                                           rr: Root[R,R], t: Trig[R]): Complex[R] =
+     def polar[R: RealLike](z: Complex[R])(implicit rr: Root[R,R], t: Trig[R]): Complex[R] =
           Complex(magnitude(z), angle(z))
 
-     def magnitude[R: RealLike](z: Complex[R])(implicit rc: Root[Complex[R], R], rr: Root[R,R]): R =
+     def magnitude[R: RealLike](z: Complex[R])(implicit rr: Root[R,R]): R =
           (z.re * z.re + z.im * z.im).sqrt()
 
      //just returns the value of theta for the complex number: theta = arctan(b / a), where c = a + bi
@@ -579,8 +599,7 @@ object Complex {
      /** Returns the nth root of a complex number - in tuple form = (modulus root n, list of all roots) */
      def nthRootComplex[R](z: Complex[R], n: R)(implicit gen: RealLike[R],
                                                 trig: Trig[R],
-                                                rr: Root[R,R],
-                                                rc: Root[Complex[R], R]): (R, List[R]) ={
+                                                rr: Root[R,R]): (R, List[R]) ={
 
           val two: R = gen.one + gen.one
           val polarComplex: Complex[R] = polar(z)
@@ -597,6 +616,14 @@ object Complex {
      }
 
      def conjugate[R: RealLike](z: Complex[R]): Complex[R] = Complex(z.re, z.im.negate())
+}
+
+
+object Imaginary {
+
+     def ZERO[R](implicit gen: RealLike[R]): Imaginary[R] = new Imaginary(gen.zero)
+     def ONE[R](implicit gen: RealLike[R]): Imaginary[R] = new Imaginary(gen.one)
+     def TWO[R](implicit gen: RealLike[R]): Imaginary[R] = new Imaginary(gen.two)
 }
 
 
