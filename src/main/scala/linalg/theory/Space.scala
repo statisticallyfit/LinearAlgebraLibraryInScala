@@ -15,9 +15,11 @@ import scala.reflect.runtime.universe._
   */
 //todo is it weird that if V is Field, then F is not? Want to show that F is Field also...
 //todo - can't inherit field twice for Field[F]
-trait VectorSpace[V, F] extends Field[V] { //extends /*Field[F] with*/ Dimension[V] {
+trait VectorSpace[V, F] extends Ring[V] { //extends /*Field[F] with*/ Dimension[V] {
 
-     this: Field[F] =>
+     implicit def scalar: Field[F]  //todo saw in spire - what does this do?
+
+     //this: Field[F] =>
      //this: Field[F] with Dimension[V] =>
      //this: AbelianGroup[V] with Dimension[V, F] =>
      //note must logically also say 'with basisvecspace' but not practically possible for row/colnull spaces
@@ -32,7 +34,11 @@ trait VectorSpace[V, F] extends Field[V] { //extends /*Field[F] with*/ Dimension
 
 //TODO tomorrow look at spire's methods: https://github.com/non/spire/blob/f86dfda4fb3029f23c023c940ea61dde51e4a0f1/core/shared/src/main/scala/spire/algebra/InnerProductSpace.scala
 
-trait InnerProductSpace[I, F] extends VectorSpace[I, F] with Field[F] {
+trait InnerProductSpace[I, F] extends VectorSpace[I, F] /*with Field[F]*/ {
+
+     def innerProduct(i1: I, i2: I): F
+     def dotProduct(i1: I, i2: I): F = innerProduct(i1, i2)
+     //this: Field[F] =>
      //this: Field[F] with Dimension[I] =>
      //todo - define methods? innerProduct()???
 }
@@ -42,7 +48,9 @@ trait InnerProductSpace[I, F] extends VectorSpace[I, F] with Field[F] {
   * A Banach space, B, is a complete normed vector space such that every Cauchy sequence (with respect
   * to the metric d(x, y) = |x - y|) in B has a limit in B.
   */
-trait BanachSpace[B, F] extends VectorSpace[B, F] with Field[F] with NormedVectorSpace[B, F] {
+trait BanachSpace[B, F] extends VectorSpace[B, F] /*with Field[F]*/ with NormedVectorSpace[B, F] {
+
+     //this: Field[F] =>
 
      // |⋅| : B → F
      //norm assigns a strictly positive length or size to all vectors in the vector space, other than the zero vector.
@@ -59,6 +67,7 @@ trait BanachSpace[B, F] extends VectorSpace[B, F] with Field[F] with NormedVecto
   */
 trait HilbertSpace[H, F] extends InnerProductSpace[H, F] {
 
+     //this: Field[F] =>
      //this: Field[F] with Dimension[H] with BanachSpace[H, F] =>
 
      //∠ : H × H → F
@@ -77,6 +86,7 @@ trait HilbertSpace[H, F] extends InnerProductSpace[H, F] {
 
 trait Basis[B, F] extends VectorSpace[B, F] /*extends Orthonormal[V] with Span[Basis[V, F], F]*/ {
 
+    // this: Field[F] =>
      //this: VectorSpace[B, N] with Span[B, N] with LinearIndependence[B, N] =>
 
      //note ifvecset cols are linearly independent, then the vecset is a basis for vecpsace V^n,
@@ -86,8 +96,10 @@ trait Basis[B, F] extends VectorSpace[B, F] /*extends Orthonormal[V] with Span[B
      //def isBasisOfSpaceWith(dim: Int): Boolean //todo do we really need this?
 }
 
-
+//todo need to provide V, F or just V?
 trait Dimension[V]{
+
+     this: VectorSpace[V, _] =>
 
      def dimension(vectorSpace: V): Int
 }
@@ -107,15 +119,22 @@ trait Dimension[V]{
 //
 //TODO //todo - started showing type parameter type is Field ....????
 
-trait NormedVectorSpace[V, F] /*extends BanachSpace[V, F]*/ {
+trait NormedVectorSpace[V, F] extends VectorSpace[V, F] {
+
+     //this: Field[F] =>
 
      def norm(n: V): F
      def normalize(n: V): V
      def isNormalized(n: V): Boolean
 }
 
-
-trait Orthogonal[V, F] extends VectorSpace[V, F] with Field[F] {
+//note: if using self-type this: Field[F] then the relation is HAS-A between the trait and the self-typer.
+//note: but if using inheritance Field[F] then relation is IS-A between the trait and F.
+//note: relation is still IS-A for the class that mixes in the overall trait.
+//source: https://softwareengineering.stackexchange.com/questions/219038/what-is-the-difference-between-self-types-and-trait-inheritance-in-scala
+// https://stackoverflow.com/questions/2224932/difference-between-trait-inheritance-and-self-type-annotation
+trait Orthogonal[V, F] extends VectorSpace[V, F] /*with Field[F] */{
+     //this: Field[F] =>
 
      def isOrthogonal(v: V): Boolean
      def areOrthogonal(v1: V, v2: V): Boolean
@@ -124,13 +143,20 @@ trait Orthogonal[V, F] extends VectorSpace[V, F] with Field[F] {
 
 trait Orthonormal[V, F] extends Orthogonal[V, F] with NormedVectorSpace[V, F]  {
 
+     //this: Field[F] =>
      def orthonormalize(v: V): V = normalize( orthogonalize(v) )
 }
 
 // TODO look at methods in linear algbera spire
-trait LinearSubspace[S, F] extends VectorSpace[S, F]
+trait LinearSubspace[S, F] extends VectorSpace[S, F]{
 
-trait Subspace[S, F] extends VectorSpace[S, F]  //def isSubspaceOf(another: )
+     //this: Field[F] =>
+}
+
+trait Subspace[S, F] extends VectorSpace[S, F] {
+     //def isSubspaceOf(another: )
+     //this: Field[F] =>
+}
 //------------------------------------------------------------------------------------------------------
 
 

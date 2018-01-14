@@ -27,41 +27,45 @@ trait Eq[E] {
 }
 
 
-trait VectorLike[V, N] extends HilbertSpace[V, N] with BanachSpace[V, N] {
+trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] with BanachSpace[V, F] {
 
-     val zero: V
-     val one: V
+     //this: Number[N] =>
+     implicit def scalar: Field[F]
 
+     //note: inherited
      def plus(v: V, w: V): V
-     def minus(v: V, w: V): V
-     def times(v: V, w: V): V  //dot product
-     def crossProduct(v: V, w: V): V  //maybe won't work
-     def outerProduct(v: V, w: V): V
-     def scale(v: V, factor: N): V
-     //no inverse, no divide!
+     def minus(v: V, w: V): V = plus(v, negate(w))
+     def times(v: V, w: V): F = innerProduct(v, w)
+     def scale(v: V, factor: F): V
+     //def divide(v: V, f: F): V  = scale(v, scalar.inverse(f)) //todo no point?
      def negate(v: V): V
+     // no divide, no inverse!
 
      def isZero(v: V): Boolean
+     def innerProduct(v: V, w: V): F
+     def crossProduct(v: V, w: V): V  //maybe won't work
+     def outerProduct(v: V, w: V): V
 
      def angle(v: V, w: V): V
 }
 
 //todo - decide overall if should use extension to specify type of the 'smaller' parameters.
 
-trait MatrixLike[M, N] extends /*Number[N] with*/ VectorLike[M, N]{
-     val IDENTITY: M = one
+trait MatrixLike[M, F] extends /*Number[N] with*/ VectorLike[M, F] with Field[M] {
 
-     def divide(m1: M, m2: M): M = times(m1, inverse(m2))
+     //this: Number[N] =>
+
+     val identity: M
+
      def inverse(m: M): M
-
      def transpose(m: M): M
      def conjugateTranspose(m: M): M
      def adjoint(m: M): M
      def cofactor(m: M): M
      def minor(m: M): M
-     def minor(m: M, rowIndex: Int, colIndex: Int): N
+     def minor(m: M, rowIndex: Int, colIndex: Int): F
      def determinant(m: M): M
-     def trace(m: M): N
+     def trace(m: M): F
      def rowReducedEchelonForm(m: M): M
 }
 //note: matrix types:
@@ -74,11 +78,13 @@ trait MatrixLike[M, N] extends /*Number[N] with*/ VectorLike[M, N]{
 
 trait LinearSystem[S, N] extends MatrixLike[S, N] {
 
+     this: Number[N] =>
+
      def isInconsistent(s: S): Boolean
      def isConsistent(s: S): Boolean  = ! isInconsistent(s)
 
      def hasNoSolution(s: S): Boolean = isInconsistent(s)
-     def hasUniqueSolution(s: S): Boolean = equals(rowReducedEchelonForm(s), IDENTITY)
+     def hasUniqueSolution(s: S): Boolean = equals(rowReducedEchelonForm(s), identity)
 
      def infiniteSolutionSolver(s: S): S
      def solve(s: S): Option[S]
