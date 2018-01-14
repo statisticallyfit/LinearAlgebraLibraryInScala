@@ -17,6 +17,7 @@ import scala.reflect.runtime.universe._
 //todo - can't inherit field twice for Field[F]
 trait VectorSpace[V, F] extends Field[V] { //extends /*Field[F] with*/ Dimension[V] {
 
+     this: Field[F] =>
      //this: Field[F] with Dimension[V] =>
      //this: AbelianGroup[V] with Dimension[V, F] =>
      //note must logically also say 'with basisvecspace' but not practically possible for row/colnull spaces
@@ -41,7 +42,7 @@ trait InnerProductSpace[I, F] extends VectorSpace[I, F] with Field[F] {
   * A Banach space, B, is a complete normed vector space such that every Cauchy sequence (with respect
   * to the metric d(x, y) = |x - y|) in B has a limit in B.
   */
-trait BanachSpace[B, F] extends VectorSpace[B, F] with NormedVectorSpace[B, F] {
+trait BanachSpace[B, F] extends VectorSpace[B, F] with Field[F] with NormedVectorSpace[B, F] {
 
      // |⋅| : B → F
      //norm assigns a strictly positive length or size to all vectors in the vector space, other than the zero vector.
@@ -74,20 +75,19 @@ trait HilbertSpace[H, F] extends InnerProductSpace[H, F] {
 
 
 
-trait Basis[V, N] /*extends Orthonormal[V] with Span[Basis[V, F], F]*/ {
+trait Basis[B, F] extends VectorSpace[B, F] /*extends Orthonormal[V] with Span[Basis[V, F], F]*/ {
 
      //this: VectorSpace[B, N] with Span[B, N] with LinearIndependence[B, N] =>
 
      //note ifvecset cols are linearly independent, then the vecset is a basis for vecpsace V^n,
      // if not return None.
      // which means this vecset is not a basis for the V^n vecspace. prereq is isBasisOfSpaceWith function
-     def basis(): Option[V]
+     def basis(): Option[B]
      //def isBasisOfSpaceWith(dim: Int): Boolean //todo do we really need this?
 }
 
 
 trait Dimension[V]{
-     //this: VectorSpace[V, _]/* with Field[F] */=>
 
      def dimension(vectorSpace: V): Int
 }
@@ -107,7 +107,7 @@ trait Dimension[V]{
 //
 //TODO //todo - started showing type parameter type is Field ....????
 
-trait NormedVectorSpace[V, F] extends BanachSpace[V, F] with Field[F] {
+trait NormedVectorSpace[V, F] /*extends BanachSpace[V, F]*/ {
 
      def norm(n: V): F
      def normalize(n: V): V
@@ -122,7 +122,7 @@ trait Orthogonal[V, F] extends VectorSpace[V, F] with Field[F] {
      def orthogonalize(v: V): V
 }
 
-trait Orthonormal[V, F] extends Orthogonal[V, F] with NormedVectorSpace[V, F] with Field[F] {
+trait Orthonormal[V, F] extends Orthogonal[V, F] with NormedVectorSpace[V, F]  {
 
      def orthonormalize(v: V): V = normalize( orthogonalize(v) )
 }
