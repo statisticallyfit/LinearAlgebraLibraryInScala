@@ -28,6 +28,16 @@ import scala.language.implicitConversions
   * note: Source for complex .i accessor:
   * https://stackoverflow.com/questions/17381896/scala-simple-notation-of-imaginary-number
   */
+//TODO: Number: make self-type this: Absolute[Number[N], N] ... etc - if it works?
+// TODO so that RealLike inherits - but must  also include: this: Trig[R] =>
+
+// TODO   must change Conversion trait so that we have Number[N, R] and RealLike[R] extends
+// TODO Number[R,R] and we have Number[Complex[R],R] instance and the rest are RealLike-s.
+// TODO Then in the Number trait we add conversion methods: def plus(const: R, num: N): N
+// TODO and def plus(num: N, const: R): N and good old def plus(n1: N, n2: N): N  and
+// TODO so on for each operation. Then maybe this will guarantee type conversion? Like
+// TODO Real + complex => complex ... so no need for the hardcoded-complex-int conversion,
+// TODO we have interoperability automatically.
 
 trait Number[N] extends Field[N]  {
 
