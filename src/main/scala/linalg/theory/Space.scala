@@ -49,39 +49,13 @@ trait VectorSpace[V, F] extends AbelianGroup[V] with Monoid[V] {
   *                                          --- (means the inner product is zero or positive)
   *
   */
-trait InnerProductSpace[I, F] extends VectorSpace[I, F] /*with Field[F]*/ {
+trait InnerProductSpace[I, F] extends VectorSpace[I, F] {
 
      def innerProduct(i1: I, i2: I): F
      def dotProduct(i1: I, i2: I): F = innerProduct(i1, i2)
-     //this: Field[F] =>
-     //this: Field[F] with Dimension[I] =>
-     //todo - define methods? innerProduct()???
 }
 
-import linalg.numeric.Number._
-import linalg.numeric._
-import linalg.numeric.Number
 
-case class Poly[N: Number](coefs: N*)
-
-object InnerProductSpace{
-     implicit def PolyIsInner[N: Number] = new InnerProductSpace[Poly[N], N] {
-
-          val gen = implicitly[Number[N]]
-
-          val zero: Int => Poly[N] = n => Poly(List.fill[N](n)(gen.zero):_*)
-          val one: Int => Poly[N] = n => Poly(List.fill[N](n)(gen.one):_*)
-
-          def innerProduct(p: Poly[N], q: Poly[N]): N ={
-               p.coefs.zip(q.coefs).map{case (pc, qc) => pc* qc}.sum
-          }
-
-          def scale(p: Poly[N], factor: N): Poly[N] = Poly(p.coefs.map(_ * factor):_*)
-
-          def plus(p: Poly[N], q: Poly[N]): Poly[N] = Poly(p.coefs.zip(q.coefs).map{case (pc, qc) => pc + qc}:_*)
-          def negate(p: Poly[N]): Poly[N] = Poly(p.coefs.map(_.negate()):_*)
-     }
-}
 
 
 /**
