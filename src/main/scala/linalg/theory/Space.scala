@@ -12,28 +12,43 @@ import scala.reflect.runtime.universe._
   * two entities to yield a third, called vector addition and scalar multiplication.
   * Vector spaces fall into two categories: A vector space V is said to be ﬁnite-dimensional if there is a finite set
   * of vectors in V that spans V and is said to be inﬁnite-dimensional if no such set exists.
-  */
-//todo is it weird that if V is Field, then F is not? Want to show that F is Field also...
-//todo - can't inherit field twice for Field[F]
-trait VectorSpace[V, F] extends Ring[V] { //extends /*Field[F] with*/ Dimension[V] {
+  *
+  * Laws:
+  * (i) a + b = b + a                   --- commutativity, vector addition
+  * (ii) (a + b) + c = a + (b + c)      --- associativity, vector addition
+  * (iii) k(a + b) = ka + kb            --- distributivity, vector addition
+  * (iv) k(cu) = (kc) u                 --- associativity, scalar multiplication
+  * (v) k + c)u = ku + cu               --- distributivity, scalars:
+  *
+ */
+trait VectorSpace[V, F] extends AbelianGroup[V] with Monoid[V] {
 
-     implicit def scalar: Field[F]  //todo saw in spire - what does this do?
+     val zero: V
+     val one: V
+     //def zero(n: Int): V //neutral element: 0 + u = u
+     //def one(n: Int): V // identity element: 1*u = u
 
-     //this: Field[F] =>
-     //this: Field[F] with Dimension[V] =>
-     //this: AbelianGroup[V] with Dimension[V, F] =>
-     //note must logically also say 'with basisvecspace' but not practically possible for row/colnull spaces
-     //note inherited from abelian group: +,-,opposite, zero
-     //note inherited from dimension: dimension()
-
-     // The result of applying this function to a scalar, c, in F and v in V is denoted cv.
-     def scale(constant: F): V
-     def scale(constant: Double): V
+     def plus(v: V, w: V): V //addition => u + v
+     def negate(v: V): V //additive inverse => u + (-u) = 0
+     def scale(v: V, constant: F): V //scalar multiplication: ku
 }
 
 
 //TODO tomorrow look at spire's methods: https://github.com/non/spire/blob/f86dfda4fb3029f23c023c940ea61dde51e4a0f1/core/shared/src/main/scala/spire/algebra/InnerProductSpace.scala
-
+//TODO next: make the testing things in Discipline (grouplaws, innerprodspace laws, vecspace laws ...etc)
+/**
+  * An inner product on a real vector space V is an operation <,> which assigns
+  * a unique real number to each pair of vectors, u, and v, which satisfies the
+  * following axioms for all vectors u,v,w in V and all scalars k.
+  *
+  * Laws:
+  * (i) < u, v> = < v, u >                   --- commutative law
+  * (ii) < u+v, w > = < u,w > + < v,w >      --- distributive law
+  * (iii) < ku, v > = k< u,v >               --- taking out scalar k
+  * (iv) < u,u > >= 0 and we have <u,u> = 0 if and only if u = 0
+  *                                          --- (means the inner product is zero or positive)
+  *
+  */
 trait InnerProductSpace[I, F] extends VectorSpace[I, F] /*with Field[F]*/ {
 
      def innerProduct(i1: I, i2: I): F
@@ -41,6 +56,31 @@ trait InnerProductSpace[I, F] extends VectorSpace[I, F] /*with Field[F]*/ {
      //this: Field[F] =>
      //this: Field[F] with Dimension[I] =>
      //todo - define methods? innerProduct()???
+}
+
+import linalg.numeric.Number._
+import linalg.numeric._
+import linalg.numeric.Number
+
+case class Poly[N: Number](coefs: N*)
+
+object InnerProductSpace{
+     implicit def PolyIsInner[N: Number] = new InnerProductSpace[Poly[N], N] {
+
+          val gen = implicitly[Number[N]]
+
+          val zero: Int => Poly[N] = n => Poly(List.fill[N](n)(gen.zero):_*)
+          val one: Int => Poly[N] = n => Poly(List.fill[N](n)(gen.one):_*)
+
+          def innerProduct(p: Poly[N], q: Poly[N]): N ={
+               p.coefs.zip(q.coefs).map{case (pc, qc) => pc* qc}.sum
+          }
+
+          def scale(p: Poly[N], factor: N): Poly[N] = Poly(p.coefs.map(_ * factor):_*)
+
+          def plus(p: Poly[N], q: Poly[N]): Poly[N] = Poly(p.coefs.zip(q.coefs).map{case (pc, qc) => pc + qc}:_*)
+          def negate(p: Poly[N]): Poly[N] = Poly(p.coefs.map(_.negate()):_*)
+     }
 }
 
 
@@ -82,6 +122,22 @@ trait HilbertSpace[H, F] extends InnerProductSpace[H, F] {
 
 //------------------------------------------------------------------------------------------------------
 
+// TODO look at methods in linear algbera spire
+trait LinearSubspace[S, F] extends VectorSpace[S, F]{
+
+     //this: Field[F] =>
+}
+
+/**
+  * A non-empty subset S of vector space V is a subspace of V if it also
+  * satisfies the ten axioms of a vector space.
+  */
+trait Subspace[S, F] extends VectorSpace[S, F] {
+
+     //todo corect? Check that subset is indeed subset of gen, only thing, since vecspace axioms are satisfied
+     // automatically when extending.
+     def isSubspaceOf(aSubset: S, generalVecSpace: VectorSpace[S,F]): Boolean
+}
 
 
 trait Basis[B, F] extends VectorSpace[B, F] /*extends Orthonormal[V] with Span[Basis[V, F], F]*/ {
@@ -147,16 +203,7 @@ trait Orthonormal[V, F] extends Orthogonal[V, F] with NormedVectorSpace[V, F]  {
      def orthonormalize(v: V): V = normalize( orthogonalize(v) )
 }
 
-// TODO look at methods in linear algbera spire
-trait LinearSubspace[S, F] extends VectorSpace[S, F]{
 
-     //this: Field[F] =>
-}
-
-trait Subspace[S, F] extends VectorSpace[S, F] {
-     //def isSubspaceOf(another: )
-     //this: Field[F] =>
-}
 //------------------------------------------------------------------------------------------------------
 
 

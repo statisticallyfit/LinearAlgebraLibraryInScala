@@ -1,4 +1,4 @@
-addCommandAlias("namaste", "~test-only org.functionalkoans.forscala.Koans")
+//addCommandAlias("namaste", "~test-only org.functionalkoans.forscala.Koans")
 
 name := "LinearAlgebraLibraryInScala"
 

@@ -30,15 +30,13 @@ trait Eq[E] {
 trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] with BanachSpace[V, F] {
 
      //this: Number[N] =>
-     implicit def scalar: Field[F]
+     //implicit def scalar: Field[F]
 
      //note: inherited
      def plus(v: V, w: V): V
-     def minus(v: V, w: V): V = plus(v, negate(w))
-     def times(v: V, w: V): F = innerProduct(v, w)
-     def scale(v: V, factor: F): V
-     //def divide(v: V, f: F): V  = scale(v, scalar.inverse(f)) //todo no point?
      def negate(v: V): V
+     def minus(v: V, w: V): V = plus(v, negate(w))
+     def scale(v: V, factor: F): V
      // no divide, no inverse!
 
      def isZero(v: V): Boolean
@@ -78,7 +76,7 @@ trait MatrixLike[M, F] extends /*Number[N] with*/ VectorLike[M, F] with Field[M]
 
 trait LinearSystem[S, N] extends MatrixLike[S, N] {
 
-     this: Number[N] =>
+     //this: Number[N] =>
 
      def isInconsistent(s: S): Boolean
      def isConsistent(s: S): Boolean  = ! isInconsistent(s)
