@@ -55,23 +55,64 @@ object InnerProductSpace{
 
 class PolyInnerProductSpaceSpec extends FunSuite with Matchers with Discipline {
 
-     implicit def arbitraryNumber[N: Number](implicit a: Arbitrary[N]): Arbitrary[N] ={
-          val realNumber = for {
-               double <- Gen.choose(Double.MinValue + 1, Double.MaxValue)
+     implicit def arbReal: Arbitrary[Real] ={
+
+          val genReal: Gen[Real] = for {
+               double <- Arbitrary.arbitrary[Double] //Gen.choose(Double.MinValue + 1, Double.MaxValue)
           } yield Real(double)
 
-
-          val rationalNumber = for {
-
-               validNumers <- Gen.choose(Integer.MIN_VALUE + 1, Integer.MAX_VALUE)
-
-               validDenoms <- Gen.choose(Integer.MIN_VALUE + 1, Integer.MAX_VALUE)
-          }
+          Arbitrary(genReal)
      }
 
+     implicit def arbRational: Arbitrary[Rational] ={
 
-     implicit def arbitraryPolynomial[N: Number](implicit a: Arbitrary[N]): Arbitrary[Polynomial[N]] ={
+          val genRational: Gen[Rational] = for {
+               n <- Arbitrary.arbitrary[Int] //Gen.choose(Integer.MIN_VALUE + 1, Integer.MAX_VALUE)
+               d <- Arbitrary.arbitrary[Int] suchThat (_ != 0)
+          } yield Rational(n, d)
 
+          Arbitrary(genRational)
+     }
+
+     implicit def arbComplex[R: RealLike : Arbitrary]: Arbitrary[Complex[R]] ={
+
+          val genComplex: Gen[Complex[R]] = for {
+               realPart <- Arbitrary.arbitrary[R]
+               imagPart <- Arbitrary.arbitrary[R]
+          } yield Complex(realPart, imagPart)
+
+          Arbitrary(genComplex)
+     }
+
+     /*implicit def arbNumber[N : Number : Arbitrary, R: RealLike : Arbitrary]: Arbitrary[Number[N]] ={
+
+          /*val genReal: Gen[Real] = for {
+               double <- Arbitrary.arbitrary[Double] //Gen.choose(Double.MinValue + 1, Double.MaxValue)
+          } yield Real(double)
+
+          val genRational: Gen[Rational] = for {
+               n <- Arbitrary.arbitrary[Int] //Gen.choose(Integer.MIN_VALUE + 1, Integer.MAX_VALUE)
+               d <- Arbitrary.arbitrary[Int] suchThat (_ != 0)
+          } yield Rational(n, d)
+
+          val genComplex: Gen[Complex[R]] = for {
+               realPart <- Arbitrary.arbitrary[R]
+               imagPart <- Arbitrary.arbitrary[R]
+          } yield Complex(realPart, imagPart)*/
+
+          val genNumber: Gen[N] = Gen.oneOf(arbReal, arbRational)
+
+          Arbitrary(genNumber)
+     }*/
+
+     implicit def arbitraryPolynomial[N: Number : Arbitrary]: Arbitrary[Polynomial[N]] ={
+
+          val genPoly: Gen[Polynomial[N]] = for {
+               length <- Gen.choose(1, 10)
+               n <- Arbitrary.arbitrary[List[N]]
+
+               //todo check here for Gen.listOfN: https://github.com/rickynils/scalacheck/blob/master/doc/UserGuide.md
+          }
 
           //Arbitrary(Gen.frequency((1, Polynomial(Gen.frequency((10, arbitrary[N].map(n => n)))))))
      }

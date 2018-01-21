@@ -9,9 +9,12 @@ trait Group[G]
   *       closure
   *       associativity
   *       existence of multiplicative identity
-  * @tparam G
+  * @tparam M
   */
-trait Monoid[G] extends Group[G]
+trait Monoid[M] extends Group[M] {
+     val zero: M
+     def plus(x: M, y: M): M
+}
 
 
 /**

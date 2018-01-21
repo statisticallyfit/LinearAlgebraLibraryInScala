@@ -49,7 +49,7 @@ trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] w
 
 //todo - decide overall if should use extension to specify type of the 'smaller' parameters.
 
-trait MatrixLike[M, F] extends /*Number[N] with*/ VectorLike[M, F] with Field[M] {
+trait MatrixLike[M, F] extends /*Number[N] with*/ VectorLike[M, F] /*with Field[M]*/ {
 
      //this: Number[N] =>
 
