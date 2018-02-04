@@ -21,10 +21,10 @@ import linalg.numeric._
   *
   * -
   */
-
-trait Eq[E] {
+//todo use Cats Eq typeclass instead!
+/*trait Eq[E] {
      def equals(x: E, y: E): Boolean
-}
+}*/
 
 
 trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] with BanachSpace[V, F] {

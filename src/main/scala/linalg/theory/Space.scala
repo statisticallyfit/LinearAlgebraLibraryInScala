@@ -45,24 +45,50 @@ trait VectorSpace[V, F] extends AbelianGroup[V] with Monoid[V] {
   * (i) < u, v> = < v, u >                   --- commutative law
   * (ii) < u+v, w > = < u,w > + < v,w >      --- distributive law
   * (iii) < ku, v > = k< u,v >               --- taking out scalar k
-  * (iv) < u,u > >= 0 and we have <u,u> = 0 if and only if u = 0
+  * (iv) < u,u > >= 0 and we have < u,u> = 0 if and only if u = 0
   *                                          --- (means the inner product is zero or positive)
   *
   */
-trait InnerProductSpace[I, F] extends VectorSpace[I, F] {
+trait InnerProductSpace[I, F] extends VectorSpace[I, F] { self =>
 
      def innerProduct(i1: I, i2: I): F
      def dotProduct(i1: I, i2: I): F = innerProduct(i1, i2)
+
+     def normed(implicit rootEv: Root[F,F]): NormedVectorSpace[I, F] =
+          new NormedInnerProductSpace[I, F] {
+               def space = self
+               def nroot: Root[F,F] = rootEv
+          }
 }
 
+object InnerProductSpace {
+     //todo meaning of final?
+     final def apply[I, R](implicit inner: InnerProductSpace[I, R]): InnerProductSpace[I, R] = inner
+}
 
+private[theory] trait NormedInnerProductSpace[V, F] extends NormedVectorSpace[V, F] {
+     def space: InnerProductSpace[V, F]
+     def scalar: Field[F] = space.scalar
+     def nroot: Root[F,F]
 
+     def zero: V = space.zero
+}
+//-------------------
+
+trait NormedVectorSpace[V, F] extends VectorSpace[V, F] {
+
+     //this: Field[F] =>
+
+     def norm(n: V): F
+     def normalize(n: V): V
+     def isNormalized(n: V): Boolean
+}
 
 /**
   * A Banach space, B, is a complete normed vector space such that every Cauchy sequence (with respect
   * to the metric d(x, y) = |x - y|) in B has a limit in B.
   */
-trait BanachSpace[B, F] extends VectorSpace[B, F] /*with Field[F]*/ with NormedVectorSpace[B, F] {
+trait BanachSpace[B, F] extends /*with Field[F]*/  NormedVectorSpace[B, F] {
 
      //this: Field[F] =>
 
@@ -149,14 +175,6 @@ trait Dimension[V]{
 //
 //TODO //todo - started showing type parameter type is Field ....????
 
-trait NormedVectorSpace[V, F] extends VectorSpace[V, F] {
-
-     //this: Field[F] =>
-
-     def norm(n: V): F
-     def normalize(n: V): V
-     def isNormalized(n: V): Boolean
-}
 
 //note: if using self-type this: Field[F] then the relation is HAS-A between the trait and the self-typer.
 //note: but if using inheritance Field[F] then relation is IS-A between the trait and F.
