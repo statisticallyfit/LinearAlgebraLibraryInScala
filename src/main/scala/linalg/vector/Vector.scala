@@ -2,6 +2,7 @@ package linalg.vector
 
 //TODO tomorrow - no self-types, just do general approach like in Number class.
 
+import cats.Eq
 import linalg.theory._
 import linalg.numeric._
 
@@ -22,9 +23,6 @@ import linalg.numeric._
   * -
   */
 //todo use Cats Eq typeclass instead!
-/*trait Eq[E] {
-     def equals(x: E, y: E): Boolean
-}*/
 
 
 trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] with BanachSpace[V, F] {
@@ -82,7 +80,7 @@ trait LinearSystem[S, N] extends MatrixLike[S, N] {
      def isConsistent(s: S): Boolean  = ! isInconsistent(s)
 
      def hasNoSolution(s: S): Boolean = isInconsistent(s)
-     def hasUniqueSolution(s: S): Boolean = equals(rowReducedEchelonForm(s), identity)
+     def hasUniqueSolution(s: S)(implicit eqSys: Eq[S]): Boolean = eqSys.eqv(rowReducedEchelonForm(s), identity)
 
      def infiniteSolutionSolver(s: S): S
      def solve(s: S): Option[S]

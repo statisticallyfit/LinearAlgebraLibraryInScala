@@ -49,7 +49,7 @@ trait VectorSpace[V, F] extends AbelianGroup[V] with Monoid[V] {
   *                                          --- (means the inner product is zero or positive)
   *
   */
-trait InnerProductSpace[I, F] extends VectorSpace[I, F] { self =>
+trait InnerProductSpace[I, F] extends Any with VectorSpace[I, F] { self =>
 
      def innerProduct(i1: I, i2: I): F
      def dotProduct(i1: I, i2: I): F = innerProduct(i1, i2)
@@ -75,13 +75,14 @@ private[theory] trait NormedInnerProductSpace[V, F] extends NormedVectorSpace[V,
 }
 //-------------------
 
-trait NormedVectorSpace[V, F] extends VectorSpace[V, F] {
+trait NormedVectorSpace[V, F] extends Any with VectorSpace[V, F] {
 
      //this: Field[F] =>
 
-     def norm(n: V): F
-     def normalize(n: V): V
-     def isNormalized(n: V): Boolean
+     def norm(v: V): F
+     def normalize(v: V): V
+     def isNormalized(v: V): Boolean
+     def distance(v: V, w: V): F = norm(minus(v, w))
 }
 
 /**
