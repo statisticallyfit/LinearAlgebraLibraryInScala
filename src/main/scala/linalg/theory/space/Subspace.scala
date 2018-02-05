@@ -1,6 +1,6 @@
 package linalg.theory.space
 
-
+import linalg.theory._
 
 /**
   * A non-empty subset S of vector space V is a subspace of V if it also
@@ -8,6 +8,8 @@ package linalg.theory.space
   */
 trait Subspace[S, F] extends VectorSpace[S, F] {
 
+     //get a subspace of vecspace V (by getting a spanning set S)
+     //todo def subspace(implicit ev: Span[S, F]): S = ev.span
      def isSubsetOf(subset: S, parent: S): Boolean
      def isSubspaceOf(subspace: S, parent: S): Boolean
 }
