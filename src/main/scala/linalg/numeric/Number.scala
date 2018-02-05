@@ -173,7 +173,7 @@ object Number {
 
      //------------------------------------------------------------------------------------------------------------------
 
-
+     //todo use cats Eq
      implicit def ComplexIsNumber[R: RealLike: Equal: Trig](implicit rr: Root[R,R],
                                                             pos: Absolute[R,R]) = new Number[Complex[R]]
 

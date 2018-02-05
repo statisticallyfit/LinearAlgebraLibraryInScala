@@ -1,9 +1,24 @@
-//package linalg.theory
-//
-//import linalg.numeric._
-///**
-//  *
-//  */
+package linalg.theory
+
+import linalg.numeric._
+import linalg.theory.space._
+import linalg.vector._
+
+/**
+  *
+  */
+
+trait Span[V, F] extends VectorSpace[V, F] {
+
+     def span(vset: V): V //gets a set that spans/generates the generic vecspace
+
+     //does vecset span/generate a generic space like R3? (example 3.10) - is genspace spanned by vecset
+     def isSpanned(vset: VectorSet[F]): Boolean
+
+     //does vecset span/generate a specific vector? (example 3.11)
+     def isSpanned(vset: VectorSet[F], space: V): Boolean
+}
+
 //// a vector set that spans a vector space has this trait
 //trait Span[V/* <: VectorSet[N]*/, N <: Number[N]]{
 //
@@ -11,9 +26,9 @@
 //
 //     //checks whether this vectorset spans the vector space of Real/Rational/orComplex just by checking its dimension
 //     //example: this vspace/set is span of R^4 if the basis has 4 elements in each vector
-//     def spansSpaceWith(dim: Int): Boolean
+//     --- def spansSpaceWith(dim: Int): Boolean
 //     // checks whether "that" vector is in the span of our vectorset/space. Like prerequisite to getspanningcoefs
-//     def isSpanned(vset: V): Boolean
+//     --- def isSpanned(vset: V): Boolean
 //     //gets coefficients that make linear combination
 //     def getSpanningCoefficients(vset: V): V
 //     //gets a vector in the space whose coordinate vector relative to `this` vecset is `coefs`

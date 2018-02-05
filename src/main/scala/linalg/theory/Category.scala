@@ -47,7 +47,7 @@ trait AbelianGroup[G] extends Group[G] {
   */
 trait Ring[R] extends AbelianGroup[R] with Monoid[R] {
 
-     //methods inherited: add,subtract,opposite,identity
+     //methods inherited: plus, negate,identity
      def times(x: R, y: R): R
 }
 

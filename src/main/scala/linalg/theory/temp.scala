@@ -6,166 +6,11 @@ import linalg.numeric._
 import scala.collection.mutable.ListBuffer
 import scala.reflect.runtime.universe._
 
-//------------------------------------------------------------------------------------------------------
-/**
-  * A vector space is a set V together with two binary operations that combine
-  * two entities to yield a third, called vector addition and scalar multiplication.
-  * Vector spaces fall into two categories: A vector space V is said to be ﬁnite-dimensional if there is a finite set
-  * of vectors in V that spans V and is said to be inﬁnite-dimensional if no such set exists.
-  *
-  * Laws:
-  * (i) a + b = b + a                   --- commutativity, vector addition
-  * (ii) (a + b) + c = a + (b + c)      --- associativity, vector addition
-  * (iii) k(a + b) = ka + kb            --- distributivity, vector addition
-  * (iv) k(cu) = (kc) u                 --- associativity, scalar multiplication
-  * (v) k + c)u = ku + cu               --- distributivity, scalars:
-  *
- */
-trait VectorSpace[V, F] extends AbelianGroup[V] with Monoid[V] {
-
-     val zero: V
-     val one: V
-     //def zero(n: Int): V //neutral element: 0 + u = u
-     //def one(n: Int): V // identity element: 1*u = u
-
-     def plus(v: V, w: V): V //addition => u + v
-     def negate(v: V): V //additive inverse => u + (-u) = 0
-     def scale(v: V, constant: F): V //scalar multiplication: ku
-}
-
-
-//TODO tomorrow look at spire's methods: https://github.com/non/spire/blob/f86dfda4fb3029f23c023c940ea61dde51e4a0f1/core/shared/src/main/scala/spire/algebra/InnerProductSpace.scala
-//TODO next: make the testing things in Discipline (grouplaws, innerprodspace laws, vecspace laws ...etc)
-/**
-  * An inner product on a real vector space V is an operation <,> which assigns
-  * a unique real number to each pair of vectors, u, and v, which satisfies the
-  * following axioms for all vectors u,v,w in V and all scalars k.
-  *
-  * Laws:
-  * (i) < u, v> = < v, u >                   --- commutative law
-  * (ii) < u+v, w > = < u,w > + < v,w >      --- distributive law
-  * (iii) < ku, v > = k< u,v >               --- taking out scalar k
-  * (iv) < u,u > >= 0 and we have < u,u> = 0 if and only if u = 0
-  *                                          --- (means the inner product is zero or positive)
-  *
-  */
-trait InnerProductSpace[I, F] extends Any with VectorSpace[I, F] { self =>
-
-     def innerProduct(i1: I, i2: I): F
-     def dotProduct(i1: I, i2: I): F = innerProduct(i1, i2)
-
-     def normed(implicit rootEv: Root[F,F]): NormedVectorSpace[I, F] =
-          new NormedInnerProductSpace[I, F] {
-               def space = self
-               def nroot: Root[F,F] = rootEv
-          }
-}
-
-object InnerProductSpace {
-     //todo meaning of final?
-     final def apply[I, R](implicit inner: InnerProductSpace[I, R]): InnerProductSpace[I, R] = inner
-}
-
-private[theory] trait NormedInnerProductSpace[V, F] extends NormedVectorSpace[V, F] {
-     def space: InnerProductSpace[V, F]
-     def scalar: Field[F] = space.scalar
-     def nroot: Root[F,F]
-
-     def zero: V = space.zero
-}
-//-------------------
-
-trait NormedVectorSpace[V, F] extends Any with VectorSpace[V, F] {
-
-     //this: Field[F] =>
-
-     def norm(v: V): F
-     def normalize(v: V): V
-     def isNormalized(v: V): Boolean
-     def distance(v: V, w: V): F = norm(minus(v, w))
-}
-
-/**
-  * A Banach space, B, is a complete normed vector space such that every Cauchy sequence (with respect
-  * to the metric d(x, y) = |x - y|) in B has a limit in B.
-  */
-trait BanachSpace[B, F] extends /*with Field[F]*/  NormedVectorSpace[B, F] {
-
-     //this: Field[F] =>
-
-     // |⋅| : B → F
-     //norm assigns a strictly positive length or size to all vectors in the vector space, other than the zero vector.
-     def norm(v: B): F //note calculates the 2-norm
-     def normalize(v: B): B
-     def isNormalized(v: B): Boolean
-}
-
-
-/**
-  * A Hilbert space is an inner product space, an abstract vector space in which distances and angles
-  * can be measured. It is also "complete", meaning that if a sequence of vectors is Cauchy, then it
-  * converges to some limit in the space.
-  */
-trait HilbertSpace[H, F] extends InnerProductSpace[H, F] {
-
-     //this: Field[F] =>
-     //this: Field[F] with Dimension[H] with BanachSpace[H, F] =>
-
-     //∠ : H × H → F
-     // Inner product formalizes the geometrical notions such as the length of a vector and the angle between two vectors.
-     def angle(that: H): F
-
-     // <⋅,⋅> : H × H → F
-     // Inner product formalizes the geometrical notions such as the length of a vector and the angle between two vectors.
-     def dotProduct(that: H): F
-}
-
-
-//------------------------------------------------------------------------------------------------------
-
-// TODO look at methods in linear algbera spire
-trait LinearSubspace[S, F] extends VectorSpace[S, F]{
-
-     //this: Field[F] =>
-}
-
-/**
-  * A non-empty subset S of vector space V is a subspace of V if it also
-  * satisfies the ten axioms of a vector space.
-  */
-trait Subspace[S, F] extends VectorSpace[S, F] {
-
-     //todo corect? Check that subset is indeed subset of gen, only thing, since vecspace axioms are satisfied
-     // automatically when extending.
-     def isSubspaceOf(aSubset: S, generalVecSpace: VectorSpace[S,F]): Boolean
-}
-
-
-trait Basis[B, F] extends VectorSpace[B, F] /*extends Orthonormal[V] with Span[Basis[V, F], F]*/ {
-
-    // this: Field[F] =>
-     //this: VectorSpace[B, N] with Span[B, N] with LinearIndependence[B, N] =>
-
-     //note ifvecset cols are linearly independent, then the vecset is a basis for vecpsace V^n,
-     // if not return None.
-     // which means this vecset is not a basis for the V^n vecspace. prereq is isBasisOfSpaceWith function
-     def basis(): Option[B]
-     //def isBasisOfSpaceWith(dim: Int): Boolean //todo do we really need this?
-}
-
-//todo need to provide V, F or just V?
-trait Dimension[V]{
-
-     this: VectorSpace[V, _] =>
-
-     def dimension(vectorSpace: V): Int
-}
 
 
 
 
 
-//------------------------------------------------------------------------------------------------------
 ////todo only problem is that we can't constrain V to be vecspace because if we do, then banacspace extends normal
 //// won't work
 ////note: the trick to putting self types: for trait A, its self type this: B is such that B is higher than A and such
@@ -182,19 +27,7 @@ trait Dimension[V]{
 //note: relation is still IS-A for the class that mixes in the overall trait.
 //source: https://softwareengineering.stackexchange.com/questions/219038/what-is-the-difference-between-self-types-and-trait-inheritance-in-scala
 // https://stackoverflow.com/questions/2224932/difference-between-trait-inheritance-and-self-type-annotation
-trait Orthogonal[V, F] extends VectorSpace[V, F] /*with Field[F] */{
-     //this: Field[F] =>
 
-     def isOrthogonal(v: V): Boolean
-     def areOrthogonal(v1: V, v2: V): Boolean
-     def orthogonalize(v: V): V
-}
-
-trait Orthonormal[V, F] extends Orthogonal[V, F] with NormedVectorSpace[V, F]  {
-
-     //this: Field[F] =>
-     def orthonormalize(v: V): V = normalize( orthogonalize(v) )
-}
 
 
 //------------------------------------------------------------------------------------------------------
@@ -339,7 +172,4 @@ trait Orthonormal[V, F] extends Orthogonal[V, F] with NormedVectorSpace[V, F]  {
 //     override def toString: String = getVectorSet().toString
 //}
 
-trait LinearTransformation
-
-//trait Rank[T <: LinearTransformation]
 

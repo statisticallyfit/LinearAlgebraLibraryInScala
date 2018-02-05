@@ -1,4 +1,4 @@
-//package linalg.vector
+package linalg.vector
 //
 //import linalg.matrix._
 //import linalg.theory._
@@ -22,7 +22,15 @@
 //}*/
 //
 ///*
-//
+import linalg.numeric._
+
+class VectorSet[N: Number](cols: Vector[N]*)
+
+object VectorSet {
+
+
+}
+
 //class VectorSet[N <: Number[N]: TypeTag](cols: Vector[N]*)
 //     extends VectorSpace[VectorSet[N], N] with BanachSpace[VectorSet[N], N] with AbelianGroup[VectorSet[N]] //with
 //          // Monoid[VectorSet[N]] with Ring[VectorSet[N]]

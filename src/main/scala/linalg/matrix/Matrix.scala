@@ -1,4 +1,4 @@
-//package linalg.matrix
+package linalg.matrix
 //
 //
 //import linalg.util._
@@ -14,8 +14,66 @@
 //import scala.util.control.Breaks._
 //
 //
-//
-//
+
+
+import cats.Eq
+
+import linalg.vector._
+import linalg.numeric._
+import linalg.theory._
+import linalg.theory.space._
+
+
+//todo - decide overall if should use extension to specify type of the 'smaller' parameters.
+
+trait MatrixLike[M, F] extends VectorLike[M, F] {
+
+     val identity: M
+
+     def inverse(m: M): M
+     def transpose(m: M): M
+     def conjugateTranspose(m: M): M
+     def adjoint(m: M): M
+     def cofactor(m: M): M
+     def minor(m: M): M
+     def minor(m: M, rowIndex: Int, colIndex: Int): F
+     def determinant(m: M): M
+     def trace(m: M): F
+     def rowReducedEchelonForm(m: M): M
+}
+//note: matrix types:
+//Square, Hessenberg, LowerTri, UpperTri, Unitary,
+//Orthogonal, Hermitian, Symmetric, Diagonal, Hilbert
+// Similar, UpperHessenberg, Jacobian.
+
+
+//todo ok to pass no param? instead of passing non-used N?
+
+trait LinearSystem[S, N] extends MatrixLike[S, N] {
+
+     //this: Number[N] =>
+
+     def isInconsistent(s: S): Boolean
+     def isConsistent(s: S): Boolean  = ! isInconsistent(s)
+
+     def hasNoSolution(s: S): Boolean = isInconsistent(s)
+     def hasUniqueSolution(s: S)(implicit eqSys: Eq[S]): Boolean = eqSys.eqv(rowReducedEchelonForm(s), identity)
+
+     def infiniteSolutionSolver(s: S): S
+     def solve(s: S): Option[S]
+}
+
+
+class Matrix[F: Field](cols: Vector[F]*)
+
+object Matrix {
+
+     /*implicit def MatrixIsMatrixLike[F: Field] = new MatrixLike[Matrix[F], F] {
+
+     }*/
+}
+
+
 ///*
 //class Matrix[N <: Number[N]: TypeTag](cols: Vector[N]*) extends VectorSet[N](cols:_*) {
 //
