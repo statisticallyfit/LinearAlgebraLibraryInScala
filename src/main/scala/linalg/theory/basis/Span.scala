@@ -10,68 +10,20 @@ import linalg.vector._
 
 trait Span[V, F] extends VectorSpace[V, F] {
 
-     def span(vset: V): V //gets a set that spans/generates the generic vecspace
+     def span(vset: V): V //gets a set that spans/generates the generic vecspace (gets the basis) todo
 
-     //does vecset span/generate a generic space like R3? (example 3.10) - is genspace spanned by vecset
-     def isSpanned(vset: VectorSet[F]): Boolean
+     //does vecset span/generate the generic space V (which is like R3)? (example 3.10) - is genspace V spanned by vset?
+     //LinearAlgebraToolkit: "Determining of the set spans the spance"
+     //def isSpanned(vset: VectorSet[F]): Boolean //= vset.reducedRowEchelonForm() === VectorSet.IDENTITY(vset)
+     def isSpanned(vset: V): Boolean
 
      //does vecset span/generate a specific vector? (example 3.11)
-     def isSpanned(vset: VectorSet[F], space: V): Boolean
+     //def isSpanned(vset: VectorSet[F], space: V): Boolean
+     //todo implicit conversion from Set[V] to VectorSet[V]
+     def isSpanned(vset: Set[V], v: V): Boolean
+
+     //gets the coefficients the relate the vset to the vector v in the linear combination. They are:
+     // k1v1 + k2v2 + k3v3 + ... = v, where vset = {v1,v2,v3...} and v = v.
+     def getSpanningCoefficients(vset: Set[V], v: V): Option[Set[F]] //if isspanned is false, then NOne else Some(...)
 }
 
-//// a vector set that spans a vector space has this trait
-//trait Span[V/* <: VectorSet[N]*/, N <: Number[N]]{
-//
-//     this: VectorSpace[V, N] /*with Rank[this, F] */=>
-//
-//     //checks whether this vectorset spans the vector space of Real/Rational/orComplex just by checking its dimension
-//     //example: this vspace/set is span of R^4 if the basis has 4 elements in each vector
-//     --- def spansSpaceWith(dim: Int): Boolean
-//     // checks whether "that" vector is in the span of our vectorset/space. Like prerequisite to getspanningcoefs
-//     --- def isSpanned(vset: V): Boolean
-//     //gets coefficients that make linear combination
-//     def getSpanningCoefficients(vset: V): V
-//     //gets a vector in the space whose coordinate vector relative to `this` vecset is `coefs`
-//     def getVectorInSpace(coefs: Vector[N]): Vector[N]
-//}
-//
-//
-//
-////a vector space that is spanned by a vectorset has this trait
-///*trait Spanned[S : VectorSpace[S, N] , N <: Number[N]]{
-//
-//     //type Space <: VectorSpace[Space, N]
-//
-//     //todo how ot make vector extend vectorset? (not possible...)
-//
-//     //checks whether this vecspace is spanned by a vecset just by checking its dimension (of vecspace)
-//     def isSpannedBy(vset: VectorSet[N]): Boolean // = space.dimension() == setOfVectors.numCols
-//     def isSpannedBy(v: Vector[N]): Boolean // = space.dimension() == setOfVectors.numCols
-//
-//     // checks whether "that" vector is in the span of our vecspace. Like prerequisite to getspanningcoefs
-//     def isSpanned(vset: VectorSet[N]): Boolean
-//     def isSpanned(b: Vector[N]): Boolean // todo how to implement?
-//
-//     //gets coefficients that make linear combination
-//     // todo check solve when system is underdetermined
-//     def getSpanningCoefficients(b: Vector[N]): Vector[N] //= setOfVectors.solve(b)
-//     def getSpanningCoefficients(vset: VectorSet[N]): VectorSet[N]
-//}*/
-//
-//
-//
-//
-//
-//
-///*class Span[N <: Number[N]](setOfVectors: VectorSet[N]){
-//
-//     //checks whether this vectorset spans a vector space just by checking its dimension
-//     def spans[V <: VectorSpace[V]](space: V): Boolean = space.dimension() == setOfVectors.numCols
-//
-//     // checks whether "that" vector is in the span of our vectorset/space. Like prerequisite to getspanningcoefs
-//     def isSpanned(b: Vector[N]): Boolean // todo how to implement?
-//
-//     //gets coefficients that make linear combination
-//     def getSpanningCoefficients(b: Vector[N]): Vector[N] = setOfVectors.solve(b) //todo check solve when
-//     // underdetermined
-//}*/

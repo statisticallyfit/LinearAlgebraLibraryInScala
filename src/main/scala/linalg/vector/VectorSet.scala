@@ -23,12 +23,18 @@ package linalg.vector
 //
 ///*
 import linalg.numeric._
+import linalg.theory._
 
-class VectorSet[N: Number](cols: Vector[N]*)
+class VectorSet[F: Field](cols: Vector[F]*)
+
 
 object VectorSet {
 
+     //typeclasses ... etc
 
+     implicit class VectorSetOps[F: Field](vset: VectorSet[F]){
+          def reducedRowEchelonForm(): VectorSet[F] = ???
+     }
 }
 
 //class VectorSet[N <: Number[N]: TypeTag](cols: Vector[N]*)
