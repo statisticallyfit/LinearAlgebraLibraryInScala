@@ -6,7 +6,7 @@ import linalg.numeric._
 import linalg.theory.space._
 import linalg.syntax.AbsoluteSyntax._
 import linalg.syntax.EqualSyntax._
-import linalg.syntax.NumberSyntax._
+//import linalg.syntax.NumberSyntax._
 import linalg.syntax.RootSyntax._
 import linalg.syntax.ShowSyntax._
 import linalg.syntax.TrigSyntax._
@@ -55,18 +55,13 @@ object Vector {
 
 
 
-
-
-
-
      implicit def VectorIsVectorLike[N: Number: Trig](implicit root: Root[N,N]) = new VectorLike[Vector[N], N] {
-
-          import Number._ //for implicit numberops syntax
-
 
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
 
+
+          import linalg.syntax.NumberSyntax._
 
           def plus(v: Vector[N], w: Vector[N]): Vector[N] =
                Vector(v.elems.zip(w.elems).map(pair => pair._1 + pair._2):_*)
@@ -95,15 +90,18 @@ object Vector {
 
 object VectorTester extends App {
 
-     import Vector._
+     import linalg.syntax.VectorLikeSyntax._
+     //
+     // import Vector._
 
-     val vec = implicitly[VectorLike[Vector[Int], Int]]
+
+     //val vec = implicitly[VectorLike[Vector[Int], Int]]
 
      val v1: Vector[Int] = Vector.ONE[Int](10)
      val v2: Vector[Int] = Vector.ONE[Int](10)
-     //val v3: Vector[Int] = v1 + v2
+     val v3: Vector[Int] = v1 + v2
 
-     println(vec.plus(v1, v2))
+     //println(vec.plus(v1, v2))
      //println(v3)
 
 

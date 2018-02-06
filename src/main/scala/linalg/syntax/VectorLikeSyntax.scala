@@ -1,15 +1,19 @@
 package linalg.syntax
 
 import linalg.numeric.{Number, Root, Trig}
-import linalg.vector.VectorLike
+import linalg.vector.{Vector, VectorLike}
 
 /**
   *
   */
 object VectorLikeSyntax {
-     implicit class VectorLikeOps[V, N: Number: Trig](current: V)(implicit root: Root[N,N],
-                                                                  vectorLike: VectorLike[V, N]){
+     implicit class VectorLikeOps[N: Number: Trig, V](current: V)/*(implicit root: Root[N,N],
+                                                                  vectorLike: VectorLike[V, N])*/{
 
+          private val vectorLike: VectorLike[V, N] = implicitly[VectorLike[V, N]]
+          private val root = implicitly[Root[N,N]]
+
+          
           def +(other: V): V = vectorLike.plus(current, other)
           def -(other: V): V = vectorLike.minus(current, other)
           def negate(): V = vectorLike.negate(current)
@@ -48,4 +52,9 @@ object VectorLikeSyntax {
 
            def isZero(): Boolean = vectorLike.isZero(current)*/
      }
+
+
+     val v1: Vector[Int] = Vector.ONE[Int](10)
+     val v2: Vector[Int] = Vector.ONE[Int](10)
+     val v3 = v1 + v2
 }

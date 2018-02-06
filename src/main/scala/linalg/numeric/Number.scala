@@ -544,8 +544,8 @@ object Rational {
 
      def apply(numerator: Int): Rational = new Rational(numerator, 1)
 
-     def apply(fracAsDouble: Double): Rational = {
-          val f = Fraction.getFraction(fracAsDouble).reduce()
+     def apply(fractionAsDouble: Double): Rational = {
+          val f = Fraction.getFraction(fractionAsDouble).reduce()
           new Rational(f.getNumerator, f.getDenominator)
      }
 }
@@ -558,8 +558,8 @@ object Rational {
 object NumberTester extends App {
 
 
-     import linalg.syntax.NumberSyntax._
-     
+     import Number._
+
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i + Rational(1)
      val b: Complex[Int] = 3 + 5.i + 3
      val c: Complex[Int] = 1 - 2.i
