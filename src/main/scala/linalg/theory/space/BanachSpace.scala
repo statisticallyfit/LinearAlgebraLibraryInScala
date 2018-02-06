@@ -14,9 +14,9 @@ trait BanachSpace[B, F] extends NormedVectorSpace[B, F] {
 
      // |⋅| : B → F
      //norm assigns a strictly positive length or size to all vectors in the vector space, other than the zero vector.
-     def norm(v: B): F //note calculates the 2-norm
+     /*def norm(v: B): F //note calculates the 2-norm
      def normalize(v: B): B
-     def isNormalized(v: B): Boolean
+     def isNormalized(v: B): Boolean*/
 }
 
 object BanachSpace {

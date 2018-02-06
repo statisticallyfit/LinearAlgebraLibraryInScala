@@ -3,7 +3,12 @@ package linalg.numeric
 
 import linalg.show.Show._
 import linalg.theory._
+
 import org.apache.commons.lang3.math.Fraction
+
+
+import cats.implicits._
+import cats.syntax._
 
 import scala.language.implicitConversions
 
@@ -110,6 +115,9 @@ trait RealLike[R] extends Number[R] {
 
 object Number {
 
+     def ZERO[N](implicit gen: Number[N]): N = gen.zero
+     def ONE[N](implicit gen: Number[N]): N = gen.one
+     def TWO[N](implicit gen: Number[N]): N = gen.two
 
      implicit class NumberOps[N: Number](current: N)  {
 
@@ -187,7 +195,7 @@ object Number {
           /** Number part */
           val zero: C = Complex.ZERO[R]
           val one: C = Complex.ONE[R]
-          val two: C = plus(one, one)
+          val two: C = Complex.TWO[R]
 
           def plus(x: C, y: C): C = Complex(x.re + y.re, x.im + y.im)
           def times(x: C, y: C): C = Complex(x.re * y.im - y.re * x.im, x.re * y.re + y.im * x.im)
@@ -205,6 +213,7 @@ object Number {
           def from(x: Int): C = Complex(realLike.from(x))
 
           /** Equality part */
+          //def eqv(x: C, y: C): Boolean = Eq[R].eqv(x.re, y.re) && Eq[R].eqv(x.im, y.im)
           def equal(x: C, y: C): Boolean = x.re :==: y.re && x.im :==: y.im
           def lessThan(x: C, y: C): Boolean = x.re < y.re || (x.re :==: y.re && x.im < y.im)
 

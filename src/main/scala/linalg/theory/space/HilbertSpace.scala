@@ -10,7 +10,7 @@ package linalg.theory.space
 trait HilbertSpace[H, F] extends InnerProductSpace[H, F] {
      //∠ : H × H → F
      // Inner product formalizes the geometrical notions such as the length of a vector and the angle between two vectors.
-     def angle(that: H): F
+     def angle(v: H, w: H): F
 
      // <⋅,⋅> : H × H → F
      // Inner product formalizes the geometrical notions such as the length of a vector and the angle between two vectors.

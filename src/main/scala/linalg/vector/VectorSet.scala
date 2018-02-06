@@ -33,15 +33,15 @@ import scala.language.higherKinds
 //note: or better: Polynomial implemenets Field typeclass.
 //class VectorSet[V[_], F: Field](cols: Vector[V[F]]*)(implicit vsp: VectorSpace[V, F])
 
-class VectorSet[F: Field](cols: Vector[F]*)
+class VectorSet[N: Number](cols: Vector[N]*)
 
 
 object VectorSet {
 
      //typeclasses ... etc
 
-     implicit class VectorSetOps[V[_], F: Field](vset: VectorSet[F]){
-          def reducedRowEchelonForm(): VectorSet[F] = ???
+     implicit class VectorSetOps[V[_], N: Number](vset: VectorSet[N]){
+          def reducedRowEchelonForm(): VectorSet[N] = ???
      }
 }
 

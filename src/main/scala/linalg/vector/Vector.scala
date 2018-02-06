@@ -29,26 +29,49 @@ import linalg.numeric._
 trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] with BanachSpace[V, F] {
 
      //note: inherited
-     def plus(v: V, w: V): V
-     def negate(v: V): V
+     //def plus(v: V, w: V): V
+     //def negate(v: V): V
      def minus(v: V, w: V): V = plus(v, negate(w))
-     def scale(v: V, factor: F): V
+     //def scale(v: V, factor: F): V
      // no divide, no inverse!
 
      def isZero(v: V): Boolean
-     def innerProduct(v: V, w: V): F
+     //def innerProduct(v: V, w: V): F
      def crossProduct(v: V, w: V): V  //maybe won't work
      def outerProduct(v: V, w: V): V
-
-     def angle(v: V, w: V): V
 }
 
 
-class Vector[F: Field](elems: F*)
+class Vector[N: Number](val elems: N*)
 
 object Vector {
 
-     implicit def VectorIsVectorLike[F: Field] = new VectorLike[Vector[F], F] {
+     def apply[N: Number](elems: N*): Vector[N] = new Vector(elems:_*)
 
+
+     implicit def VectorIsVectorLike[N: Number: Trig] = new VectorLike[Vector[N], N] {
+
+          import Number._ //for implicit numberops syntax
+
+
+          def plus(v: Vector[N], w: Vector[N]): Vector[N] =
+               Vector(v.elems.zip(w.elems).map(pair => pair._1 + pair._2):_*)
+
+          def negate(v: Vector[N]): Vector[N] = Vector(v.elems.map(e => e.negate()):_*)
+
+          def scale(v: Vector[N], factor: N): Vector[N] = Vector(v.elems.map(e => e * factor):_*)
+
+          def isZero(v: Vector[N]): Boolean = v.elems.forall(e => e == Number.ZERO[N])
+
+          def innerProduct(v: Vector[N], w: Vector[N]): N = v.elems.zip(w.elems).map(pair => pair._1 * pair._2).sum
+
+          def outerProduct(v: Vector[N], w: Vector[N]): Vector[N] = ???
+
+          def crossProduct(v: Vector[N], w: Vector[N]): Vector[N] = ???
+
+          def angle(v: Vector[N], w: Vector[N]): N = innerProduct(v, w) / (norm(v) * norm(w)).arccos()
+
+          def norm(v: Vector[N])(implicit root: Root[N,N]): N = v.elems.map(e => root.power(e, Number.TWO[N])) //todo
+          // sum finish
      }
 }
