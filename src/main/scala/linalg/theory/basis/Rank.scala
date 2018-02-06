@@ -1,13 +1,16 @@
-//package linalg.theory
-//
-//
-//import linalg.numeric._
-//
-//
-//
-//trait Rank[V, F] extends VectorSpace[V, F] {
-//
-//     this: Field[F] => //todo - ok?
-//
-//     def rank(vecSpace: V): Int
-//}
+package linalg.theory.basis
+
+
+import linalg.numeric._
+import linalg.theory.space._
+import linalg.theory._
+
+/**
+  *
+  *
+  */
+
+trait Rank[V, F] extends VectorSpace[V, F] {
+
+     def rank(vectorSpace: V): Int
+}

@@ -2,7 +2,8 @@ package linalg.theory.space
 
 /**
   * todo
+  * note: polynomials are represented with highest powers in first place of array.
   */
-trait PolynomialSpace {
+trait PolynomialSpace[P, F] extends VectorSpace[P, F] {
 
 }

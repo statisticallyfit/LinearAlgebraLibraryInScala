@@ -24,6 +24,14 @@ package linalg.vector
 ///*
 import linalg.numeric._
 import linalg.theory._
+import linalg.theory.space._
+
+import scala.language.higherKinds
+
+
+//note: avoid this problem by making class Polynomial extend Vector
+//note: or better: Polynomial implemenets Field typeclass.
+//class VectorSet[V[_], F: Field](cols: Vector[V[F]]*)(implicit vsp: VectorSpace[V, F])
 
 class VectorSet[F: Field](cols: Vector[F]*)
 
@@ -32,7 +40,7 @@ object VectorSet {
 
      //typeclasses ... etc
 
-     implicit class VectorSetOps[F: Field](vset: VectorSet[F]){
+     implicit class VectorSetOps[V[_], F: Field](vset: VectorSet[F]){
           def reducedRowEchelonForm(): VectorSet[F] = ???
      }
 }

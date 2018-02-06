@@ -8,7 +8,7 @@ import linalg.numeric._
   *
   */
 
-trait NormedVectorSpace[V, F] extends Any with VectorSpace[V, F] {
+trait NormedVectorSpace[V, F] extends VectorSpace[V, F] {
 
      //note defining norm() just in normedinnerprodspace only - normedvecspace doesn't know about innerprod.
      def norm(v: V): F

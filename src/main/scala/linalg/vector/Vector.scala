@@ -48,4 +48,7 @@ class Vector[F: Field](elems: F*)
 
 object Vector {
 
+     implicit def VectorIsVectorLike[F: Field] = new VectorLike[Vector[F], F] {
+
+     }
 }

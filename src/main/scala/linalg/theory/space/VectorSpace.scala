@@ -2,6 +2,7 @@ package linalg.theory.space
 
 
 import linalg.theory._
+import linalg.theory.basis._
 
 /**
   * A vector space is a set V together with two binary operations that combine
@@ -19,6 +20,7 @@ import linalg.theory._
   */
 trait VectorSpace[V, F] extends AbelianGroup[V] with Monoid[V] {
 
+     implicit val dimensionOfVectorSpace: Dimension[V]
      implicit val scalar: Field[F]
 
      val zero: V

@@ -23,16 +23,17 @@ import linalg.numeric._
   *                                          --- (means the inner product is zero or positive)
   *
   */
-trait InnerProductSpace[I, F] extends Any with VectorSpace[I, F] { self =>
+trait InnerProductSpace[I, F] extends VectorSpace[I, F] { self =>
 
      def innerProduct(i1: I, i2: I): F
      def dotProduct(i1: I, i2: I): F = innerProduct(i1, i2)
 
-     def normed(implicit ev: Root[F,F]): NormedVectorSpace[I, F] = new NormedInnerProductSpace[I, F] {
-               val innerSpace = self
-               val scalar: Field[F] = innerSpace.scalar
-               val rt: Root[F,F] = ev
-          }
+     def normed(implicit ev: Root[F, F]): NormedVectorSpace[I, F] = new NormedInnerProductSpace[I, F] {
+          val innerSpace = self
+          val dimensionOfVectorSpace = self.dimensionOfVectorSpace
+          val scalar: Field[F] = innerSpace.scalar
+          val rt: Root[F, F] = ev
+     }
 }
 
 object InnerProductSpace {
