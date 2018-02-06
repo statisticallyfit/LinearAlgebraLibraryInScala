@@ -11,6 +11,7 @@ trait Group[G]
   *       existence of multiplicative identity
   * @tparam M
   */
+//todo use cats.Monoid and Group
 trait Monoid[M] extends Group[M] {
      val zero: M
      def plus(x: M, y: M): M

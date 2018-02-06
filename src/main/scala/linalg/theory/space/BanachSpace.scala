@@ -1,7 +1,7 @@
 package linalg.theory.space
 
 
-
+import linalg.theory._
 /**
   * A Banach space, B, is a complete normed vector space such that every Cauchy sequence (with respect
   * to the metric d(x, y) = |x - y|) in B has a limit in B.
