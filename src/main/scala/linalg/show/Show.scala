@@ -1,18 +1,17 @@
 package linalg.show
 
 import linalg.numeric._
+import linalg.vector._
 
+/**
+  *
+  */
 
 trait Show[S] {
 
      def show(x: S): String
 }
 object Show {
-     implicit class ShowOps[S: Show](current: S) {
-          val ev = implicitly[Show[S]]
-
-          def show: String = ev.show(current)
-     }
 
      implicit object IntHasShow extends Show[Int] {def show(x: Int): String = x.toString}
      implicit object DoubleHasShow extends Show[Double] {def show(x: Double): String = x.toString}
@@ -27,5 +26,9 @@ object Show {
 
      implicit def ComplexHasShow[R : RealLike] = new Show[Complex[R]] {
           def show(x: Complex[R]): String = x.re.toString + Imaginary(x.im).toString
+     }
+
+     implicit def VectorHasShow[N: Number] = new Show[Vector[N]]{
+          def show(v: Vector[N]): String = ???
      }
 }

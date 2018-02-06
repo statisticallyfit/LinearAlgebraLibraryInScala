@@ -14,7 +14,7 @@ trait HilbertSpace[H, F] extends InnerProductSpace[H, F] {
 
      // <⋅,⋅> : H × H → F
      // Inner product formalizes the geometrical notions such as the length of a vector and the angle between two vectors.
-     def dotProduct(that: H): F
+     //def dotProduct(that: H): F
 }
 
 

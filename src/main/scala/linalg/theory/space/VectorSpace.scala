@@ -1,6 +1,5 @@
 package linalg.theory.space
 
-
 import linalg.theory._
 import linalg.theory.basis._
 
@@ -20,13 +19,11 @@ import linalg.theory.basis._
   */
 trait VectorSpace[V, F] extends AbelianGroup[V] with Monoid[V] {
 
-     implicit val dimensionOfVectorSpace: Dimension[V]
-     implicit val scalar: Field[F]
+     //implicit def dimensionOfVectorSpace: Dimension[V]
+     //implicit val scalar: Field[F]
 
      val zero: V
      val one: V
-     //def zero(n: Int): V //neutral element: 0 + u = u
-     //def one(n: Int): V // identity element: 1*u = u
 
      def plus(v: V, w: V): V //addition => u + v
      def negate(v: V): V //additive inverse => u + (-u) = 0

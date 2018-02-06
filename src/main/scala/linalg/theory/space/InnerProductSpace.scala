@@ -30,15 +30,15 @@ trait InnerProductSpace[I, F] extends VectorSpace[I, F] { self =>
 
      def normed(implicit ev: Root[F, F]): NormedVectorSpace[I, F] = new NormedInnerProductSpace[I, F] {
           val innerSpace = self
-          val dimensionOfVectorSpace = self.dimensionOfVectorSpace
-          val scalar: Field[F] = innerSpace.scalar
+          //val dimensionOfVectorSpace = self.dimensionOfVectorSpace
+          //val scalar: Field[F] = innerSpace.scalar
           val rt: Root[F, F] = ev
      }
 }
 
 object InnerProductSpace {
      //todo meaning of final?
-     final def apply[I, R](implicit inner: InnerProductSpace[I, R]): InnerProductSpace[I, R] = inner
+     final def apply[I, R](implicit ev: InnerProductSpace[I, R]): InnerProductSpace[I, R] = ev
 }
 
 

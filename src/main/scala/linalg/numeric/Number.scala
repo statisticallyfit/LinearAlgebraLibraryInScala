@@ -3,12 +3,15 @@ package linalg.numeric
 
 import linalg.show.Show._
 import linalg.theory._
+import linalg.syntax.AbsoluteSyntax._
+import linalg.syntax.EqualSyntax._
+import linalg.syntax.NumberSyntax._
+import linalg.syntax.RootSyntax._
+import linalg.syntax.ShowSyntax._
+import linalg.syntax.TrigSyntax._
+
 
 import org.apache.commons.lang3.math.Fraction
-
-
-import cats.implicits._
-import cats.syntax._
 
 import scala.language.implicitConversions
 
@@ -119,72 +122,10 @@ object Number {
      def ONE[N](implicit gen: Number[N]): N = gen.one
      def TWO[N](implicit gen: Number[N]): N = gen.two
 
-     implicit class NumberOps[N: Number](current: N)  {
-
-          private val number = implicitly[Number[N]]
-
-          def +(other: N): N = number.plus(current, other)
-          def -(other: N): N = number.minus(current, other)
-          def *(other: N): N = number.times(current, other)
-          def /(other: N): N = number.divide(current, other)
-          def negate(): N = number.negate(current)
-          def inverse(): N = number.inverse(current)
-          def isZero: Boolean = number.isZero(current)
-          def isNegative: Boolean = number.isNegative(current)
-          def toDouble: Double = number.doubleValue(current)
-          def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!
-     }
-
-     implicit class RootOps[H, L](base: H)(implicit root: Root[H, L]){
-
-          def ^(exp: L): H = root.power(base, exp)
-          def sqrt(): H = root.squareRoot(base)
-          def nRoot(n: L): H = root.nRoot(base, n)
-     }
-
-     implicit class AbsoluteOps[H, L](current: H)(implicit pos: Absolute[H, L]){
-          def abs(): L = pos.absoluteValue(current)
-     }
-
-     implicit class EqualityOps[E: Equal](current: E){
-          private val eq = implicitly[Equal[E]]
-
-          def :==:(other: E): Boolean = eq.equal(current, other)
-          def !==(other: E): Boolean = ! eq.equal(current, other)
-          def <(other: E): Boolean = eq.lessThan(current, other)
-          def >(other: E): Boolean = eq.greaterThan(current, other)
-          def <=(other: E): Boolean = eq.lessThanOrEqual(current, other)
-          def >=(other: E): Boolean = eq.greaterThanOrEqual(current, other)
-     }
 
 
-     implicit class TrigOps[T: Trig](current: T) {
-          private val trig = implicitly[Trig[T]]
-
-          /*val E: T = trig.E // note - I don't want objects to access these with '.' operator, nor theta.
-          val PI: T = trig.PI*/
-
-          def sin(): T = trig.sin(current)
-          def cos(): T = trig.cos(current)
-          def tan(): T = trig.tan(current)
-          def csc(): T = trig.csc(current)
-          def sec(): T = trig.sec(current)
-          def cot(): T = trig.cot(current)
-
-          def arcsin(): T = trig.arcsin(current)
-          def arccos(): T = trig.arccos(current)
-          def arctan(): T = trig.arctan(current)
-          def arccsc(): T = trig.arccsc(current)
-          def arcsec(): T = trig.arcsec(current)
-          def arccot(): T = trig.arccot(current)
-     }
-
-     //------------------------------------------------------------------------------------------------------------------
-
-     //todo use cats Eq
      implicit def ComplexIsNumber[R: RealLike: Equal: Trig](implicit rr: Root[R,R],
                                                             pos: Absolute[R,R]) = new Number[Complex[R]]
-
           with Equal[Complex[R]] with Root[Complex[R], R] with Absolute[Complex[R], R] {
 
 
@@ -434,7 +375,6 @@ object Number {
           def theta(y: Double, x: Double): Double = math.tan(y / x)
      }
 }
-import Number._
 
 
 
@@ -542,7 +482,6 @@ case class Imaginary[R: RealLike](im: R) {
 
 
 object Complex {
-     import Number._
 
      def ZERO[R](implicit gen: RealLike[R]): Complex[R] = new Complex(gen.zero, gen.zero)
      def ONE[R](implicit gen: RealLike[R]): Complex[R] = new Complex(gen.one, gen.zero)
@@ -619,10 +558,16 @@ object Rational {
 object NumberTester extends App {
 
 
+     import linalg.syntax.NumberSyntax._
+     
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i + Rational(1)
      val b: Complex[Int] = 3 + 5.i + 3
      val c: Complex[Int] = 1 - 2.i
 
+     val r1: Rational = Rational(2)
+     val r2: Rational = Rational(4,5)
+
+     println(r1 + r2)
      println(c)
      println(b < c)
      println(b :==: c)
