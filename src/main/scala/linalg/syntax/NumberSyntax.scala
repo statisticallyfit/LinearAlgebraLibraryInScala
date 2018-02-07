@@ -1,15 +1,15 @@
 package linalg.syntax
 
-import linalg.numeric.Number
+import linalg.numeric._
 
 /**
   *
   */
 object NumberSyntax {
 
-     implicit class NumberOps[N: Number](current: N)  {
+     implicit class NumberOps[N: Number](current: N)(implicit number: Number[N])  {
 
-          private val number = implicitly[Number[N]]
+          //private val number = implicitly[Number[N]]
 
           def +(other: N): N = number.plus(current, other)
           def -(other: N): N = number.minus(current, other)
@@ -22,4 +22,5 @@ object NumberSyntax {
           def toDouble: Double = number.doubleValue(current)
           def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!
      }
+
 }

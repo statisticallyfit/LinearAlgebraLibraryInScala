@@ -115,7 +115,8 @@ trait RealLike[R] extends Number[R] {
 }
 
 
-//trait NumberLike[N1, N2] extends Number[N1]
+
+
 
 object Number {
 
@@ -124,27 +125,6 @@ object Number {
      def TWO[N](implicit gen: Number[N]): N = gen.two
 
 
-     /*implicit def compisnumberlike[R] = new NumberLike[Complex[R], R] {
-          override val zero = _
-          override val one = _
-          override val two = _
-
-          override def plus(x: Complex[R], y: Complex[R]) = ???
-
-          override def times(x: Complex[R], y: Complex[R]) = ???
-
-          override def divide(x: Complex[R], y: Complex[R]) = ???
-
-          override def negate(x: Complex[R]) = ???
-
-          override def isZero(x: Complex[R]) = ???
-
-          override def isNegative(x: Complex[R]) = ???
-
-          override def doubleValue(x: Complex[R]) = ???
-
-          override def from(x: Int) = ???
-     }*/
 
      implicit def ComplexIsNumber[R: RealLike: Equal: Trig](implicit rr: Root[R,R],
                                                             pos: Absolute[R,R]) = new Number[Complex[R]]
@@ -588,6 +568,8 @@ object NumberTester extends App {
 
      val r1: Rational = Rational(2)
      val r2: Rational = Rational(4,5)
+
+     //println(a.testing(Rational(2)))
 
      println(r1 + r2)
      println(c)

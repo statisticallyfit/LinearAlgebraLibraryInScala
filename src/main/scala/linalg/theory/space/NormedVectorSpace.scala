@@ -16,7 +16,7 @@ trait NormedVectorSpace[V, F] extends VectorSpace[V, F] {
      //note defining norm() just in normedinnerprodspace only - normedvecspace doesn't know about innerprod.
      def norm(v: V): F
      def normalize(v: V): V ={
-          implicit val scalar: Field[F] = norm(v).asInstanceOf[Field[F]]
+          implicit val scalar: Field[F] = norm(v).asInstanceOf[Field[F]] //todo major fix!
           scale(v, scalar.inverse(norm(v)))
      }
      def isNormalized(v: V)(implicit eq: Eq[V]): Boolean = eq.eqv(v, normalize(v))

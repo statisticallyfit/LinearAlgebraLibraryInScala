@@ -1,16 +1,14 @@
 package linalg.vector
 
 
-import linalg.numeric.{Number, Trig, Root}
+import linalg.numeric.{Number, Root, Trig}
 import linalg.theory.space._
 import linalg.theory._
-import linalg.syntax.ShowSyntax._
 import linalg.syntax.TrigSyntax._
 
 import scala.language.implicitConversions
 import scala.language.higherKinds
 
-import spire.algebra.VectorSpace
 
 /**
   * Features:
@@ -24,8 +22,7 @@ import spire.algebra.VectorSpace
   */
 
 
-
-trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] with BanachSpace[V, F] {
+trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] with NormedVectorSpace[V, F] {
 
      // inherited - plus, negate, scale, innerProduct
      def minus(v: V, w: V): V = plus(v, negate(w))
@@ -46,7 +43,6 @@ object VectorLike {
 
 
           import linalg.syntax.NumberSyntax._
-          import Number._
 
           def plus(v: Vector[N], w: Vector[N]): Vector[N] =
                Vector(v.elems.zip(w.elems).map(pair => pair._1 + pair._2):_*)
@@ -75,6 +71,8 @@ object VectorLike {
 // ------------------------------------------------------------------------------------------------------------------------
 
 class Vector[N: Number](val elems: N*){
+
+     import linalg.syntax.ShowSyntax._
      override def toString: String = Vector(elems:_*).show
 }
 
@@ -93,14 +91,14 @@ object Vector {
 class VectorSet[N: Number](val cols: Vector[N]*)
 
 
-/*object VectorSet {
+object VectorSet {
 
      //typeclasses ... etc
 
      implicit class VectorSetOps[V[_], N: Number](vset: VectorSet[N]){
           def reducedRowEchelonForm(): VectorSet[N] = ???
      }
-}*/
+}
 
 
 // ------------------------------------------------------------------------------------------------------------------------
@@ -111,14 +109,36 @@ object VectorTester extends App {
      import VectorLike._
 
 
-     //val vec = implicitly[VectorLike[Vector[Int], Int]]
+     val v1: Vector[Int] = Vector(1,2,3)
+     val v2: Vector[Int] = Vector(2,0,4)
+     /*val v3: Vector[Int] = v1.add(v1)
+     v1 + v2 */
 
-     val v1: Vector[Int] = Vector.ONE[Int](10)
-     val v2: Vector[Int] = Vector.ONE[Int](10)
-     val v3: Vector[Int] = v1 + v2
+     //     v1 ~ v2
+     //     v1.isZero()
 
+
+     //println(Vector(1,2).innerProduct(v2))
      //println(vec.plus(v1, v2))
      //println(v3)
 
+     //-------
+     //note: this did not work either.
+     /*trait Tester[W, E] {
+          def testingMethod(x: W, y: E): String
+     }
 
+     import linalg.numeric.{RealLike, Complex}
+
+     implicit class testerops[W, E: RealLike](currentComplex: W)(implicit w: Tester[W, E]){
+          def testing(evalue: E): String = w.testingMethod(currentComplex, evalue)
+          def plus(other: W): String = s"$currentComplex paired (+) with $other"
+     }
+
+     implicit def ComplexIsTester[R: RealLike](implicit root: Root[R,R]): Tester[Complex[R], R] = new Tester[Complex[R], R] {
+          def testingMethod(x: Complex[R], real: R): String = s"$x with real $real"
+     }*/
+
+     /*val comp: Complex[Int] = new Complex(3, 2)
+     comp.plus(comp) */
 }
