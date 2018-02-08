@@ -80,20 +80,22 @@ trait Absolute0[H, L]{
 
 trait Absolute[A] extends Absolute0[A, A]
 
-trait Root0[H, L]{ self =>
-     val oneConst: L
-     val twoConst: L
-     val root0 = self
+trait Root0[H, L]{ //self =>
+
+     val rootOne: L //= num.one
+     val rootTwo: L //= num.two
+     //val root0 = self
 
      def power(base: H, exp: L): H
-     def nRoot(base: H, n: L)(implicit div: Field[L]): H = power(base, div.divide(oneConst, n))
-     def squareRoot(base: H)(implicit div: Field[L]): H = nRoot(base, twoConst)
+     def nRoot(base: H, n: L)(implicit div: Field[L]): H = power(base, div.divide(rootOne, n))
+     def squareRoot(base: H)(implicit div: Field[L]): H = nRoot(base, rootTwo)
 }
 
-trait Root[R] extends Root0[R, R]{
-     val oneConst: R = root0.oneConst
-     val twoConst: R = root0.twoConst
-}
+trait Root[R] extends Root0[R, R]
+/*{
+     val rootOne: R = root0.rootOne
+     val rootTwo: R = super.rootTwo
+}*/
 
 
 trait Trig[T] {
@@ -141,10 +143,9 @@ object Number {
      //note: need to keep rr and pos as base 0 types not Root[R] since otherwise
      // note: the tests below don't work
 
-     implicit def ComplexIsNumber[R: RealLike: Equiv: Trig](implicit rr: Root[R],
-                                                            pos: Absolute[R]) = new Number[Complex[R]]
-          with Equiv[Complex[R]] with Root0[Complex[R], R] with Absolute0[Complex[R], R] {
-
+     implicit def ComplexIsNumber[R: RealLike: Equiv: Trig]
+          (implicit rr: Root[R], pos: Absolute[R]) = new Number[Complex[R]] with Equiv[Complex[R]]
+          with Root0[Complex[R],R] with Absolute0[Complex[R], R] {
 
           type C = Complex[R]
           val realLike = implicitly[RealLike[R]]
@@ -154,9 +155,11 @@ object Number {
           val zero: C = Complex.ZERO[R]
           val one: C = Complex.ONE[R]
           val two: C = Complex.TWO[R]
+          val rootOne: R = realLike.one
+          val rootTwo: R = realLike.two
 
-          val oneConst: R = realLike.one
-          val twoConst: R = realLike.two
+          /*val rootOne: R = realLike.one
+          val rootTwo: R = realLike.two*/
 
 
           def plus(x: C, y: C): C = Complex(x.re + y.re, x.im + y.im)
@@ -206,6 +209,8 @@ object Number {
           val one: Real = Real.ONE
           val two: Real = Real.TWO
 
+          val rootOne: Real = one
+          val rootTwo: Real = two
 
           def plus(x: Real, y: Real): Real = Real(x.double + y.double)
           def times(x: Real, y: Real): Real = Real(x.double * y.double)
@@ -255,6 +260,8 @@ object Number {
           val zero: Rational = Rational.ONE
           val one: Rational = Rational.ONE
           val two: Rational = Rational.ONE
+          val rootOne: Rational = one
+          val rootTwo: Rational = two
 
           def plus(x: Rational, y: Rational): Rational = Rational(x.num*y.den + y.num*x.den, x.den*y.den)
           def times(x: Rational, y: Rational): Rational = Rational(x.num * y.num, x.den * y.den)
@@ -305,6 +312,8 @@ object Number {
           val zero: Int = 0
           val one: Int = 1
           val two: Int = 2
+          val rootOne: Int = 1
+          val rootTwo: Int = 2
 
           def plus(x: Int, y: Int): Int = x + y
           def times(x: Int, y: Int): Int = x * y
@@ -355,6 +364,8 @@ object Number {
           val zero: Double = 0.0
           val one: Double = 1.0
           val two: Double = 2.0
+          val rootOne: Double = 1.0
+          val rootTwo: Double =      2.0
 
           def plus(x: Double, y: Double): Double = x + y
           def times(x: Double, y: Double): Double = x * y
@@ -513,10 +524,10 @@ object Complex {
 
 
      // --- Operations ---
-     def polar[R: RealLike](z: Complex[R])(implicit rr: Root0[R,R], t: Trig[R]): Complex[R] =
+     def polar[R: RealLike](z: Complex[R])(implicit rr: Root[R], t: Trig[R]): Complex[R] =
           Complex(magnitude(z), angle(z))
 
-     def magnitude[R: RealLike](z: Complex[R])(implicit rr: Root0[R,R]): R =
+     def magnitude[R: RealLike](z: Complex[R])(implicit rr: Root[R]): R =
           (z.re * z.re + z.im * z.im).sqrt()
 
      //just returns the value of theta for the complex number: theta = arctan(b / a), where c = a + bi
@@ -525,7 +536,7 @@ object Complex {
      /** Returns the nth root of a complex number - in tuple form = (modulus root n, list of all roots) */
      def nthRootComplex[R](z: Complex[R], n: R)(implicit gen: RealLike[R],
                                                 trig: Trig[R],
-                                                rr: Root0[R,R]): (R, List[R]) ={
+                                                rr: Root[R]): (R, List[R]) ={
 
           val two: R = gen.one + gen.one
           val polarComplex: Complex[R] = polar(z)
@@ -589,10 +600,15 @@ object NumberTester extends App {
      val r1: Rational = Rational(2)
      val r2: Rational = Rational(4,5)
 
-     //println(a.testing(Rational(2)))
 
      println(r1 + r2)
      println(c)
+     //println(c.nRoot(2)) //todo doesn't work, like vectorlike
+     val rootC: Root0[Complex[Double], Double] = implicitly[Root0[Complex[Double], Double]]
+     println("NROOT TEST: " + rootC.nRoot(Complex(1.0, 2.0), 2.0))
+     Complex(1.0, 2.0).nRoot(2.0)
+     //TODO start here tomrorow
+
      println(b < c)
      println(b :==: c)
      println((4 + 3.i) :==: (4 + 3.i))

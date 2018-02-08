@@ -26,8 +26,8 @@ object VectorLikeSyntax {
 
      /*implicit class VectorLikeOps[V[_], N: Number: Trig](current: V[N])(implicit root: Root0[N,N],
                                                                         vectorLike: VectorLike[V[N], N]){*/
-     implicit class VectorLikeOps[V, N: Number: Trig](current: V)(implicit root: Root0[N, N],
-                                                                  vectorLike: VectorLike[V, N]){
+     implicit class VectorLikeOps[V, W, N: Number: Trig](current: V)(implicit root: Root0[N, N],
+                                                                  vectorLike: VectorLike[V, W, N]){
 
           /*def +(other: V[N]): V[N] = vectorLike.plus(current, other)
           def -(other: V[N]): V[N] = vectorLike.minus(current, other)
@@ -51,13 +51,14 @@ object VectorLikeSyntax {
           def angle(other: V): N = vectorLike.angle(current, other)
           def innerProduct(other: V): N = vectorLike.innerProduct(current, other)
           def dotProduct(other: V): N = vectorLike.dotProduct(current, other)
-          def crossProduct(other: V): V = vectorLike.crossProduct(current, other)
+          def crossProduct(other: V): W = vectorLike.crossProduct(current, other)
+          def outerProduct(other: V): W = vectorLike.outerProduct(current, other)
 
      }
 
-     implicit class VectorSetOps[V[_], N: Number](vset: SetOfVectors[N]){
+     /*implicit class SetOfVectorsOps[V[_], N: Number](vset: SetOfVectors[N]){
           def reducedRowEchelonForm(): SetOfVectors[N] = ???
-     }
+     }*/
      /*import VectorLike._
      val v1: Vector[Int] = Vector(1,2,3)
      val v2: Vector[Int] = Vector(1,2,3)

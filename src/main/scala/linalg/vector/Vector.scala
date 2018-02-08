@@ -24,13 +24,16 @@ import scala.language.higherKinds
   */
 
 
-trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] with NormedVectorSpace[V, F] {
+trait VectorLike[V, W, F]
+     extends InnerProductSpace[V, F]
+     with HilbertSpace[V, F]
+     with NormedVectorSpace[V, F] {
 
-     // inherited - plus, negate, scale, innerProduct
+     // inherited - plus, negate, scale, innerProduct, norm, angle
      def minus(v: V, w: V): V = plus(v, negate(w))
      def isZero(v: V): Boolean
-     def crossProduct(v: V, w: V): V  //maybe won't work
-     def outerProduct(v: V, w: V): V
+     def crossProduct(v: V, w: V): W  //maybe won't work
+     def outerProduct(v: V, w: V): W
 }
 
 
@@ -40,7 +43,7 @@ object VectorLike {
      //NOTE: use root0 not root because the N might be a complex
 
      implicit def VectorIsVectorLike[N: Number: Trig: Equiv](implicit root: Root0[N,N]) = new
-               VectorLike[Vector[N], N] {
+               VectorLike[Vector[N], SetOfVectors[N], N] {
 
           import linalg.syntax.NumberSyntax._
 
@@ -50,39 +53,25 @@ object VectorLike {
 
 
           def plus(v: Vector[N], w: Vector[N]): Vector[N] =
-               Vector(v.elems.zip(w.elems).map(pair => pair._1 + pair._2):_*)
+               Vector(v.elements.zip(w.elements).map(pair => pair._1 + pair._2):_*)
 
-          def negate(v: Vector[N]): Vector[N] = Vector(v.elems.map(e => e.negate()):_*)
+          def negate(v: Vector[N]): Vector[N] = Vector(v.elements.map(e => e.negate()):_*)
 
-          def scale(v: Vector[N], factor: N): Vector[N] = Vector(v.elems.map(e => e * factor):_*)
+          def scale(v: Vector[N], factor: N): Vector[N] = Vector(v.elements.map(e => e * factor):_*)
 
-          def isZero(v: Vector[N]): Boolean = v.elems.forall(e => e :==: Number.ZERO[N])
+          def isZero(v: Vector[N]): Boolean = v.elements.forall(e => e :==: Number.ZERO[N])
 
           def innerProduct(v: Vector[N], w: Vector[N]): N =
-               v.elems.zip(w.elems).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
+               v.elements.zip(w.elements).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
 
-          def outerProduct(v: Vector[N], w: Vector[N]): Vector[N] = ??? //todo
+          def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = ??? //todo
 
-          def crossProduct(v: Vector[N], w: Vector[N]): Vector[N] = ??? //todo
+          def crossProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = ??? //todo
 
           def angle(v: Vector[N], w: Vector[N]): N = innerProduct(v, w) / (norm(v) * norm(w)).arccos()
 
           def norm(v: Vector[N])(implicit div: Field[N]): N =
-               v.elems.map(e => root.power(e, Number.TWO[N])).reduceLeft(_ + _)
-     }
-
-
-     implicit def VectorSetIsVectorLike[N: Number: Trig: Equiv](implicit vector: VectorLike[Vector[N], N]) = new
-               VectorLike[SetOfVectors[N], N]{
-
-          import linalg.syntax.NumberSyntax._
-          import linalg.syntax.VectorLikeSyntax._
-
-          val zero: SetOfVectors[N] = SetOfVectors(Vector.ZERO[N](1))
-          val one: SetOfVectors[N] = SetOfVectors(Vector.ONE[N](1))
-
-          def plus(v: SetOfVectors[N], w: SetOfVectors[N]): SetOfVectors[N] =
-               SetOfVectors(v.cols.zip(w.cols).map(pair => pair._1 + pair._2):_*) //vector.plus(pair._1, pair._2)
+               v.elements.map(e => root.power(e, Number.TWO[N])).reduceLeft(_ + _)
      }
 }
 
@@ -90,9 +79,9 @@ object VectorLike {
 //
 // ------------------------------------------------------------------------------------------------------------------------
 
-class Vector[N: Number](val elems: N*){
+class Vector[N: Number](val elements: N*){
 
-     override def toString: String = Vector(elems:_*).show
+     override def toString: String = Vector(elements:_*).show
 }
 
 
@@ -105,20 +94,8 @@ object Vector {
 }
 
 
-// ------------------------------------------------------------------------------------------------------------------------
-
-class SetOfVectors[N: Number](val cols: Vector[N]*)
 
 
-object SetOfVectors {
-
-     //typeclasses ... etc
-
-     def apply[N: Number](cols: Vector[N]*): SetOfVectors[N] = SetOfVectors(cols:_*)
-}
-
-
-// ------------------------------------------------------------------------------------------------------------------------
 
 object VectorTester extends App {
 

@@ -26,7 +26,7 @@ import linalg.theory.space._
 
 //todo - decide overall if should use extension to specify type of the 'smaller' parameters.
 
-trait MatrixLike[M, F] extends VectorLike[M, F] {
+trait MatrixLike[M, F] extends SetOfVectorsLike[M, F] {
 
      val identity: M
 
@@ -39,7 +39,6 @@ trait MatrixLike[M, F] extends VectorLike[M, F] {
      def minor(m: M, rowIndex: Int, colIndex: Int): F
      def determinant(m: M): M
      def trace(m: M): F
-     def rowReducedEchelonForm(m: M): M
 }
 //note: matrix types:
 //Square, Hessenberg, LowerTri, UpperTri, Unitary,
@@ -57,7 +56,7 @@ trait LinearSystem[S, N] extends MatrixLike[S, N] {
      def isConsistent(s: S): Boolean  = ! isInconsistent(s)
 
      def hasNoSolution(s: S): Boolean = isInconsistent(s)
-     def hasUniqueSolution(s: S)(implicit eqSys: Eq[S]): Boolean = eqSys.eqv(rowReducedEchelonForm(s), identity)
+     def hasUniqueSolution(s: S)(implicit eqSys: Eq[S]): Boolean = eqSys.eqv(rowReducedEchelon(s), identity)
 
      def infiniteSolutionSolver(s: S): S
      def solve(s: S): Option[S]
