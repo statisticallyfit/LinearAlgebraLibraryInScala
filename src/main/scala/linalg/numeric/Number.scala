@@ -4,7 +4,7 @@ package linalg.numeric
 import linalg.show.Show._
 import linalg.theory._
 import linalg.syntax.AbsoluteSyntax._
-import linalg.syntax.EqualSyntax._
+import linalg.syntax.EquivalenceSyntax._
 import linalg.syntax.NumberSyntax._
 import linalg.syntax.RootSyntax._
 import linalg.syntax.ShowSyntax._
@@ -66,7 +66,7 @@ trait Number[N] extends Field[N]  {
      def from(x: Int): N
 }
 
-trait Equal[E]  {
+trait Equivalence[E]  {
      def equal(x: E, y: E): Boolean
      def lessThan(x: E, y: E): Boolean
      def greaterThan(x: E, y: E): Boolean = lessThan(y, x)
@@ -74,15 +74,27 @@ trait Equal[E]  {
      def greaterThanOrEqual(x: E, y: E): Boolean = greaterThan(x, y) || equal(x, y)
 }
 
-trait Absolute[H, L]{
+trait Absolute0[H, L]{
      def absoluteValue(x: H): L
 }
 
-trait Root[H, L]{
+trait Absolute[A] extends Absolute0[A, A]
+
+trait Root0[H, L]{ self =>
+     val oneConst: L
+     val twoConst: L
+     val root0 = self
+
      def power(base: H, exp: L): H
-     def nRoot(base: H, n: L): H // = power(base, one / n)
-     def squareRoot(base: H): H // = nRoot(base, two)
+     def nRoot(base: H, n: L)(implicit div: Field[L]): H = power(base, div.divide(oneConst, n))
+     def squareRoot(base: H)(implicit div: Field[L]): H = nRoot(base, twoConst)
 }
+
+trait Root[R] extends Root0[R, R]{
+     val oneConst: R = root0.oneConst
+     val twoConst: R = root0.twoConst
+}
+
 
 trait Trig[T] {
 
@@ -126,9 +138,12 @@ object Number {
 
 
 
-     implicit def ComplexIsNumber[R: RealLike: Equal: Trig](implicit rr: Root[R,R],
-                                                            pos: Absolute[R,R]) = new Number[Complex[R]]
-          with Equal[Complex[R]] with Root[Complex[R], R] with Absolute[Complex[R], R] {
+     //note: need to keep rr and pos as base 0 types not Root[R] since otherwise
+     // note: the tests below don't work
+
+     implicit def ComplexIsNumber[R: RealLike: Equivalence: Trig](implicit rr: Root[R],
+                                                                  pos: Absolute[R]) = new Number[Complex[R]]
+          with Equivalence[Complex[R]] with Root0[Complex[R], R] with Absolute0[Complex[R], R] {
 
 
           type C = Complex[R]
@@ -139,6 +154,10 @@ object Number {
           val zero: C = Complex.ZERO[R]
           val one: C = Complex.ONE[R]
           val two: C = Complex.TWO[R]
+
+          val oneConst: R = realLike.one
+          val twoConst: R = realLike.two
+
 
           def plus(x: C, y: C): C = Complex(x.re + y.re, x.im + y.im)
           def times(x: C, y: C): C = Complex(x.re * y.im - y.re * x.im, x.re * y.re + y.im * x.im)
@@ -165,13 +184,13 @@ object Number {
           def power(base: Complex[R], exp: R): Complex[R] =
                Complex(rr.power(Complex.magnitude(base), exp), Complex.angle(base) * exp)
 
-          def nRoot(base: Complex[R], n: R): Complex[R] = {
+          /*def nRoot(base: Complex[R], n: R): Complex[R] = {
                val (modulusRoot, listRoots): (R, List[R]) = Complex.nthRootComplex(base, n)
                Complex(modulusRoot, listRoots.head) //just returning first root for convenience.
           }
 
           def squareRoot(base: Complex[R]): Complex[R] = nRoot(base, realLike.one / realLike.two)
-
+*/
 
           /** Absolute part */
           def absoluteValue(z: Complex[R]): R = Complex.magnitude(z)
@@ -179,20 +198,21 @@ object Number {
 
 
 
-     implicit object RealIsNumber extends RealLike[Real] with Equal[Real] with Absolute[Real, Real]
-          with Root[Real, Real] with Trig[Real] {
+     implicit object RealIsNumber extends RealLike[Real] with Equivalence[Real] with Absolute[Real]
+          with Root[Real] with Trig[Real] {
 
           /** Real part */
           val zero: Real = Real.ZERO
           val one: Real = Real.ONE
           val two: Real = Real.TWO
 
+
           def plus(x: Real, y: Real): Real = Real(x.double + y.double)
           def times(x: Real, y: Real): Real = Real(x.double * y.double)
           def divide(x: Real, y: Real): Real = Real(x.double / y.double)
           def power(base: Real, exp: Real): Real = Real(math.pow(base.double, exp.double))
-          def nRoot(base: Real, n: Real): Real = power(base, divide(one, n))
-          def squareRoot(base: Real): Real = nRoot(base, two)
+          //def nRoot(base: Real, n: Real): Real = power(base, divide(one, n))
+          //def squareRoot(base: Real): Real = nRoot(base, two)
           def absoluteValue(x: Real): Real = Real(math.abs(x.double))
           def negate(x: Real): Real = Real(-x.double)
           def isZero(x: Real): Boolean = equal(x, zero)
@@ -228,20 +248,20 @@ object Number {
      }
 
 
-     implicit object RationalIsRealNumber extends RealLike[Rational] with Equal[Rational] with Absolute[Rational, Rational]
-          with Root[Rational, Rational] with Trig[Rational] {
+     implicit object RationalIsRealNumber extends RealLike[Rational] with Equivalence[Rational] with Absolute[Rational]
+          with Root[Rational] with Trig[Rational] {
 
           /** Real part */
           val zero: Rational = Rational.ONE
           val one: Rational = Rational.ONE
-          val two: Rational = Rational.TWO
+          val two: Rational = Rational.ONE
 
           def plus(x: Rational, y: Rational): Rational = Rational(x.num*y.den + y.num*x.den, x.den*y.den)
           def times(x: Rational, y: Rational): Rational = Rational(x.num * y.num, x.den * y.den)
           def divide(x: Rational, y: Rational): Rational = Rational(x.num * y.den, x.den * y.num)
           def power(base: Rational, exp: Rational): Rational = Rational(math.pow(doubleValue(base), doubleValue(exp)))
-          def nRoot(base: Rational, n: Rational): Rational = power(base, divide(one, n))
-          def squareRoot(base: Rational): Rational = nRoot(base, two)
+          //def nRoot(base: Rational, n: Rational): Rational = power(base, divide(one, n))
+          //def squareRoot(base: Rational): Rational = nRoot(base, two)
           def absoluteValue(x: Rational): Rational = Rational(math.abs(x.num), math.abs(x.den))
           def negate(x: Rational): Rational = Rational(-x.num, -x.den)
           def areEqual(x: Rational, y: Rational): Boolean = x.num == y.num && x.den == y.den
@@ -278,20 +298,20 @@ object Number {
      }
 
 
-     implicit object IntIsRealNumber extends RealLike[Int] with Equal[Int] with Absolute[Int, Int]
-          with Root[Int, Int] with Trig[Int] {
+     implicit object IntIsRealNumber extends RealLike[Int] with Equivalence[Int] with Absolute[Int]
+          with Root[Int] with Trig[Int] {
 
           /** Real part **/
-          val one: Int = 1
           val zero: Int = 0
+          val one: Int = 1
           val two: Int = 2
 
           def plus(x: Int, y: Int): Int = x + y
           def times(x: Int, y: Int): Int = x * y
           def divide(x: Int, y: Int): Int = x / y
           def power(base: Int, exp: Int): Int = math.pow(base, exp).toInt //not chopped off
-          def nRoot(base: Int, n: Int): Int = math.pow(base, 1.0 / n).toInt //todo gets chopped off
-          def squareRoot(base: Int): Int = nRoot(base, two)
+          //def nRoot(base: Int, n: Int): Int = math.pow(base, 1.0 / n).toInt //todo gets chopped off
+          //def squareRoot(base: Int): Int = nRoot(base, two)
           def absoluteValue(x: Int): Int = math.abs(x)
           def negate(x: Int): Int = -x
           def isZero(x: Int): Boolean = x == 0
@@ -328,20 +348,20 @@ object Number {
      }
 
 
-     implicit object DoubleIsRealNumber extends RealLike[Double] with Equal[Double] with Absolute[Double, Double]
-          with Root[Double, Double] with Trig[Double] {
+     implicit object DoubleIsRealNumber extends RealLike[Double] with Equivalence[Double] with Absolute[Double]
+          with Root[Double] with Trig[Double] {
 
           /** Real part **/
-          val one: Double = 1.0
           val zero: Double = 0.0
+          val one: Double = 1.0
           val two: Double = 2.0
 
           def plus(x: Double, y: Double): Double = x + y
           def times(x: Double, y: Double): Double = x * y
           def divide(x: Double, y: Double): Double = x / y
           def power(base: Double, exp: Double): Double = math.pow(base, exp)
-          def squareRoot(base: Double): Double = math.sqrt(base)
-          def nRoot(base: Double, n: Double): Double = power(base, 1/n)
+          //def squareRoot(base: Double): Double = math.sqrt(base)
+          //def nRoot(base: Double, n: Double): Double = power(base, 1/n)
           def absoluteValue(x: Double): Double = math.abs(x)
           def negate(x: Double): Double = -x
           def isZero(x: Double): Boolean = x == 0
@@ -411,7 +431,7 @@ object Conversion {
 
      // ---------------------------------------------------------------------------------------------
 
-     implicit def GeneralRealToComplex[R: RealLike](implicit rt: Root[Complex[R], R]) =
+     implicit def GeneralRealToComplex[R: RealLike](implicit rt: Root0[Complex[R], R]) =
           new Conversion[R, Complex[R]]{
 
           def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)
@@ -493,10 +513,10 @@ object Complex {
 
 
      // --- Operations ---
-     def polar[R: RealLike](z: Complex[R])(implicit rr: Root[R,R], t: Trig[R]): Complex[R] =
+     def polar[R: RealLike](z: Complex[R])(implicit rr: Root0[R,R], t: Trig[R]): Complex[R] =
           Complex(magnitude(z), angle(z))
 
-     def magnitude[R: RealLike](z: Complex[R])(implicit rr: Root[R,R]): R =
+     def magnitude[R: RealLike](z: Complex[R])(implicit rr: Root0[R,R]): R =
           (z.re * z.re + z.im * z.im).sqrt()
 
      //just returns the value of theta for the complex number: theta = arctan(b / a), where c = a + bi
@@ -505,7 +525,7 @@ object Complex {
      /** Returns the nth root of a complex number - in tuple form = (modulus root n, list of all roots) */
      def nthRootComplex[R](z: Complex[R], n: R)(implicit gen: RealLike[R],
                                                 trig: Trig[R],
-                                                rr: Root[R,R]): (R, List[R]) ={
+                                                rr: Root0[R,R]): (R, List[R]) ={
 
           val two: R = gen.one + gen.one
           val polarComplex: Complex[R] = polar(z)

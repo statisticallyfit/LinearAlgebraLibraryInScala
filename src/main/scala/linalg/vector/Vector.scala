@@ -1,7 +1,7 @@
 package linalg.vector
 
 
-import linalg.numeric.{Number, Root, Trig}
+import linalg.numeric.{Number, Root0, Trig}
 import linalg.theory.space._
 import linalg.theory._
 import linalg.syntax.TrigSyntax._
@@ -35,7 +35,7 @@ trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] w
 
 object VectorLike {
 
-     implicit def VectorIsVectorLike[N: Number: Trig](implicit root: Root[N,N]) = new VectorLike[Vector[N], N] {
+     implicit def VectorIsVectorLike[N: Number: Trig](implicit root: Root0[N,N]) = new VectorLike[Vector[N], N] {
 
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
@@ -62,7 +62,8 @@ object VectorLike {
 
           def angle(v: Vector[N], w: Vector[N]): N = innerProduct(v, w) / (norm(v) * norm(w)).arccos()
 
-          def norm(v: Vector[N]): N = v.elems.map(e => root.power(e, Number.TWO[N])).reduceLeft(_ + _)
+          def norm(v: Vector[N])(implicit div: Field[N]): N =
+               v.elems.map(e => root.power(e, Number.TWO[N])).reduceLeft(_ + _)
      }
 }
 
@@ -112,7 +113,7 @@ object VectorTester extends App {
      val v1: Vector[Int] = Vector(1,2,3)
      val v2: Vector[Int] = Vector(2,0,4)
      /*val v3: Vector[Int] = v1.add(v1)
-     v1 + v2 */
+     v1 + v2*/
 
      //     v1 ~ v2
      //     v1.isZero()

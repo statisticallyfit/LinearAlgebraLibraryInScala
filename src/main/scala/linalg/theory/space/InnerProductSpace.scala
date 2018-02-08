@@ -28,11 +28,11 @@ trait InnerProductSpace[I, F] extends VectorSpace[I, F] { self =>
      def innerProduct(i1: I, i2: I): F
      def dotProduct(i1: I, i2: I): F = innerProduct(i1, i2)
 
-     def normed(implicit ev: Root[F, F]): NormedVectorSpace[I, F] = new NormedInnerProductSpace[I, F] {
+     def normed(implicit ev: Root[F]): NormedVectorSpace[I, F] = new NormedInnerProductSpace[I, F] {
           //val dimensionOfVectorSpace = self.dimensionOfVectorSpace
           //this: Field[F] =>
 
-          val root: Root[F, F] = ev
+          val root: Root[F] = ev
           val innerSpace = self
      }
 }
@@ -53,7 +53,7 @@ private[theory] trait NormedInnerProductSpace[V, F] extends NormedVectorSpace[V,
      //this: Field[F] =>
 
      //val scalar: Field[F] = innerSpace.scalar
-     val root: Root[F,F]
+     val root: Root[F]
      val innerSpace: InnerProductSpace[V, F]
 
      val zero: V = innerSpace.zero
@@ -63,5 +63,5 @@ private[theory] trait NormedInnerProductSpace[V, F] extends NormedVectorSpace[V,
      def minus(v: V, w: V): V = innerSpace.plus(v, innerSpace.negate(w))
      def scale(v: V, constant: F): V = innerSpace.scale(v, constant)
 
-     def norm(v: V): F = root.squareRoot(innerSpace.innerProduct(v, v))
+     def norm(v: V)(implicit div: Field[F]): F = root.squareRoot(innerSpace.innerProduct(v, v))
 }

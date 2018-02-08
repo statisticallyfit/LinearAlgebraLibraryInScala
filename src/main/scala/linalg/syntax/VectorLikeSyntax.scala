@@ -23,13 +23,15 @@ object VectorLikeSyntax {
           def dotProduct(other:  Vector[N]): N = vectorLike.dotProduct(current, other)
           def crossProduct(other:  Vector[N]):  Vector[N] = vectorLike.crossProduct(current, other)
      }*/
+     implicit class AbsoluteOps[H, L](current: H)(implicit pos: Absolute0[H, L]){
+          def abs(): L = pos.absoluteValue(current)
+     }
+     /*implicit class VectorLikeOps[V[_], N: Number: Trig](current: V[N])(implicit root: Root0[N,N],
+                                                                        vectorLike: VectorLike[V[N], N]){*/
+     implicit class VectorLikeOps[V, N: Number: Trig](private val current: V)(implicit root: Root0[N, N],
+                                                                        vectorLike: VectorLike[V, N]){
 
-     implicit class VectorLikeOps[V[_], N: Number: Trig](current: V[N])(implicit root: Root[N,N],
-                                                                  vectorLike: VectorLike[V[N], N]){
-     /*implicit class VectorLikeOps[V, N: Number: Trig](private val current: V)(implicit root: Root[N,N],
-                                                                        vectorLike: VectorLike[V, N]){*/
-
-          def +(other: V[N]): V[N] = vectorLike.plus(current, other)
+          /*def +(other: V[N]): V[N] = vectorLike.plus(current, other)
           def -(other: V[N]): V[N] = vectorLike.minus(current, other)
           def negate(): V[N] = vectorLike.negate(current)
           def scale(factor: N): V[N] = vectorLike.scale(current, factor)
@@ -38,10 +40,10 @@ object VectorLikeSyntax {
           def angle(other: V[N]): N = vectorLike.angle(current, other)
           def innerProduct(other: V[N]): N = vectorLike.innerProduct(current, other)
           def dotProduct(other: V[N]): N = vectorLike.dotProduct(current, other)
-          def crossProduct(other: V[N]): V[N] = vectorLike.crossProduct(current, other)
+          def crossProduct(other: V[N]): V[N] = vectorLike.crossProduct(current, other)*/
 
           def isZero(): Boolean = vectorLike.isZero(current)
-          /*def +(other: V): V = vectorLike.plus(current, other)
+          def +(other: V): V = vectorLike.plus(current, other)
           def add(other: V): V = vectorLike.plus(current, other)
           def -(other: V): V = vectorLike.minus(current, other)
           def negate(): V = vectorLike.negate(current)
@@ -51,7 +53,7 @@ object VectorLikeSyntax {
           def angle(other: V): N = vectorLike.angle(current, other)
           def innerProduct(other: V): N = vectorLike.innerProduct(current, other)
           def dotProduct(other: V): N = vectorLike.dotProduct(current, other)
-          def crossProduct(other: V): V = vectorLike.crossProduct(current, other)*/
+          def crossProduct(other: V): V = vectorLike.crossProduct(current, other)
 
      }
      /*import VectorLike._
