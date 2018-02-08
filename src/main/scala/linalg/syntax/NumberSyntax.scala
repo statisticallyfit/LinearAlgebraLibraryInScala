@@ -7,7 +7,7 @@ import linalg.numeric._
   */
 object NumberSyntax {
 
-     implicit class NumberOps[N: Number](current: N)(implicit number: Number[N])  {
+     implicit class NumberOps[N](current: N)(implicit number: Number[N])  {
 
           //private val number = implicitly[Number[N]]
 

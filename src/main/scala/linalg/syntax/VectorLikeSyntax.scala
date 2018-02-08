@@ -23,13 +23,11 @@ object VectorLikeSyntax {
           def dotProduct(other:  Vector[N]): N = vectorLike.dotProduct(current, other)
           def crossProduct(other:  Vector[N]):  Vector[N] = vectorLike.crossProduct(current, other)
      }*/
-     implicit class AbsoluteOps[H, L](current: H)(implicit pos: Absolute0[H, L]){
-          def abs(): L = pos.absoluteValue(current)
-     }
+
      /*implicit class VectorLikeOps[V[_], N: Number: Trig](current: V[N])(implicit root: Root0[N,N],
                                                                         vectorLike: VectorLike[V[N], N]){*/
-     implicit class VectorLikeOps[V, N: Number: Trig](private val current: V)(implicit root: Root0[N, N],
-                                                                        vectorLike: VectorLike[V, N]){
+     implicit class VectorLikeOps[V, N: Number: Trig](current: V)(implicit root: Root0[N, N],
+                                                                  vectorLike: VectorLike[V, N]){
 
           /*def +(other: V[N]): V[N] = vectorLike.plus(current, other)
           def -(other: V[N]): V[N] = vectorLike.minus(current, other)

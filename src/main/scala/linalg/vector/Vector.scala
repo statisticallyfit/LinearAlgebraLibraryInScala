@@ -1,10 +1,12 @@
 package linalg.vector
 
 
-import linalg.numeric.{Number, Root0, Trig}
+import linalg.numeric._ //{Number, Root0, Trig}
 import linalg.theory.space._
 import linalg.theory._
 import linalg.syntax.TrigSyntax._
+import linalg.syntax.ShowSyntax._
+import linalg.syntax.EquivSyntax._
 
 import scala.language.implicitConversions
 import scala.language.higherKinds
@@ -35,14 +37,17 @@ trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] w
 
 object VectorLike {
 
-     implicit def VectorIsVectorLike[N: Number: Trig](implicit root: Root0[N,N]) = new VectorLike[Vector[N], N] {
+     //NOTE: use root0 not root because the N might be a complex
+
+     implicit def VectorIsVectorLike[N: Number: Trig: Equiv](implicit root: Root0[N,N]) = new
+               VectorLike[Vector[N], N] {
+
+          import linalg.syntax.NumberSyntax._
+
 
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
-          //implicit override val scalar: Field[N]
 
-
-          import linalg.syntax.NumberSyntax._
 
           def plus(v: Vector[N], w: Vector[N]): Vector[N] =
                Vector(v.elems.zip(w.elems).map(pair => pair._1 + pair._2):_*)
@@ -51,7 +56,7 @@ object VectorLike {
 
           def scale(v: Vector[N], factor: N): Vector[N] = Vector(v.elems.map(e => e * factor):_*)
 
-          def isZero(v: Vector[N]): Boolean = v.elems.forall(e => e == Number.ZERO[N])
+          def isZero(v: Vector[N]): Boolean = v.elems.forall(e => e :==: Number.ZERO[N])
 
           def innerProduct(v: Vector[N], w: Vector[N]): N =
                v.elems.zip(w.elems).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
@@ -73,7 +78,6 @@ object VectorLike {
 
 class Vector[N: Number](val elems: N*){
 
-     import linalg.syntax.ShowSyntax._
      override def toString: String = Vector(elems:_*).show
 }
 
@@ -108,6 +112,7 @@ object VectorTester extends App {
 
      import linalg.syntax.VectorLikeSyntax._
      import VectorLike._
+
 
 
      val v1: Vector[Int] = Vector(1,2,3)

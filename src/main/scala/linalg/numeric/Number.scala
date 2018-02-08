@@ -4,7 +4,7 @@ package linalg.numeric
 import linalg.show.Show._
 import linalg.theory._
 import linalg.syntax.AbsoluteSyntax._
-import linalg.syntax.EquivalenceSyntax._
+import linalg.syntax.EquivSyntax._
 import linalg.syntax.NumberSyntax._
 import linalg.syntax.RootSyntax._
 import linalg.syntax.ShowSyntax._
@@ -66,7 +66,7 @@ trait Number[N] extends Field[N]  {
      def from(x: Int): N
 }
 
-trait Equivalence[E]  {
+trait Equiv[E]  {
      def equal(x: E, y: E): Boolean
      def lessThan(x: E, y: E): Boolean
      def greaterThan(x: E, y: E): Boolean = lessThan(y, x)
@@ -141,9 +141,9 @@ object Number {
      //note: need to keep rr and pos as base 0 types not Root[R] since otherwise
      // note: the tests below don't work
 
-     implicit def ComplexIsNumber[R: RealLike: Equivalence: Trig](implicit rr: Root[R],
-                                                                  pos: Absolute[R]) = new Number[Complex[R]]
-          with Equivalence[Complex[R]] with Root0[Complex[R], R] with Absolute0[Complex[R], R] {
+     implicit def ComplexIsNumber[R: RealLike: Equiv: Trig](implicit rr: Root[R],
+                                                            pos: Absolute[R]) = new Number[Complex[R]]
+          with Equiv[Complex[R]] with Root0[Complex[R], R] with Absolute0[Complex[R], R] {
 
 
           type C = Complex[R]
@@ -198,7 +198,7 @@ object Number {
 
 
 
-     implicit object RealIsNumber extends RealLike[Real] with Equivalence[Real] with Absolute[Real]
+     implicit object RealIsNumber extends RealLike[Real] with Equiv[Real] with Absolute[Real]
           with Root[Real] with Trig[Real] {
 
           /** Real part */
@@ -248,7 +248,7 @@ object Number {
      }
 
 
-     implicit object RationalIsRealNumber extends RealLike[Rational] with Equivalence[Rational] with Absolute[Rational]
+     implicit object RationalIsRealNumber extends RealLike[Rational] with Equiv[Rational] with Absolute[Rational]
           with Root[Rational] with Trig[Rational] {
 
           /** Real part */
@@ -298,7 +298,7 @@ object Number {
      }
 
 
-     implicit object IntIsRealNumber extends RealLike[Int] with Equivalence[Int] with Absolute[Int]
+     implicit object IntIsRealNumber extends RealLike[Int] with Equiv[Int] with Absolute[Int]
           with Root[Int] with Trig[Int] {
 
           /** Real part **/
@@ -348,7 +348,7 @@ object Number {
      }
 
 
-     implicit object DoubleIsRealNumber extends RealLike[Double] with Equivalence[Double] with Absolute[Double]
+     implicit object DoubleIsRealNumber extends RealLike[Double] with Equiv[Double] with Absolute[Double]
           with Root[Double] with Trig[Double] {
 
           /** Real part **/
