@@ -10,7 +10,7 @@ import linalg.vector._
 trait Subspace[S, F] extends VectorSpace[S, F] {
 
      //return the basis of the subspace W of vecspace V, because that is the generating set of W (basis)
-     def subspace(vset: VectorSet[F]): VectorSet[S] //same implementation as span(vset)
+     def subspace(vset: SetOfVectors[F]): SetOfVectors[S] //same implementation as span(vset)
 
      def isSubsetOf(subset: S, parent: S): Boolean// implicit class has: parent.isSubset(subset): Boolean
 

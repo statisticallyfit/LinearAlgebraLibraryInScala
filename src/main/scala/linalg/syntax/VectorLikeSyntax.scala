@@ -54,6 +54,10 @@ object VectorLikeSyntax {
           def crossProduct(other: V): V = vectorLike.crossProduct(current, other)
 
      }
+
+     implicit class VectorSetOps[V[_], N: Number](vset: SetOfVectors[N]){
+          def reducedRowEchelonForm(): SetOfVectors[N] = ???
+     }
      /*import VectorLike._
      val v1: Vector[Int] = Vector(1,2,3)
      val v2: Vector[Int] = Vector(1,2,3)

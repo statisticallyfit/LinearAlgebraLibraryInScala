@@ -70,6 +70,20 @@ object VectorLike {
           def norm(v: Vector[N])(implicit div: Field[N]): N =
                v.elems.map(e => root.power(e, Number.TWO[N])).reduceLeft(_ + _)
      }
+
+
+     implicit def VectorSetIsVectorLike[N: Number: Trig: Equiv](implicit vector: VectorLike[Vector[N], N]) = new
+               VectorLike[SetOfVectors[N], N]{
+
+          import linalg.syntax.NumberSyntax._
+          import linalg.syntax.VectorLikeSyntax._
+
+          val zero: SetOfVectors[N] = SetOfVectors(Vector.ZERO[N](1))
+          val one: SetOfVectors[N] = SetOfVectors(Vector.ONE[N](1))
+
+          def plus(v: SetOfVectors[N], w: SetOfVectors[N]): SetOfVectors[N] =
+               SetOfVectors(v.cols.zip(w.cols).map(pair => pair._1 + pair._2):_*) //vector.plus(pair._1, pair._2)
+     }
 }
 
 
@@ -93,16 +107,14 @@ object Vector {
 
 // ------------------------------------------------------------------------------------------------------------------------
 
-class VectorSet[N: Number](val cols: Vector[N]*)
+class SetOfVectors[N: Number](val cols: Vector[N]*)
 
 
-object VectorSet {
+object SetOfVectors {
 
      //typeclasses ... etc
 
-     implicit class VectorSetOps[V[_], N: Number](vset: VectorSet[N]){
-          def reducedRowEchelonForm(): VectorSet[N] = ???
-     }
+     def apply[N: Number](cols: Vector[N]*): SetOfVectors[N] = SetOfVectors(cols:_*)
 }
 
 
