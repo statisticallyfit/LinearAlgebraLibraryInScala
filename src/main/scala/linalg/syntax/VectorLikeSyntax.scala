@@ -24,9 +24,9 @@ object VectorLikeSyntax {
           def crossProduct(other:  Vector[N]):  Vector[N] = vectorLike.crossProduct(current, other)
      }*/
 
-     implicit class VectorLikeOps[V[_], N: Number/*: Trig*/](current: V[N])(implicit root: Root[N,N],
+     implicit class VectorLikeOps[V[_], N: Number: Trig](current: V[N])(implicit root: Root[N,N],
                                                                   vectorLike: VectorLike[V[N], N]){
-     /*implicit class VectorLikeOps[V, N: Number](private val current: V)(implicit root: Root[N,N],
+     /*implicit class VectorLikeOps[V, N: Number: Trig](private val current: V)(implicit root: Root[N,N],
                                                                         vectorLike: VectorLike[V, N]){*/
 
           def +(other: V[N]): V[N] = vectorLike.plus(current, other)
@@ -35,7 +35,7 @@ object VectorLikeSyntax {
           def scale(factor: N): V[N] = vectorLike.scale(current, factor)
 
           def norm(): N = vectorLike.norm(current)
-          //def angle(other: V[N]): N = vectorLike.angle(current, other)
+          def angle(other: V[N]): N = vectorLike.angle(current, other)
           def innerProduct(other: V[N]): N = vectorLike.innerProduct(current, other)
           def dotProduct(other: V[N]): N = vectorLike.dotProduct(current, other)
           def crossProduct(other: V[N]): V[N] = vectorLike.crossProduct(current, other)
@@ -48,14 +48,15 @@ object VectorLikeSyntax {
           def scale(factor: N): V = vectorLike.scale(current, factor)
 
           def norm(): N = vectorLike.norm(current)
-          //def angle(other: V): N = vectorLike.angle(current, other)
+          def angle(other: V): N = vectorLike.angle(current, other)
           def innerProduct(other: V): N = vectorLike.innerProduct(current, other)
           def dotProduct(other: V): N = vectorLike.dotProduct(current, other)
           def crossProduct(other: V): V = vectorLike.crossProduct(current, other)*/
 
      }
-     import VectorLike._
+     /*import VectorLike._
      val v1: Vector[Int] = Vector(1,2,3)
      val v2: Vector[Int] = Vector(1,2,3)
      v1 + v2
+     Vector(Real(1), Real(2)) + Vector(Real(1), Real(2))*/
 }
