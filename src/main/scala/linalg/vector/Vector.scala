@@ -1,12 +1,13 @@
 package linalg.vector
 
 
-import linalg.numeric._ //{Number, Root0, Trig}
+import linalg.numeric.{Number, Root0, Trig, Compare}
 import linalg.theory.space._
 import linalg.theory._
 import linalg.syntax.TrigSyntax._
 import linalg.syntax.ShowSyntax._
-import linalg.syntax.EquivSyntax._
+import linalg.syntax.CompareSyntax._
+//import linalg.syntax.NumberSyntax._
 
 import scala.language.implicitConversions
 import scala.language.higherKinds
@@ -24,7 +25,7 @@ import scala.language.higherKinds
   */
 
 
-trait VectorLike[V, W, F]
+trait VectorLike[V, F]
      extends InnerProductSpace[V, F]
      with HilbertSpace[V, F]
      with NormedVectorSpace[V, F] {
@@ -32,8 +33,8 @@ trait VectorLike[V, W, F]
      // inherited - plus, negate, scale, innerProduct, norm, angle
      def minus(v: V, w: V): V = plus(v, negate(w))
      def isZero(v: V): Boolean
-     def crossProduct(v: V, w: V): W  //maybe won't work
-     def outerProduct(v: V, w: V): W
+     def crossProduct(v: V, w: V): SetOfVectors[F]  //maybe won't work
+     def outerProduct(v: V, w: V): SetOfVectors[F]
 }
 
 
@@ -42,8 +43,8 @@ object VectorLike {
 
      //NOTE: use root0 not root because the N might be a complex
 
-     implicit def VectorIsVectorLike[N: Number: Trig: Equiv](implicit root: Root0[N,N]) = new
-               VectorLike[Vector[N], SetOfVectors[N], N] {
+     implicit def VectorIsVectorLike[N: Number: Trig: Compare](implicit root: Root0[N,N]) = new
+               VectorLike[Vector[N], N] {
 
           import linalg.syntax.NumberSyntax._
 
@@ -76,8 +77,8 @@ object VectorLike {
 }
 
 
-//
-// ------------------------------------------------------------------------------------------------------------------------
+
+
 
 class Vector[N: Number](val elements: N*){
 
@@ -97,15 +98,21 @@ object Vector {
 
 
 
+
+
 object VectorTester extends App {
 
+     import linalg.numeric.Number._
      import linalg.syntax.VectorLikeSyntax._
-     import VectorLike._
+     import linalg.vector._
 
 
 
      val v1: Vector[Int] = Vector(1,2,3)
      val v2: Vector[Int] = Vector(2,0,4)
+
+     v1.negate
+     v1 + v2
      /*val v3: Vector[Int] = v1.add(v1)
      v1 + v2*/
 

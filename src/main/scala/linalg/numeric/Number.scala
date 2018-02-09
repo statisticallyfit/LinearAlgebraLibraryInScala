@@ -4,16 +4,18 @@ package linalg.numeric
 import linalg.show.Show._
 import linalg.theory._
 import linalg.syntax.AbsoluteSyntax._
-import linalg.syntax.EquivSyntax._
+import linalg.syntax.CompareSyntax._
 import linalg.syntax.NumberSyntax._
 import linalg.syntax.RootSyntax._
 import linalg.syntax.ShowSyntax._
 import linalg.syntax.TrigSyntax._
+import linalg.numeric.NumericConversion._
 
 
 import org.apache.commons.lang3.math.Fraction
 
 import scala.language.implicitConversions
+import scala.language.higherKinds
 
 
 /**
@@ -47,26 +49,8 @@ import scala.language.implicitConversions
 // TODO Real + complex => complex ... so no need for the hardcoded-complex-int conversion,
 // TODO we have interoperability automatically.
 
-trait Number[N] extends Field[N]  {
 
-     val zero: N
-     val one: N
-     val two: N
-
-     def plus(x: N, y: N): N
-     def minus(x: N, y: N): N = plus(x, negate(y))
-     def times(x: N, y: N): N
-     def divide(x: N, y: N): N
-     def negate(x: N): N
-     def inverse(x: N): N
-     def isZero(x: N): Boolean
-     def isNegative(x: N): Boolean
-
-     def doubleValue(x: N): Double
-     def from(x: Int): N
-}
-
-trait Equiv[E]  {
+trait Compare[E] {
      def equal(x: E, y: E): Boolean
      def lessThan(x: E, y: E): Boolean
      def greaterThan(x: E, y: E): Boolean = lessThan(y, x)
@@ -74,21 +58,23 @@ trait Equiv[E]  {
      def greaterThanOrEqual(x: E, y: E): Boolean = greaterThan(x, y) || equal(x, y)
 }
 
-trait Absolute0[H, L]{
+trait Absolute0[H, L] {
      def absoluteValue(x: H): L
 }
 
 trait Absolute[A] extends Absolute0[A, A]
 
-trait Root0[H, L]{ //self =>
+trait Root0[H, L] {
 
-     val rootOne: L //= num.one
-     val rootTwo: L //= num.two
+     //val evRootH: Root0[H, L] = self
+
+     val rOne: L //= num.one
+     val rTwo: L //= num.two
      //val root0 = self
 
      def power(base: H, exp: L): H
-     def nRoot(base: H, n: L)(implicit div: Field[L]): H = power(base, div.divide(rootOne, n))
-     def squareRoot(base: H)(implicit div: Field[L]): H = nRoot(base, rootTwo)
+     def nRoot(base: H, n: L)(implicit div: Field[L]): H = power(base, div.divide(rOne, n))
+     def squareRoot(base: H)(implicit f: Field[L]): H = nRoot(base, rTwo)
 }
 
 trait Root[R] extends Root0[R, R]
@@ -122,6 +108,35 @@ trait Trig[T] {
 }
 
 
+trait Number[N] extends Field[N]  {
+
+     val zero: N
+     val one: N
+     val two: N
+
+     /*implicit def numberHasRoot: Root0[Number[N], N] = new Root0[Number[N], N] { self =>
+          val rootOne: N = self.rootOne
+          val rootTwo: N = self.rootTwo
+
+          def power(base: Number[N], exp: N): Number[N] //= self.power(base, exp)
+          def nRoot(base: Number[N], exp: N)/*(implicit div: Field[N])*/: Number[N] = power(base, divide(rootOne, exp))
+          def squareRoot(base: Number[N])/*(implicit div: Field[N])*/: Number[N] = nRoot(base, rootTwo)
+     }*/
+
+     def plus(x: N, y: N): N
+     def minus(x: N, y: N): N = plus(x, negate(y))
+     def times(x: N, y: N): N
+     def divide(x: N, y: N): N
+     def negate(x: N): N
+     def inverse(x: N): N
+     def isZero(x: N): Boolean
+     def isNegative(x: N): Boolean
+
+     def doubleValue(x: N): Double
+     def from(x: Int): N
+}
+
+
 
 trait RealLike[R] extends Number[R] {
 
@@ -143,8 +158,8 @@ object Number {
      //note: need to keep rr and pos as base 0 types not Root[R] since otherwise
      // note: the tests below don't work
 
-     implicit def ComplexIsNumber[R: RealLike: Equiv: Trig]
-          (implicit rr: Root[R], pos: Absolute[R]) = new Number[Complex[R]] with Equiv[Complex[R]]
+     implicit def ComplexIsNumber[R: RealLike: Compare: Trig]
+          (implicit rr: Root[R], pos: Absolute[R]) = new Number[Complex[R]] with Compare[Complex[R]]
           with Root0[Complex[R],R] with Absolute0[Complex[R], R] {
 
           type C = Complex[R]
@@ -155,12 +170,6 @@ object Number {
           val zero: C = Complex.ZERO[R]
           val one: C = Complex.ONE[R]
           val two: C = Complex.TWO[R]
-          val rootOne: R = realLike.one
-          val rootTwo: R = realLike.two
-
-          /*val rootOne: R = realLike.one
-          val rootTwo: R = realLike.two*/
-
 
           def plus(x: C, y: C): C = Complex(x.re + y.re, x.im + y.im)
           def times(x: C, y: C): C = Complex(x.re * y.im - y.re * x.im, x.re * y.re + y.im * x.im)
@@ -184,16 +193,18 @@ object Number {
 
 
           /** Root part */
+          val rOne: R = realLike.one
+          val rTwo: R = realLike.two
+
           def power(base: Complex[R], exp: R): Complex[R] =
                Complex(rr.power(Complex.magnitude(base), exp), Complex.angle(base) * exp)
+          /*implicit def numberHasRoot: Root0[Complex[R], R] = new Root0[Complex[R], R]{
+               val rOne: R = realLike.one
+               val rTwo: R = realLike.two
 
-          /*def nRoot(base: Complex[R], n: R): Complex[R] = {
-               val (modulusRoot, listRoots): (R, List[R]) = Complex.nthRootComplex(base, n)
-               Complex(modulusRoot, listRoots.head) //just returning first root for convenience.
-          }
-
-          def squareRoot(base: Complex[R]): Complex[R] = nRoot(base, realLike.one / realLike.two)
-*/
+               def power(base: Complex[R], exp: R): Complex[R] =
+                    Complex(rr.power(Complex.magnitude(base), exp), Complex.angle(base) * exp)
+          }*/
 
           /** Absolute part */
           def absoluteValue(z: Complex[R]): R = Complex.magnitude(z)
@@ -201,7 +212,7 @@ object Number {
 
 
 
-     implicit object RealIsNumber extends RealLike[Real] with Equiv[Real] with Absolute[Real]
+     implicit object RealIsNumber extends RealLike[Real] with Compare[Real] with Absolute[Real]
           with Root[Real] with Trig[Real] {
 
           /** Real part */
@@ -209,8 +220,8 @@ object Number {
           val one: Real = Real.ONE
           val two: Real = Real.TWO
 
-          val rootOne: Real = one
-          val rootTwo: Real = two
+          val rOne: Real = one
+          val rTwo: Real = two
 
           def plus(x: Real, y: Real): Real = Real(x.double + y.double)
           def times(x: Real, y: Real): Real = Real(x.double * y.double)
@@ -253,15 +264,15 @@ object Number {
      }
 
 
-     implicit object RationalIsRealNumber extends RealLike[Rational] with Equiv[Rational] with Absolute[Rational]
+     implicit object RationalIsRealNumber extends RealLike[Rational] with Compare[Rational] with Absolute[Rational]
           with Root[Rational] with Trig[Rational] {
 
           /** Real part */
           val zero: Rational = Rational.ONE
           val one: Rational = Rational.ONE
           val two: Rational = Rational.ONE
-          val rootOne: Rational = one
-          val rootTwo: Rational = two
+          val rOne: Rational = one
+          val rTwo: Rational = two
 
           def plus(x: Rational, y: Rational): Rational = Rational(x.num*y.den + y.num*x.den, x.den*y.den)
           def times(x: Rational, y: Rational): Rational = Rational(x.num * y.num, x.den * y.den)
@@ -305,15 +316,15 @@ object Number {
      }
 
 
-     implicit object IntIsRealNumber extends RealLike[Int] with Equiv[Int] with Absolute[Int]
+     implicit object IntIsRealNumber extends RealLike[Int] with Compare[Int] with Absolute[Int]
           with Root[Int] with Trig[Int] {
 
           /** Real part **/
           val zero: Int = 0
           val one: Int = 1
           val two: Int = 2
-          val rootOne: Int = 1
-          val rootTwo: Int = 2
+          val rOne: Int = 1
+          val rTwo: Int = 2
 
           def plus(x: Int, y: Int): Int = x + y
           def times(x: Int, y: Int): Int = x * y
@@ -357,15 +368,15 @@ object Number {
      }
 
 
-     implicit object DoubleIsRealNumber extends RealLike[Double] with Equiv[Double] with Absolute[Double]
+     implicit object DoubleIsRealNumber extends RealLike[Double] with Compare[Double] with Absolute[Double]
           with Root[Double] with Trig[Double] {
 
           /** Real part **/
           val zero: Double = 0.0
           val one: Double = 1.0
           val two: Double = 2.0
-          val rootOne: Double = 1.0
-          val rootTwo: Double =      2.0
+          val rOne: Double = 1.0
+          val rTwo: Double =      2.0
 
           def plus(x: Double, y: Double): Double = x + y
           def times(x: Double, y: Double): Double = x * y
@@ -408,69 +419,6 @@ object Number {
           def theta(y: Double, x: Double): Double = math.tan(y / x)
      }
 }
-
-
-
-// ---------------------------------------------------------------------------------------------------------
-
-
-
-//represents a conversion between numbers
-//todo is it weird that it has similar methods as Number? Repetitive? Maybe have general number type with
-// SimpleNumber[R] ext Number[R, R]
-trait Conversion[F, T] {
-     def plus(from: F, to: T): T
-     def minus(from: F, to: T): T
-     def times(from: F, to: T): T
-     def divide(from: F, to: T): T
-     def power(base: T, exp: F): T
-}
-object Conversion {
-     //mechanism: takes something that implements RealNumber and gives it .i accessor, returning Imaginary.
-     implicit class ToImaginary[R: RealLike](private val imaginaryPart: R){
-
-          def i: Imaginary[R] = Imaginary(imaginaryPart)
-     }
-
-     //mechanism: takes something that implements RealNumber and makes it addable with Imaginary (which BTW cannot
-     // implement Number because i*i = -1, not imaginary)
-     implicit class ToComplex[R: RealLike](private val realPart: R)/*(implicit compLike: ComplexLike[Imaginary[R], R])*/ {
-
-          def +(that: Imaginary[R]) = Complex(realPart, that.im) //compLike.imag(that)) //can just do that.im
-          def -(that: Imaginary[R]) = Complex(realPart, that.im.negate()) //compLike.imag(that).negate())
-     }
-
-     // ---------------------------------------------------------------------------------------------
-
-     implicit def GeneralRealToComplex[R: RealLike](implicit rt: Root0[Complex[R], R]) =
-          new Conversion[R, Complex[R]]{
-
-          def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)
-          def minus(from: R, to: Complex[R]): Complex[R] = Complex(from - to.re, to.im)
-          def times(from: R, to: Complex[R]): Complex[R] = Complex(from * to.re, from * to.im)
-          def divide(from: R, to: Complex[R]): Complex[R] = Complex(to.re / from, to.im / from)
-          def power(base: Complex[R], exp: R): Complex[R] = base ^ exp
-     }
-
-     implicit class ConvertFrom[F, T](val from: F)(implicit conv: Conversion[F, T]){
-          def +(to: T): T = conv.plus(from, to)
-          def -(to: T): T = conv.minus(from, to)
-          def *(to: T): T = conv.times(from, to)
-          def /(to: T): T = conv.divide(from, to)
-          def ^(exp: T): T = conv.power(exp, from)
-     }
-     implicit class ConvertTo[F, T](val to: T)(implicit conv: Conversion[F, T]){
-          def +(from: F): T = conv.plus(from, to)
-          def -(from: F): T = conv.minus(from, to)
-          def *(from: F): T = conv.times(from, to)
-          def /(from: F): T = conv.divide(from, to)
-          def ^(exp: F): T = conv.power(to, exp)
-     }
-}
-import Conversion._
-
-
-
 
 // ---------------------------------------------------------------------------------------------------------
 
@@ -601,13 +549,33 @@ object NumberTester extends App {
      val r2: Rational = Rational(4,5)
 
 
-     println(r1 + r2)
-     println(c)
-     //println(c.nRoot(2)) //todo doesn't work, like vectorlike
+     //------
+     //TODO start here tomrorow
+
      val rootC: Root0[Complex[Double], Double] = implicitly[Root0[Complex[Double], Double]]
      println("NROOT TEST: " + rootC.nRoot(Complex(1.0, 2.0), 2.0))
-     Complex(1.0, 2.0).nRoot(2.0)
-     //TODO start here tomrorow
+     println("NROOT TEST: " + Complex(1.0, 2.0).nRoot(2.0))
+     println("NROOT TEST: " + (Rational(2) ^ Rational(2)))
+     println("ABS TEST: " + Real(-2).abs)
+
+     import linalg.syntax.AbsoluteSyntax._
+     import scala.runtime.{RichInt => _, _}
+     import scala.runtime.{ScalaNumberProxy => _, _}
+     println("ABS TEST: " + (-23).abs) //todo this uses RichInt's abs method how to stop this?
+     println("ABS TEST: " + Complex[Double](-1, 2).abs)
+
+     import linalg.vector._
+     import linalg.syntax.VectorLikeSyntax._
+
+     val v: Vector[Int] = Vector(1,2,3)
+     println("VEC TEST: " + v.negate )
+     println("VEC TEST: " + (v + v))
+     v.negate()
+
+     //------
+
+     println(r1 + r2)
+     println(c)
 
      println(b < c)
      println(b :==: c)

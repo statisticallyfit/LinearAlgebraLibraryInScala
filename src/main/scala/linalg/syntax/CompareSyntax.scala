@@ -1,13 +1,13 @@
 package linalg.syntax
 
-import linalg.numeric.Equiv
+import linalg.numeric.Compare
 
 /**
   *
   */
-object EquivSyntax {
-     implicit class EqualityOps[E: Equiv](current: E){
-          private val eq = implicitly[Equiv[E]]
+object CompareSyntax {
+     implicit class EqualityOps[E: Compare](current: E){
+          private val eq = implicitly[Compare[E]]
 
           def :==:(other: E): Boolean = eq.equal(current, other)
           def !==(other: E): Boolean = ! eq.equal(current, other)

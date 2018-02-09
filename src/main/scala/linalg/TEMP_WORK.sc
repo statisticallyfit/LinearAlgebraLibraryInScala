@@ -1,7 +1,7 @@
 
 import linalg.numeric._
 import linalg.theory.space._
-import linalg.syntax.EquivSyntax._
+import linalg.syntax.CompareSyntax._
 import linalg.syntax.TrigSyntax._
 import linalg.theory._
 
@@ -43,7 +43,7 @@ object VectorLike {
      }
 
 
-     implicit def VectorIsVectorLike[N: Number: Trig: Equiv](implicit root: Root0[N,N]) = new
+     implicit def VectorIsVectorLike[N: Number: Trig: Compare](implicit root: Root0[N,N]) = new
                VectorLike[Vector[N],  N] {
 
           import linalg.syntax.NumberSyntax._
