@@ -2,6 +2,7 @@ package linalg.theory.space
 
 
 import linalg.theory._
+import linalg.theory.basis._
 import linalg.numeric._
 
 
@@ -31,6 +32,9 @@ trait InnerProductSpace[I, F] extends VectorSpace[I, F] { self =>
      def normed(implicit ev: Root[F]): NormedVectorSpace[I, F] = new NormedInnerProductSpace[I, F] {
           val root: Root[F] = ev
           val innerSpace = self
+          implicit val vectorSpaceDimension: Dimension[I] = new Dimension[I] {
+               def dimension(i: I): Int = self.vectorSpaceDimension.dimension(i)
+          }
      }
 }
 

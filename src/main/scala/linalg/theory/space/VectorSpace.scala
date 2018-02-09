@@ -19,7 +19,7 @@ import linalg.theory.basis._
   */
 trait VectorSpace[V, F] extends AbelianGroup[V] with Monoid[V] {
 
-     //implicit def dimensionOfVectorSpace: Dimension[V]
+     implicit def vectorSpaceDimension: Dimension[V]
      //implicit val scalar: Field[F]
 
      val zero: V
@@ -30,6 +30,10 @@ trait VectorSpace[V, F] extends AbelianGroup[V] with Monoid[V] {
      def scale(v: V, constant: F): V //scalar multiplication: ku
 
      //def minus(v: V, w: V): V = plus(v, negate(w))
+
+     /*implicit def vecSpaceHasDimension: Dimension[V] = new Dimension[V] {
+          override def dimension(v: V): Int =
+     }*/
 }
 
 object VectorSpace {

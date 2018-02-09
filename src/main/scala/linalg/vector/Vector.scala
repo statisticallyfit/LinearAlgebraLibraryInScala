@@ -1,13 +1,17 @@
 package linalg.vector
 
 
-import linalg.numeric.{Number, Root0, Trig, Compare}
-import linalg.theory.space._
 import linalg.theory._
+import linalg.theory.space._
+import linalg.theory.basis._
+import linalg.syntax.VectorLikeSyntax._
+import linalg.numeric.{Number, Trig, Compare, Root0, Root}
+import linalg.numeric.Number._
+import linalg.syntax.RootSyntax._
+import linalg.syntax.NumberSyntax._
 import linalg.syntax.TrigSyntax._
 import linalg.syntax.ShowSyntax._
 import linalg.syntax.CompareSyntax._
-//import linalg.syntax.NumberSyntax._
 
 import scala.language.implicitConversions
 import scala.language.higherKinds
@@ -25,6 +29,7 @@ import scala.language.higherKinds
   */
 
 
+
 trait VectorLike[V, F]
      extends InnerProductSpace[V, F]
      with HilbertSpace[V, F]
@@ -35,23 +40,36 @@ trait VectorLike[V, F]
      def isZero(v: V): Boolean
      def crossProduct(v: V, w: V): SetOfVectors[F]  //maybe won't work
      def outerProduct(v: V, w: V): SetOfVectors[F]
+
+     //def size(v: V)(implicit d: Dimension[V]): Int //todo replace with Dimension trait result
 }
 
+/*trait SizeChecker[V] {
+     def ensureSameSize(v: V, w: V): Boolean
+}*/
 
 
 object VectorLike {
 
+     /*implicit def VectorLikeHasSameSize[V[_], N](implicit vecLike: VectorLike[V[N], N]) = new SizeChecker[V[N]]{
+
+          def ensureSameSize(v: V[N], w: V[N]): Boolean = vecLike.size(v) == vecLike.size(w)
+     }*/
      //NOTE: use root0 not root because the N might be a complex
 
-     implicit def VectorIsVectorLike[N: Number: Trig: Compare](implicit root: Root0[N,N]) = new
-               VectorLike[Vector[N], N] {
+     //(implicit ensure: SizeChecker[Vector[N]])
+     implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root] = new VectorLike[Vector[N], N] {
 
-          import linalg.syntax.NumberSyntax._
-
+          implicit val vectorSpaceDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
+               def dimension(v: Vector[N]): Int = v.elements.length
+          }
 
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
+          //val ensureSize = implicitly[SizeChecker[Vector[N]]]
+          //val root = implicitly[Root[N]]
 
+          //todo how to ensure they are the same size? use implicits? how?
 
           def plus(v: Vector[N], w: Vector[N]): Vector[N] =
                Vector(v.elements.zip(w.elements).map(pair => pair._1 + pair._2):_*)
@@ -72,7 +90,9 @@ object VectorLike {
           def angle(v: Vector[N], w: Vector[N]): N = innerProduct(v, w) / (norm(v) * norm(w)).arccos()
 
           def norm(v: Vector[N])(implicit div: Field[N]): N =
-               v.elements.map(e => root.power(e, Number.TWO[N])).reduceLeft(_ + _)
+               v.elements.map(e => e ^ Number.TWO[N]).reduceLeft(_ + _)
+
+          def size(v: Vector[N]): Int = v.elements.length
      }
 }
 
@@ -102,13 +122,9 @@ object Vector {
 
 object VectorTester extends App {
 
-     import linalg.numeric.Number._
-     import linalg.syntax.VectorLikeSyntax._
-
-
 
      val v1: Vector[Int] = Vector(1,2,3)
-     val v2: Vector[Int] = Vector(2,0,4)
+     val v2: Vector[Int] = Vector(2,0,4, 5)
 
      println(v1.negate())
      println(v1 + v2)
