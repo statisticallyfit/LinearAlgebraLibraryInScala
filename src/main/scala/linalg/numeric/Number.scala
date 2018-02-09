@@ -108,8 +108,7 @@ trait Trig[T] {
 }
 
 
-trait Number[N] extends Field[N]  {
-
+trait Number[N] extends Field[N] {
      val zero: N
      val one: N
      val two: N
@@ -138,9 +137,14 @@ trait RealLike[R] extends Number[R] {
 
      def from(x: Int): R
 
+     //inherited: Compare[R]
      implicit def realNumberIsTrigonometric: Trig[R]
      implicit def realNumberHasAbsoluteValue: Absolute[R]
      implicit def realNumberHasRoot: Root[R]
+
+     override implicit def numberHasRoot: Root0[R, R] = realNumberHasRoot
+     override implicit def numberHasAbsoluteValue: Absolute0[R, R] = realNumberHasAbsoluteValue
+     //override implicit def numberHasRoot: Root0[R, R] = realNumberHasRoot
 }
 
 
@@ -208,10 +212,8 @@ object Number {
 
 
 
-     implicit object RealIsNumber extends RealLike[Real] /*with Compare[Real] with Absolute[Real]
-          with Root[Real] with Trig[Real]*/ {
+     implicit object RealIsNumber extends RealLike[Real] {
 
-          /** Real part */
           val zero: Real = Real.ZERO
           val one: Real = Real.ONE
           val two: Real = Real.TWO
@@ -226,10 +228,11 @@ object Number {
           def doubleValue(x: Real): Double = x.double
           def from(x: Int): Real = Real(x)
 
-
           /** Equality part */
-          /*def equal(x: Real, y: Real): Boolean = x.double == y.double
-          def lessThan(x: Real, y: Real): Boolean = x.double < y.double*/
+          implicit def numberIsComparable: Compare[Real] = new Compare[Real] {
+               def equal(x: Real, y: Real): Boolean = x.double == y.double
+               def lessThan(x: Real, y: Real): Boolean = x.double < y.double
+          }
 
           /** Root part */
           implicit def realNumberHasRoot: Root[Real] = new Root[Real] {
@@ -267,159 +270,179 @@ object Number {
      }
 
 
-     implicit object RationalIsRealNumber extends RealLike[Rational] with Compare[Rational] with Absolute[Rational]
-          with Root[Rational] with Trig[Rational] {
+     implicit object RationalIsRealNumber extends RealLike[Rational] {
 
           /** Real part */
           val zero: Rational = Rational.ONE
           val one: Rational = Rational.ONE
           val two: Rational = Rational.ONE
-          val rOne: Rational = one
-          val rTwo: Rational = two
 
           def plus(x: Rational, y: Rational): Rational = Rational(x.num*y.den + y.num*x.den, x.den*y.den)
           def times(x: Rational, y: Rational): Rational = Rational(x.num * y.num, x.den * y.den)
           def divide(x: Rational, y: Rational): Rational = Rational(x.num * y.den, x.den * y.num)
-          def power(base: Rational, exp: Rational): Rational = Rational(math.pow(doubleValue(base), doubleValue(exp)))
-          //def nRoot(base: Rational, n: Rational): Rational = power(base, divide(one, n))
-          //def squareRoot(base: Rational): Rational = nRoot(base, two)
-          def absoluteValue(x: Rational): Rational = Rational(math.abs(x.num), math.abs(x.den))
           def negate(x: Rational): Rational = Rational(-x.num, -x.den)
-          def areEqual(x: Rational, y: Rational): Boolean = x.num == y.num && x.den == y.den
-          def isZero(x: Rational): Boolean = areEqual(x, zero)
+          def isZero(x: Rational): Boolean = numberIsComparable.equal(x, zero)
           def isNegative(x: Rational): Boolean = x.num < 0
           def doubleValue(x: Rational): Double = x.num * 1.0 / x.den
           def from(x: Int): Rational = Rational(x)
 
+          /** Root part */
+          implicit def realNumberHasRoot: Root[Rational] = new Root[Rational] {
+               val rOne: Rational = one
+               val rTwo: Rational = two
+
+               def power(base: Rational, exp: Rational): Rational = Rational(math.pow(doubleValue(base), doubleValue(exp)))
+          }
 
           /** Equality part **/
-          def equal(x: Rational, y: Rational): Boolean = x.num * y.den == y.num * x.den
-          def lessThan(x: Rational, y: Rational): Boolean = x.num * y.den < y.num * x.den
-
+          implicit def numberIsComparable: Compare[Rational] = new Compare[Rational] {
+               def equal(x: Rational, y: Rational): Boolean = x.num * y.den == y.num * x.den
+               def lessThan(x: Rational, y: Rational): Boolean = x.num * y.den < y.num * x.den
+          }
 
           /** Trig part **/
-          val E: Rational = Rational(scala.math.E)
-          val PI: Rational = Rational(scala.math.Pi) // this is what spire does too, because these are finit     e.
+          implicit def realNumberIsTrigonometric: Trig[Rational] = new Trig[Rational]{
+               val E: Rational = Rational(scala.math.E)
+               val PI: Rational = Rational(scala.math.Pi) // this is what spire does too, because these are finit     e.
 
-          def sin(x: Rational): Rational = Rational(math.sin(doubleValue(x)))
-          def cos(x: Rational): Rational = Rational(math.cos(doubleValue(x)))
-          def tan(x: Rational): Rational = Rational(math.tan(doubleValue(x)))
-          def csc(x: Rational): Rational = divide(Rational.ONE, sin(x))
-          def sec(x: Rational): Rational = divide(Rational.ONE, cos(x))
-          def cot(x: Rational): Rational = divide(Rational.ONE, tan(x))
+               def sin(x: Rational): Rational = Rational(math.sin(doubleValue(x)))
+               def cos(x: Rational): Rational = Rational(math.cos(doubleValue(x)))
+               def tan(x: Rational): Rational = Rational(math.tan(doubleValue(x)))
+               def csc(x: Rational): Rational = divide(Rational.ONE, sin(x))
+               def sec(x: Rational): Rational = divide(Rational.ONE, cos(x))
+               def cot(x: Rational): Rational = divide(Rational.ONE, tan(x))
 
-          def arcsin(x: Rational): Rational = Rational(math.asin(doubleValue(x)))
-          def arccos(x: Rational): Rational = Rational(math.acos(doubleValue(x)))
-          def arctan(x: Rational): Rational = Rational(math.atan(doubleValue(x)))
-          def arccsc(x: Rational): Rational = divide(Rational.ONE, arcsin(x))
-          def arcsec(x: Rational): Rational = divide(Rational.ONE, arccos(x))
-          def arccot(x: Rational): Rational = divide(Rational.ONE, arctan(x))
+               def arcsin(x: Rational): Rational = Rational(math.asin(doubleValue(x)))
+               def arccos(x: Rational): Rational = Rational(math.acos(doubleValue(x)))
+               def arctan(x: Rational): Rational = Rational(math.atan(doubleValue(x)))
+               def arccsc(x: Rational): Rational = divide(Rational.ONE, arcsin(x))
+               def arcsec(x: Rational): Rational = divide(Rational.ONE, arccos(x))
+               def arccot(x: Rational): Rational = divide(Rational.ONE, arctan(x))
 
-          def theta(y: Rational, x: Rational): Rational = Rational(math.tan(doubleValue(x) / doubleValue(x)))
+               def theta(y: Rational, x: Rational): Rational = Rational(math.tan(doubleValue(x) / doubleValue(x)))
+          }
+
+          /** Absolute value part */
+          implicit def realNumberHasAbsoluteValue: Absolute[Rational] = new Absolute[Rational]{
+               def absoluteValue(x: Rational): Rational = Rational(math.abs(x.num), math.abs(x.den))
+          }
      }
 
 
-     implicit object IntIsRealNumber extends RealLike[Int] with Compare[Int] with Absolute[Int]
-          with Root[Int] with Trig[Int] {
+     implicit object IntIsRealNumber extends RealLike[Int] {
 
-          /** Real part **/
           val zero: Int = 0
           val one: Int = 1
           val two: Int = 2
-          val rOne: Int = 1
-          val rTwo: Int = 2
 
           def plus(x: Int, y: Int): Int = x + y
           def times(x: Int, y: Int): Int = x * y
           def divide(x: Int, y: Int): Int = x / y
-          def power(base: Int, exp: Int): Int = math.pow(base, exp).toInt //not chopped off
-          //def nRoot(base: Int, n: Int): Int = math.pow(base, 1.0 / n).toInt //todo gets chopped off
-          //def squareRoot(base: Int): Int = nRoot(base, two)
-          def absoluteValue(x: Int): Int = math.abs(x)
           def negate(x: Int): Int = -x
           def isZero(x: Int): Boolean = x == 0
           def isNegative(x: Int): Boolean = x < 0
-          def areEqual(x: Int, y: Int): Boolean = x == y
           def doubleValue(x: Int): Double = x * 1.0
           def from(x: Int): Int = x
 
 
           /** Equality part **/
-          def equal(x: Int, y: Int): Boolean = x == y
-          def lessThan(x: Int, y: Int): Boolean = x < y
+          implicit def numberIsComparable: Compare[Int] = new Compare[Int] {
+               def equal(x: Int, y: Int): Boolean = x == y
+               def lessThan(x: Int, y: Int): Boolean = x < y
+          }
 
+          implicit def realNumberHasAbsoluteValue: Absolute[Int] = new Absolute[Int]{
+               def absoluteValue(x: Int): Int = math.abs(x)
+          }
+
+          /** Root part */
+          implicit def realNumberHasRoot: Root[Int] = new Root[Int] {
+               val rOne: Int = 1
+               val rTwo: Int = 2
+
+               def power(base: Int, exp: Int): Int = math.pow(base, exp).toInt //not chopped off
+          }
 
           /** Trig part **/
-          val E: Int = 2
-          val PI: Int = 3 //just approximations! - note: int is not good for calculations
+          implicit def realNumberIsTrigonometric: Trig[Int] = new Trig[Int] {
+               val E: Int = 2
+               val PI: Int = 3 //just approximations! - note: int is not good for calculations
 
-          def sin(x: Int): Int = math.sin(x).toInt
-          def cos(x: Int): Int = math.cos(x).toInt
-          def tan(x: Int): Int = math.tan(x).toInt
-          def csc(x: Int): Int = (1.0 / sin(x)).toInt
-          def sec(x: Int): Int = (1.0 / cos(x)).toInt
-          def cot(x: Int): Int = (1.0 / tan(x)).toInt
+               def sin(x: Int): Int = math.sin(x).toInt
+               def cos(x: Int): Int = math.cos(x).toInt
+               def tan(x: Int): Int = math.tan(x).toInt
+               def csc(x: Int): Int = (1.0 / sin(x)).toInt
+               def sec(x: Int): Int = (1.0 / cos(x)).toInt
+               def cot(x: Int): Int = (1.0 / tan(x)).toInt
 
-          def arcsin(x: Int): Int = math.asin(x).toInt
-          def arccos(x: Int): Int = math.acos(x).toInt
-          def arctan(x: Int): Int = math.atan(x).toInt
-          def arccsc(x: Int): Int = (1.0 / arcsin(x)).toInt
-          def arcsec(x: Int): Int = (1.0 / arccos(x)).toInt
-          def arccot(x: Int): Int = (1.0 / arctan(x)).toInt
+               def arcsin(x: Int): Int = math.asin(x).toInt
+               def arccos(x: Int): Int = math.acos(x).toInt
+               def arctan(x: Int): Int = math.atan(x).toInt
+               def arccsc(x: Int): Int = (1.0 / arcsin(x)).toInt
+               def arcsec(x: Int): Int = (1.0 / arccos(x)).toInt
+               def arccot(x: Int): Int = (1.0 / arctan(x)).toInt
 
-          def theta(y: Int, x: Int): Int = math.tan(y / x).toInt
+               def theta(y: Int, x: Int): Int = math.tan(y / x).toInt
+          }
      }
 
 
-     implicit object DoubleIsRealNumber extends RealLike[Double] with Compare[Double] with Absolute[Double]
-          with Root[Double] with Trig[Double] {
+     implicit object DoubleIsRealNumber extends RealLike[Double] {
 
-          /** Real part **/
           val zero: Double = 0.0
           val one: Double = 1.0
           val two: Double = 2.0
-          val rOne: Double = 1.0
-          val rTwo: Double =      2.0
 
           def plus(x: Double, y: Double): Double = x + y
           def times(x: Double, y: Double): Double = x * y
           def divide(x: Double, y: Double): Double = x / y
-          def power(base: Double, exp: Double): Double = math.pow(base, exp)
-          //def squareRoot(base: Double): Double = math.sqrt(base)
-          //def nRoot(base: Double, n: Double): Double = power(base, 1/n)
           def absoluteValue(x: Double): Double = math.abs(x)
           def negate(x: Double): Double = -x
           def isZero(x: Double): Boolean = x == 0
           def isNegative(x: Double): Boolean = x < 0
-          def areEqual(x: Double, y: Double): Boolean = x == y
           def doubleValue(x: Double): Double = x
           def from(x: Int): Double = x * 1.0
 
 
           /** Equality part **/
-          def equal(x: Double, y: Double): Boolean = x == y
-          def lessThan(x: Double, y: Double): Boolean = x < y
+          implicit def numberIsComparable: Compare[Double] = new Compare[Double]{
+               def equal(x: Double, y: Double): Boolean = x == y
+               def lessThan(x: Double, y: Double): Boolean = x < y
+          }
 
+          implicit def realNumberHasAbsoluteValue: Absolute[Double] = new Absolute[Double]{
+               def absoluteValue(x: Double): Double = math.abs(x)
+          }
+
+          /**Root part */
+          implicit def realNumberHasRoot: Root[Double] = new Root[Double]{
+               val rOne: Double = 1.0
+               val rTwo: Double = 2.0
+
+               def power(base: Double, exp: Double): Double = math.pow(base, exp)
+          }
 
           /** Trig part **/
-          val E: Double = scala.math.E
-          val PI: Double = scala.math.Pi
+          implicit def realNumberIsTrigonometric: Trig[Double] = new Trig[Double]{
+               val E: Double = scala.math.E
+               val PI: Double = scala.math.Pi
 
-          def sin(x: Double): Double = math.sin(x)
-          def cos(x: Double): Double = math.cos(x)
-          def tan(x: Double): Double = math.tan(x)
-          def csc(x: Double): Double = 1.0 / sin(x)
-          def sec(x: Double): Double = 1.0 / cos(x)
-          def cot(x: Double): Double = 1.0 / tan(x)
+               def sin(x: Double): Double = math.sin(x)
+               def cos(x: Double): Double = math.cos(x)
+               def tan(x: Double): Double = math.tan(x)
+               def csc(x: Double): Double = 1.0 / sin(x)
+               def sec(x: Double): Double = 1.0 / cos(x)
+               def cot(x: Double): Double = 1.0 / tan(x)
 
-          def arcsin(x: Double): Double = math.asin(x)
-          def arccos(x: Double): Double = math.acos(x)
-          def arctan(x: Double): Double = math.atan(x)
-          def arccsc(x: Double): Double = 1.0 / arcsin(x)
-          def arcsec(x: Double): Double = 1.0 / arccos(x)
-          def arccot(x: Double): Double = 1.0 / arctan(x)
+               def arcsin(x: Double): Double = math.asin(x)
+               def arccos(x: Double): Double = math.acos(x)
+               def arctan(x: Double): Double = math.atan(x)
+               def arccsc(x: Double): Double = 1.0 / arcsin(x)
+               def arcsec(x: Double): Double = 1.0 / arccos(x)
+               def arccot(x: Double): Double = 1.0 / arctan(x)
 
-          def theta(y: Double, x: Double): Double = math.tan(y / x)
+               def theta(y: Double, x: Double): Double = math.tan(y / x)
+          }
      }
 }
 
