@@ -60,14 +60,13 @@ object VectorLike {
      //(implicit ensure: SizeChecker[Vector[N]])
      implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root] = new VectorLike[Vector[N], N] {
 
-          implicit val vectorSpaceDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
+          implicit val vectorSpaceHasDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
                def dimension(v: Vector[N]): Int = v.elements.length
           }
 
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
           //val ensureSize = implicitly[SizeChecker[Vector[N]]]
-          //val root = implicitly[Root[N]]
 
           //todo how to ensure they are the same size? use implicits? how?
 
