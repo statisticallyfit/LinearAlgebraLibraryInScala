@@ -29,7 +29,7 @@ object Show {
      }
 
      implicit def VectorHasShow[N: Number] = new Show[Vector[N]]{
-          def show(v: Vector[N]): String = ??? //todo
+          def show(v: Vector[N]): String = s"Vector(${v.elements})"
      }
 
      implicit def PolynomialHasShow[R: RealLike] = new Show[Polynomial[R]]{

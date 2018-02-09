@@ -104,43 +104,16 @@ object VectorTester extends App {
 
      import linalg.numeric.Number._
      import linalg.syntax.VectorLikeSyntax._
-     import linalg.vector._
 
 
 
      val v1: Vector[Int] = Vector(1,2,3)
      val v2: Vector[Int] = Vector(2,0,4)
 
-     v1.negate
-     v1 + v2
-     /*val v3: Vector[Int] = v1.add(v1)
-     v1 + v2*/
+     println(v1.negate())
+     println(v1 + v2)
+     println(Vector(2,3,4) + Vector(-2, 3, -6))
+     println(v1.isZero())
+     println(v1.dotProduct(v2))
 
-     //     v1 ~ v2
-     //     v1.isZero()
-
-
-     //println(Vector(1,2).innerProduct(v2))
-     //println(vec.plus(v1, v2))
-     //println(v3)
-
-     //-------
-     //note: this did not work either.
-     /*trait Tester[W, E] {
-          def testingMethod(x: W, y: E): String
-     }
-
-     import linalg.numeric.{RealLike, Complex}
-
-     implicit class testerops[W, E: RealLike](currentComplex: W)(implicit w: Tester[W, E]){
-          def testing(evalue: E): String = w.testingMethod(currentComplex, evalue)
-          def plus(other: W): String = s"$currentComplex paired (+) with $other"
-     }
-
-     implicit def ComplexIsTester[R: RealLike](implicit root: Root[R,R]): Tester[Complex[R], R] = new Tester[Complex[R], R] {
-          def testingMethod(x: Complex[R], real: R): String = s"$x with real $real"
-     }*/
-
-     /*val comp: Complex[Int] = new Complex(3, 2)
-     comp.plus(comp) */
 }
