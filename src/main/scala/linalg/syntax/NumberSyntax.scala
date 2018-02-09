@@ -21,6 +21,7 @@ object NumberSyntax {
           def isNegative: Boolean = number.isNegative(current)
           def toDouble: Double = number.doubleValue(current)
           def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!
+
      }
 
 }
