@@ -34,13 +34,14 @@ object NumericConversion {
      // ---------------------------------------------------------------------------------------------
 
      implicit def GeneralRealToComplex[R: RealLike]
-     (implicit root0: Root0[Complex[R], R]): NumericConversion[R, Complex[R]] = new NumericConversion[R, Complex[R]]{
+     /*(implicit root0: Root0[Complex[R], R])*/: NumericConversion[R, Complex[R]] = new NumericConversion[R, Complex[R]]{
 
           def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)
           def minus(from: R, to: Complex[R]): Complex[R] = Complex(from - to.re, to.im)
           def times(from: R, to: Complex[R]): Complex[R] = Complex(from * to.re, from * to.im)
           def divide(from: R, to: Complex[R]): Complex[R] = Complex(to.re / from, to.im / from)
-          def exponentiate(base: Complex[R], exp: R): Complex[R] = root0.power(base, exp) //todo why cannot base ^ exp
+          def exponentiate(base: Complex[R], exp: R): Complex[R] = base ^ exp
+          //root0.power(base, exp) //todo why cannot base ^ exp
      }
 
      implicit class ConvertFrom[F, T](val from: F)(implicit conv: NumericConversion[F, T]){

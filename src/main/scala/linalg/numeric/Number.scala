@@ -113,7 +113,7 @@ trait Number[N] extends Field[N] {
      val one: N
      val two: N
 
-     //implicit def numberIsTrigonometric: Trig[N]
+     implicit def numberIsTrigonometric: Trig[N]
      implicit def numberIsComparable: Compare[N]
      implicit def numberHasRoot: Root0[Number[N], N]
      implicit def numberHasAbsoluteValue: Absolute0[Number[N], N]
@@ -144,7 +144,7 @@ trait RealLike[R] extends Number[R] {
 
      override implicit def numberHasRoot: Root0[R, R] = realNumberHasRoot
      override implicit def numberHasAbsoluteValue: Absolute0[R, R] = realNumberHasAbsoluteValue
-     //override implicit def numberHasRoot: Root0[R, R] = realNumberHasRoot
+     override implicit def numberIsTrigonometric: Trig[R] = realNumberIsTrigonometric
 }
 
 
@@ -162,7 +162,7 @@ object Number {
      //note: need to keep rr and pos as base 0 types not Root[R] since otherwise
      // note: the tests below don't work
 
-     implicit def ComplexIsNumber[R: RealLike: Compare: Trig](implicit rr: Root[R], pos: Absolute[R]) = new Number[Complex[R]]
+     implicit def ComplexIsNumber[R: RealLike/*: Compare: Trig*/]/*(implicit rr: Root[R], pos: Absolute[R])*/ = new Number[Complex[R]]
           /*with Compare[Complex[R]]
           with Root0[Complex[R],R] with Absolute0[Complex[R], R] */{
 
@@ -191,22 +191,47 @@ object Number {
 
           /** Equality part */
           implicit def numberIsComparable: Compare[Complex[R]] = new Compare[Complex[R]]{
+               //private val realCompare: Compare[R] then import syntax      ... todo
                def equal(x: Complex[R], y: Complex[R]): Boolean = x.re :==: y.re && x.im :==: y.im
                def lessThan(x: Complex[R], y: Complex[R]): Boolean = x.re < y.re || (x.re :==: y.re && x.im < y.im)
           }
 
           /** Root part */
-          implicit def numberHasRoot: Root0[Complex[R], R] = new Root0[Complex[R], R]{
+          def numberHasRoot: Root0[Complex[R], R] = new Root0[Complex[R], R]{
                val rOne: R = realLike.one
                val rTwo: R = realLike.two
 
+
                def power(base: Complex[R], exp: R): Complex[R] =
-                    Complex(rr.power(Complex.magnitude(base), exp), Complex.angle(base) * exp)
+                    Complex(Complex.magnitude(base) ^ exp, Complex.angle(base) * exp)
           }
 
           /** Absolute part */
           implicit def numberHasAbsoluteValue: Absolute0[Complex[R], R] = new Absolute0[Complex[R], R]{
                def absoluteValue(z: Complex[R]): R = Complex.magnitude(z)
+          }
+
+          /** Trig part */
+          implicit def numberIsTrigonometric: Trig[Complex[R]] = new Trig[Complex[R]]{
+
+               val E: Complex[R] = Complex(scala.math.E).asInstanceOf[Complex[R]] //todo more graceful way?
+               val PI: Complex[R] = Complex(scala.math.Pi).asInstanceOf[Complex[R]]
+
+               //todo major todo 
+               def sin(x: Complex[R], y: Complex[R]): Complex[R] = ???
+               def cos(x: Complex[R], y: Complex[R]): Complex[R] = ???
+               def tan(x: Complex[R], y: Complex[R]): Complex[R] = ???
+               def csc(x: Complex[R], y: Complex[R]): Complex[R] = ???
+               def sec(x: Complex[R], y: Complex[R]): Complex[R] = ???
+               def cot(x: Complex[R], y: Complex[R]): Complex[R] = ???
+
+               def arcsin(x: Complex[R], y: Complex[R]): Complex[R] = ???
+               def arccos(x: Complex[R], y: Complex[R]): Complex[R] = ???
+               def arctan(x: Complex[R], y: Complex[R]): Complex[R] = ???
+               def arccsc(x: Complex[R], y: Complex[R]): Complex[R] = ???
+               def arcsec(x: Complex[R], y: Complex[R]): Complex[R] = ???
+               def arccot(x: Complex[R], y: Complex[R]): Complex[R] = ???
+
           }
      }
 
@@ -235,7 +260,7 @@ object Number {
           }
 
           /** Root part */
-          implicit def realNumberHasRoot: Root[Real] = new Root[Real] {
+          def realNumberHasRoot: Root[Real] = new Root[Real] {
                val rOne: Real = one
                val rTwo: Real = two
                def power(base: Real, exp: Real): Real = Real(math.pow(base.double, exp.double))
@@ -287,7 +312,7 @@ object Number {
           def from(x: Int): Rational = Rational(x)
 
           /** Root part */
-          implicit def realNumberHasRoot: Root[Rational] = new Root[Rational] {
+          def realNumberHasRoot: Root[Rational] = new Root[Rational] {
                val rOne: Rational = one
                val rTwo: Rational = two
 
@@ -356,7 +381,7 @@ object Number {
           }
 
           /** Root part */
-          implicit def realNumberHasRoot: Root[Int] = new Root[Int] {
+          def realNumberHasRoot: Root[Int] = new Root[Int] {
                val rOne: Int = 1
                val rTwo: Int = 2
 
@@ -415,7 +440,7 @@ object Number {
           }
 
           /**Root part */
-          implicit def realNumberHasRoot: Root[Double] = new Root[Double]{
+          def realNumberHasRoot: Root[Double] = new Root[Double]{
                val rOne: Double = 1.0
                val rTwo: Double = 2.0
 
@@ -608,6 +633,9 @@ object NumberTester extends App {
      println((4 + 3.i) :==: (4 + 3.i))
      println((2 + 5.i) < (2 + 7.i))
      println((2 + 5.i) < (2 - 5.i))
+     println((8 + 2.i) + (9 + 2.i))
+     println((8 + 2.i) - (9 + 2.i))
+     println((8 + 2.i) < (9 + 2.i))
 
      println(a)
      println(b)
@@ -617,9 +645,6 @@ object NumberTester extends App {
      println((1.5 + 3.2.i) + 23.2)
      println((1 + 3.i) + 1)
      println(1 + (1 + 3.i))
-     println((8 + 2.i) + (9 + 2.i))
-     println((8 + 2.i) - (9 + 2.i))
-     println((8 + 2.i) < (9 + 2.i))
 
      println(new Rational(4, 8))
      println(Rational(4, 8) + Rational(5, 15))

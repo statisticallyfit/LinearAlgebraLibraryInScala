@@ -17,9 +17,7 @@ import scala.language.implicitConversions
 
 object VectorLikeSyntax {
 
-     implicit class VectorLikeOps[V[_], N: Number: Trig: Root: Compare](current: V[N])
-                                                                       (implicit vecLike: VectorLike[V[N], N]/*,
-                                                                        ensure: SizeChecker[V[N]]*/){
+     implicit class VecLikeOps[V[_], N: Number](current: V[N])(implicit vecLike: VectorLike[V[N], N]){
 
 
           def +(other: V[N]): V[N] = vecLike.plus(current, other)
