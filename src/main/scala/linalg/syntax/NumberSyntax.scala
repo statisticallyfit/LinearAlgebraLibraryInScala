@@ -39,7 +39,7 @@ object NumberSyntax {
 
      implicit class NumberComplexOps[N](current: Number[N])(implicit number: Number[N]){
 
-          private  val root: Root0[Number[N], N] = number.numberHasRoot
+          private val root: Root0[Number[N], N] = number.numberHasRoot
 
           def ^(exp: N): Number[N] = root.power(current, exp)
           def sqrt(): Number[N] = root.squareRoot(current)
@@ -51,6 +51,7 @@ object NumberSyntax {
           def abs(): N = ab.absoluteValue(current)
      }
 
+     Complex(1,2).nRoot(2)
 
      implicit class RealLikeOps[R](current: R)(implicit realLike: RealLike[R]){
 
@@ -112,6 +113,5 @@ object NumberSyntax {
           def sqrt(): H[L] = root.squareRoot(base)
           def nRoot(n: L): H[L] = root.nRoot(base, n)
      }*/
-     Complex(1,2).nRoot(2)
 
 }

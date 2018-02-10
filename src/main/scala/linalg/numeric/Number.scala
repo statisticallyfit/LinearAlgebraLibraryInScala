@@ -107,16 +107,21 @@ trait Trig[T] {
      def theta(y: T, x: T): T
 }
 
-
-trait Number[N] extends Field[N] {
+//TODO WOW spire example here supports extending Number with Root etc instead of having them INSIDE like now
+// https://insight.io/github.com/non/spire/blob/master/core/shared/src/main/scala/spire/std/bigInt.scala
+//TODO revert back to previous work with separate typeclasses, no mixing with number, like similar to spire here:
+//https://insight.io/github.com/non/spire/blob/master/core/shared/src/main/scala/spire/math/Complex.scala
+//followup note: root doesn't have to know about number:
+//note -  https://insight.io/github.com/non/spire/blob/master/core/shared/src/main/scala/spire/algebra/NRoot.scala
+trait Number[N] extends Field[N] with Trig[N] with Root0[Number[N], N] with Absolute0[Number[N], N] with Compare[N] {
      val zero: N
      val one: N
      val two: N
 
-     implicit def numberIsTrigonometric: Trig[N]
+     /*implicit def numberIsTrigonometric: Trig[N]
      implicit def numberIsComparable: Compare[N]
      implicit def numberHasRoot: Root0[Number[N], N]
-     implicit def numberHasAbsoluteValue: Absolute0[Number[N], N]
+     implicit def numberHasAbsoluteValue: Absolute0[Number[N], N]*/
 
      def plus(x: N, y: N): N
      def minus(x: N, y: N): N = plus(x, negate(y))
@@ -131,20 +136,20 @@ trait Number[N] extends Field[N] {
      def from(x: Int): N
 }
 
-
+//TODO problem with inheritance strategy: reallike needs Root not Root0 and et     c.      ...
 
 trait RealLike[R] extends Number[R] {
 
      def from(x: Int): R
 
      //inherited: Compare[R]
-     implicit def realNumberIsTrigonometric: Trig[R]
+     /*implicit def realNumberIsTrigonometric: Trig[R]
      implicit def realNumberHasAbsoluteValue: Absolute[R]
      implicit def realNumberHasRoot: Root[R]
 
      override implicit def numberHasRoot: Root0[R, R] = realNumberHasRoot
      override implicit def numberHasAbsoluteValue: Absolute0[R, R] = realNumberHasAbsoluteValue
-     override implicit def numberIsTrigonometric: Trig[R] = realNumberIsTrigonometric
+     override implicit def numberIsTrigonometric: Trig[R] = realNumberIsTrigonometric*/
 }
 
 
@@ -217,21 +222,22 @@ object Number {
                val E: Complex[R] = Complex(scala.math.E).asInstanceOf[Complex[R]] //todo more graceful way?
                val PI: Complex[R] = Complex(scala.math.Pi).asInstanceOf[Complex[R]]
 
-               //todo major todo 
-               def sin(x: Complex[R], y: Complex[R]): Complex[R] = ???
-               def cos(x: Complex[R], y: Complex[R]): Complex[R] = ???
-               def tan(x: Complex[R], y: Complex[R]): Complex[R] = ???
-               def csc(x: Complex[R], y: Complex[R]): Complex[R] = ???
-               def sec(x: Complex[R], y: Complex[R]): Complex[R] = ???
-               def cot(x: Complex[R], y: Complex[R]): Complex[R] = ???
+               //todo major todo
+               def sin(x: Complex[R]): Complex[R] = ???
+               def cos(x: Complex[R]): Complex[R] = ???
+               def tan(x: Complex[R]): Complex[R] = ???
+               def csc(x: Complex[R]): Complex[R] = ???
+               def sec(x: Complex[R]): Complex[R] = ???
+               def cot(x: Complex[R]): Complex[R] = ???
 
-               def arcsin(x: Complex[R], y: Complex[R]): Complex[R] = ???
-               def arccos(x: Complex[R], y: Complex[R]): Complex[R] = ???
-               def arctan(x: Complex[R], y: Complex[R]): Complex[R] = ???
-               def arccsc(x: Complex[R], y: Complex[R]): Complex[R] = ???
-               def arcsec(x: Complex[R], y: Complex[R]): Complex[R] = ???
-               def arccot(x: Complex[R], y: Complex[R]): Complex[R] = ???
+               def arcsin(x: Complex[R]): Complex[R] = ???
+               def arccos(x: Complex[R]): Complex[R] = ???
+               def arctan(x: Complex[R]): Complex[R] = ???
+               def arccsc(x: Complex[R]): Complex[R] = ???
+               def arcsec(x: Complex[R]): Complex[R] = ???
+               def arccot(x: Complex[R]): Complex[R] = ???
 
+               def theta(y: Complex[R], x: Complex[R]): Complex[R] = tan(divide(y, x))
           }
      }
 
@@ -344,6 +350,7 @@ object Number {
                def arcsec(x: Rational): Rational = divide(Rational.ONE, arccos(x))
                def arccot(x: Rational): Rational = divide(Rational.ONE, arctan(x))
 
+               //todo isn't it supposed to be arctan?
                def theta(y: Rational, x: Rational): Rational = Rational(math.tan(doubleValue(x) / doubleValue(x)))
           }
 

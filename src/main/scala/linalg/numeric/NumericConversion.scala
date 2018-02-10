@@ -16,6 +16,10 @@ trait NumericConversion[F, T] {
      def divide(from: F, to: T): T
      def exponentiate(base: T, exp: F): T
 }
+
+//TODO learn more about spire conversion here:
+// https://insight.io/github.com/non/spire/blob/master/core/shared/src/main/scala/spire/math/Convertable.scala
+
 object NumericConversion {
      //mechanism: takes something that implements RealNumber and gives it .i accessor, returning Imaginary.
      implicit class ToImaginary[R: RealLike](private val imaginaryPart: R){
