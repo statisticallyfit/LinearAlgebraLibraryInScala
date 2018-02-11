@@ -38,7 +38,7 @@ trait VectorLike[V, F]
      // inherited - plus, negate, scale, innerProduct, norm, angle
      def minus(v: V, w: V): V = plus(v, negate(w))
      def isZero(v: V): Boolean
-     def crossProduct(v: V, w: V): SetOfVectors[F]  //maybe won't work
+     def crossProduct(v: V, w: V): Option[SetOfVectors[F]]  //maybe won't work
      def outerProduct(v: V, w: V): SetOfVectors[F]
 
      //def size(v: V)(implicit d: Dimension[V]): Int //todo replace with Dimension trait result
@@ -84,7 +84,11 @@ object VectorLike {
 
           def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = ??? //todo
 
-          def crossProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = ??? //todo
+          def crossProduct(v: Vector[N], w: Vector[N]): Option[SetOfVectors[N]] = {
+               //step 1 - check vectors are both 3x3
+               //u x v = (u2*v3 - u3*v2, u3*v1 -u1*v3, u1*v2-u2*v1)
+               def isThreeByThree(v: Vector[N]): Boolean 
+          }
 
           def angle(v: Vector[N], w: Vector[N]): N = innerProduct(v, w) / (norm(v) * norm(w)).arccos()
 

@@ -31,7 +31,7 @@ object VectorLikeSyntax {
 
           def innerProduct(other: V[N]): N = vecLike.innerProduct(current, other)
           def dotProduct(other: V[N]): N = vecLike.dotProduct(current, other)
-          def crossProduct(other: V[N]): SetOfVectors[N] = vecLike.crossProduct(current, other)
+          def crossProduct(other: V[N]): Option[SetOfVectors[N]] = vecLike.crossProduct(current, other)
           def outerProduct(other: V[N]): SetOfVectors[N]= vecLike.outerProduct(current, other)
 
           def isZero(): Boolean = vecLike.isZero(current)
