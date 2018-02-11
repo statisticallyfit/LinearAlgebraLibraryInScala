@@ -12,6 +12,9 @@ import linalg.syntax.NumberSyntax._
 import linalg.syntax.TrigSyntax._
 import linalg.syntax.ShowSyntax._
 import linalg.syntax.CompareSyntax._
+import linalg.util.Exception._
+import linalg.util.Util.SizeChecker
+
 
 import scala.language.implicitConversions
 import scala.language.higherKinds
@@ -42,37 +45,29 @@ trait VectorLike[V, F]
      def outerProduct(v: V, w: V): SetOfVectors[F]
 
      def get(v: V, i: Int): F
-     //def size(v: V)(implicit d: Dimension[V]): Int //todo replace with Dimension trait result
 }
 
-/*trait SizeChecker[V] {
-     def ensureSameSize(v: V, w: V): Boolean
-}*/
+
 
 
 object VectorLike {
 
-     /*implicit def VectorLikeHasSameSize[V[_], N](implicit vecLike: VectorLike[V[N], N]) = new SizeChecker[V[N]]{
+     implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root: Absolute](implicit chk: SizeChecker[Vector[N]]) =
+          new VectorLike[Vector[N], N] with Dimension[Vector[N]]  {
 
-          def ensureSameSize(v: V[N], w: V[N]): Boolean = vecLike.size(v) == vecLike.size(w)
-     }*/
-     //NOTE: use root0 not root because the N might be a complex
-
-     //(implicit ensure: SizeChecker[Vector[N]])
-     implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root: Absolute] = new VectorLike[Vector[N], N] {
-
-          implicit val vectorSpaceHasDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
+          /*implicit val vectorSpaceHasDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
                def dimension(v: Vector[N]): Int = v.elements.length
-          }
+          }*/
 
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
-          //val ensureSize = implicitly[SizeChecker[Vector[N]]]
 
-          //todo how to ensure they are the same size? use implicits? how?
 
-          def plus(v: Vector[N], w: Vector[N]): Vector[N] =
+
+          def plus(v: Vector[N], w: Vector[N]): Vector[N] ={
+               chk.ensureSize(v, w)
                Vector(v.elements.zip(w.elements).map(pair => pair._1 + pair._2):_*)
+          }
 
           def negate(v: Vector[N]): Vector[N] = Vector(v.elements.map(e => e.negate()):_*)
 
@@ -80,20 +75,29 @@ object VectorLike {
 
           def isZero(v: Vector[N]): Boolean = v.elements.forall(e => e :==: Number.ZERO[N])
 
-          def innerProduct(v: Vector[N], w: Vector[N]): N =
+          def innerProduct(v: Vector[N], w: Vector[N]): N = {
+               chk.ensureSize(v, w)
                v.elements.zip(w.elements).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
+          }
 
-          def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = ??? //todo
+          def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = {
+               chk.ensureSize(v, w)
+
+               val as: Seq[N] = v.elements
+               val bs: Seq[N] = w.elements
+
+               val result: Seq[Seq[N]] = as.map(a => bs.map(b => a * b))
+
+               SetOfVectors.fromSequences(result:_*)
+          }
 
           def crossProduct(u: Vector[N], v: Vector[N]): Option[Vector[N]] = {
 
-               def isThreeByThree(v: Vector[N]) = size(v) == 3
-
-               if(isThreeByThree(u) && isThreeByThree(v)){
-                    //todo check if need () order of operations?
+               if(dimension(u) == 3 && dimension(v) == 3){
                     val w1: N = (get(u,2) * get(v,3)) - (get(u,3) * get(v,2))
                     val w2: N = (get(u,3) * get(v,1)) - (get(u,1) * get(v,3))
                     val w3: N = (get(u,1) * get(v,2)) - (get(u,2) * get(v,1))
+
                     Some(Vector(w1, w2, w3))
 
                } else None
@@ -104,20 +108,12 @@ object VectorLike {
           def norm(v: Vector[N])(implicit f: Field[N]): N =
                v.elements.map(e => e ^ Number.TWO[N]).reduceLeft(_ + _)
 
-          def size(v: Vector[N]): Int = v.elements.length
+          def dimension(v: Vector[N]): Int = v.elements.length
 
           def get(v: Vector[N], i: Int): N = {
                val elements = v.elements.toList
                elements(i)
           }
-
-          /*private def innerProdRealLike(v: Vector[R], w: Vector[R]): R =
-               v.elements.zip(w.elements).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
-
-          def angle(v: Vector[R], w: Vector[R]): R = innerProdRealLike(v, w) / (norm(v) * norm(w)).arccos()
-
-          def norm(v: Vector[R])(implicit div: Field[R]): R =
-               v.elements.map(e => e ^ Number.TWO[R]).reduceLeft(_ + _)*/
      }
 }
 

@@ -1,6 +1,7 @@
 package linalg.syntax
 
 import linalg.numeric._
+import linalg.util.Util.SizeChecker
 import linalg.vector._
 
 import scala.language.higherKinds
@@ -16,8 +17,9 @@ import scala.language.implicitConversions
 
 object VectorLikeSyntax {
 
-     implicit class VecLikeOps[V[_], N: Number: Trig: Compare](current: V[N])
-                                                              (implicit vecLike: VectorLike[V[N], N]){
+     implicit class VecLikeOps[V[_], N: Number: Trig: Compare: Root: Absolute](current: V[N])
+                                                              (implicit vecLike: VectorLike[V[N], N],
+                                                               chk: SizeChecker[Vector[N]]){
 
           def +(other: V[N]): V[N] = vecLike.plus(current, other)
           def -(other: V[N]): V[N] = vecLike.minus(current, other)

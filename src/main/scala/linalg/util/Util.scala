@@ -1,3 +1,35 @@
+package linalg.util
+
+
+import linalg.vector._
+import linalg.numeric._
+import linalg.syntax.DimensionSyntax._
+import linalg.theory.basis.Dimension
+import linalg.util.Exception.VectorLikeSizeException
+
+
+object Util {
+
+     trait SizeChecker[V] {
+          def ensureSize(v: V, w: V, SIZE: Int = 0): Unit //throw exception
+     }
+
+     object SizeChecker {
+
+          implicit def DimensionLikeNeedsSizeAssertion[V: Dimension, N] = new SizeChecker[V]{
+
+               def ensureSize(v: V, w: V, SIZE: Int = 0): Unit = {
+
+                    val caseVectorsAreDifferentSize: Boolean = (SIZE == 0 || SIZE < 0) && (v.dimension() != w.dimension())
+                    val caseVectorsAreDifferentThanSpecificSize: Boolean = SIZE != v.dimension() || SIZE != w.dimension()
+
+                    if(caseVectorsAreDifferentSize || caseVectorsAreDifferentThanSpecificSize){
+                         throw VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
+                    }
+               }
+          }
+     }
+}
 //package linalg.util
 //
 //
