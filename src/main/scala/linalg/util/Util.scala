@@ -3,7 +3,7 @@ package linalg.util
 
 import linalg.numeric._
 import linalg.vector._
-import linalg.vector.VectorLike._
+import linalg.theory.basis.Dimension
 import linalg.syntax.DimensionSyntax._
 import linalg.util.Exception.VectorLikeSizeException
 
@@ -18,18 +18,19 @@ object Util {
 
           //todo how to make sizechecker implementation for ALL vectorlike?
 
-          implicit def VectorNeedsSizeAssertion[N: Number: Trig: Root: Absolute: Compare] = new SizeChecker[Vector[N]]{
-
-               def ensureSize(v: Vector[N], w: Vector[N], SIZE: Int = 0): Unit = {
-
-                    val caseVectorsAreDifferentSize: Boolean = (SIZE == 0 || SIZE < 0) && (v.dimension() != w.dimension())
-                    val caseVectorsAreDifferentThanSpecificSize: Boolean = SIZE != v.dimension() || SIZE != w.dimension()
-
-                    if(caseVectorsAreDifferentSize || caseVectorsAreDifferentThanSpecificSize){
-                         throw VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
-                    }
-               }
-          }
+//          implicit def VectorNeedsSizeAssertion[N: Number: Trig: Root: Absolute: Compare]
+//          (implicit dim: Dimension[Vector[N]]) = new SizeChecker[Vector[N]]{
+//
+//               def ensureSize(v: Vector[N], w: Vector[N], SIZE: Int = 0): Unit = {
+//
+//                    val caseVectorsAreDifferentSize: Boolean = (SIZE == 0 || SIZE < 0) && (v.dimension() != w.dimension())
+//                    val caseVectorsAreDifferentThanSpecificSize: Boolean = SIZE != v.dimension() || SIZE != w.dimension()
+//
+//                    if(caseVectorsAreDifferentSize || caseVectorsAreDifferentThanSpecificSize){
+//                         throw VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
+//                    }
+//               }
+//          }
 
 //          implicit def VectorNeedsSizeAssertion[V: Dimension, N: Number: Trig: Root: Absolute: Compare] = new SizeChecker[V]{
 //

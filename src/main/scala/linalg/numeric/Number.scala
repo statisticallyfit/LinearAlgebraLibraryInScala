@@ -554,14 +554,15 @@ object NumberTester extends App {
      println("ABS TEST: " + (-23).abs) //todo this uses RichInt's abs method how to stop this?
      println("ABS TEST: " + Complex[Double](-1, 2).abs)
 
-     import linalg.vector._
-     import linalg.vector.Vector._
+     /*import linalg.vector._
+     import linalg.vector.VectorLike._
      import linalg.syntax.VectorLikeSyntax._
+     import linalg.syntax.VectorSpaceSyntax._
 
      val v: Vector[Int] = Vector(1,2,3)
      println("VEC TEST: " + v.negate )
      println("VEC TEST: " + (v + v))
-     v.negate()
+     v.negate()*/
 
      //------
 

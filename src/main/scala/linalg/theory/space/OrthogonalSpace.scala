@@ -1,6 +1,4 @@
-package linalg.theory.basis
-
-import linalg.theory.space._
+package linalg.theory.space
 
 /**
   *

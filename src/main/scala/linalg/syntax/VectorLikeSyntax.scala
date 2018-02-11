@@ -1,8 +1,9 @@
 package linalg.syntax
 
 import linalg.numeric._
-import linalg.util.Util.SizeChecker
 import linalg.vector._
+
+import cats.Eq
 
 import scala.language.higherKinds
 import scala.language.implicitConversions
@@ -17,25 +18,25 @@ import scala.language.implicitConversions
 
 object VectorLikeSyntax {
 
-     implicit class VecLikeOps[V[_], N: Number: Trig: Compare: Root: Absolute](current: V[N])
+     implicit class VecLikeOps[V[_], N: Number: Trig: Root: Absolute: Compare](current: V[N])
                                                               (implicit vecLike: VectorLike[V[N], N]){
 
-          def +(other: V[N]): V[N] = vecLike.plus(current, other)
+          /** Vector like */
           def -(other: V[N]): V[N] = vecLike.minus(current, other)
-          def negate(): V[N] = vecLike.negate(current)
-          def scale(factor: N): V[N] = vecLike.scale(current, factor)
-
-          //todo test vector complex norm (is the implicit Root0[N,N] correct?) + check in typeclass def.
-          def norm(): N = vecLike.norm(current)
           def angle(other: V[N]): N = vecLike.angle(current, other)
-
-          def innerProduct(other: V[N]): N = vecLike.innerProduct(current, other)
-          def dotProduct(other: V[N]): N = vecLike.dotProduct(current, other)
           def crossProduct(other: V[N]): Option[V[N]] = vecLike.crossProduct(current, other)
           def outerProduct(other: V[N]): SetOfVectors[N]= vecLike.outerProduct(current, other)
-
           def isZero(): Boolean = vecLike.isZero(current)
-
           def get(i: Int): N = vecLike.get(current, i)
+
+          /** Inner product space */
+          def innerProduct(other: V[N]): N = vecLike.innerProduct(current, other)
+          def dotProduct(other: V[N]): N = vecLike.dotProduct(current, other)
+
+          /** Normed vector space */
+          def norm(): N = vecLike.norm(current)
+          def normalize(): V[N] = vecLike.normalize(current)
+          def isNormalized()(implicit eqVec: Eq[V[N]]): Boolean = vecLike.isNormalized(current)
+          def distance(other: V[N]): N = vecLike.distance(current, other)
      }
 }

@@ -5,6 +5,7 @@ import linalg.theory._
 import linalg.theory.space._
 import linalg.theory.basis._
 import linalg.syntax.VectorLikeSyntax._
+import linalg.syntax.VectorSpaceSyntax._
 import linalg.numeric._ //{Number, Trig, Compare, Root0, Root}
 import linalg.numeric.Number._
 import linalg.syntax.RootSyntax._
@@ -15,6 +16,7 @@ import linalg.syntax.CompareSyntax._
 import linalg.util.Exception._
 import linalg.util.Util.SizeChecker
 
+import cats.Eq
 
 import scala.language.implicitConversions
 import scala.language.higherKinds
@@ -31,7 +33,7 @@ import scala.language.higherKinds
   * -
   */
 
-trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] with NormedVectorSpace[V, F] {
+trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
 
      // inherited - plus, negate, scale, innerProduct, norm, angle
      def minus(v: V, w: V): V = plus(v, negate(w))
@@ -44,8 +46,10 @@ trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] w
 
 object VectorLike {
 
-     implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root: Absolute](implicit check: SizeChecker[Vector[N]]) =
-          new VectorLike[Vector[N], N] with Dimension[Vector[N]]  {
+     implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root: Absolute]/*(implicit check: SizeChecker[Vector[N]])*/ =
+          new VectorLike[Vector[N], N] with Dimension[Vector[N]] with Eq[Vector[N]]
+               /*with SizeChecker[Vector[N]]*//*with Basis[Vector[N],
+          N] */{
 
           /*implicit val vectorSpaceHasDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
                def dimension(v: Vector[N]): Int = v.elements.length
@@ -53,10 +57,22 @@ object VectorLike {
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
 
+          def ensureSize(v: Vector[N], w: Vector[N], SIZE: Int = 0): Unit = {
 
+               val caseVectorsAreDifferentSize: Boolean = (SIZE == 0 || SIZE < 0) && (dimension(v) != dimension(w))
+               val caseVectorsAreDifferentThanSpecificSize: Boolean = SIZE != dimension(v) || SIZE != dimension(w)
 
+               if(caseVectorsAreDifferentSize || caseVectorsAreDifferentThanSpecificSize){
+                    throw VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
+               }
+          }
+
+          /** Eq part */
+          def eqv(v: Vector[N], w: Vector[N]): Boolean = v.elements == w.elements
+
+          /** VectorLike part */
           def plus(v: Vector[N], w: Vector[N]): Vector[N] ={
-               check.ensureSize(v, w)
+               ensureSize(v, w)
                Vector(v.elements.zip(w.elements).map(pair => pair._1 + pair._2):_*)
           }
 
@@ -66,13 +82,8 @@ object VectorLike {
 
           def isZero(v: Vector[N]): Boolean = v.elements.forall(e => e :==: Number.ZERO[N])
 
-          def innerProduct(v: Vector[N], w: Vector[N]): N = {
-               check.ensureSize(v, w)
-               v.elements.zip(w.elements).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
-          }
-
           def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = {
-               check.ensureSize(v, w)
+               ensureSize(v, w)
 
                val as: Seq[N] = v.elements
                val bs: Seq[N] = w.elements
@@ -80,6 +91,11 @@ object VectorLike {
                val result: Seq[Seq[N]] = as.map(a => bs.map(b => a * b))
 
                SetOfVectors.fromSequences(result:_*)
+          }
+
+          def innerProduct(v: Vector[N], w: Vector[N]): N = {
+               ensureSize(v, w)
+               v.elements.zip(w.elements).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
           }
 
           def crossProduct(u: Vector[N], v: Vector[N]): Option[Vector[N]] = {
@@ -134,6 +150,7 @@ object Vector {
 
 object VectorTester extends App {
 
+     import VectorLike._
 
      val v1: Vector[Int] = Vector(1,2,3)
      val v2: Vector[Int] = Vector(2,0,4, 5)
@@ -143,5 +160,7 @@ object VectorTester extends App {
      println(Vector(2,3,4) + Vector(-2, 3, -6))
      println(v1.isZero())
      println(v1.dotProduct(v2))
+     println(v1.norm())
+     println(v1.isNormalized())
 
 }

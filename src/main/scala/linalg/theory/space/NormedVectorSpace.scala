@@ -18,7 +18,7 @@ trait NormedVectorSpace[V, F] extends VectorSpace[V, F] {
 
      def normalize(v: V)(implicit f: Field[F]): V = scale(v, f.inverse(norm(v)))
 
-     def isNormalized(v: V)(implicit eq: Eq[V], div: Field[F]): Boolean = eq.eqv(v, normalize(v))
+     def isNormalized(v: V)(implicit eq: Eq[V], f: Field[F]): Boolean = eq.eqv(v, normalize(v))
 
      def distance(v: V, w: V)(implicit f: Field[F]): F = norm(plus(v, negate(w)))
 }
