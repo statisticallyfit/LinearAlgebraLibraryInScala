@@ -31,12 +31,7 @@ import scala.language.higherKinds
   * -
   */
 
-
-
-trait VectorLike[V, F]
-     extends InnerProductSpace[V, F]
-     with HilbertSpace[V, F]
-     with NormedVectorSpace[V, F] {
+trait VectorLike[V, F] extends InnerProductSpace[V, F] with HilbertSpace[V, F] with NormedVectorSpace[V, F] {
 
      // inherited - plus, negate, scale, innerProduct, norm, angle
      def minus(v: V, w: V): V = plus(v, negate(w))
@@ -47,25 +42,21 @@ trait VectorLike[V, F]
      def get(v: V, i: Int): F
 }
 
-
-
-
 object VectorLike {
 
-     implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root: Absolute](implicit chk: SizeChecker[Vector[N]]) =
+     implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root: Absolute](implicit check: SizeChecker[Vector[N]]) =
           new VectorLike[Vector[N], N] with Dimension[Vector[N]]  {
 
           /*implicit val vectorSpaceHasDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
                def dimension(v: Vector[N]): Int = v.elements.length
           }*/
-
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
 
 
 
           def plus(v: Vector[N], w: Vector[N]): Vector[N] ={
-               chk.ensureSize(v, w)
+               check.ensureSize(v, w)
                Vector(v.elements.zip(w.elements).map(pair => pair._1 + pair._2):_*)
           }
 
@@ -76,12 +67,12 @@ object VectorLike {
           def isZero(v: Vector[N]): Boolean = v.elements.forall(e => e :==: Number.ZERO[N])
 
           def innerProduct(v: Vector[N], w: Vector[N]): N = {
-               chk.ensureSize(v, w)
+               check.ensureSize(v, w)
                v.elements.zip(w.elements).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
           }
 
           def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = {
-               chk.ensureSize(v, w)
+               check.ensureSize(v, w)
 
                val as: Seq[N] = v.elements
                val bs: Seq[N] = w.elements
