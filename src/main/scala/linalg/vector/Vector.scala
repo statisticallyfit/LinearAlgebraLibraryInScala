@@ -58,7 +58,7 @@ object VectorLike {
      //NOTE: use root0 not root because the N might be a complex
 
      //(implicit ensure: SizeChecker[Vector[N]])
-     implicit def VectorIsVectorLike[R: RealLike, N: Number/*: Trig: Compare: Root*/] = new VectorLike[Vector[N], N] {
+     implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root: Absolute] = new VectorLike[Vector[N], N] {
 
           implicit val vectorSpaceHasDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
                def dimension(v: Vector[N]): Int = v.elements.length
@@ -86,15 +86,20 @@ object VectorLike {
 
           def crossProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = ??? //todo
 
-          private def innerProdRealLike(v: Vector[R], w: Vector[R]): R =
+          def angle(v: Vector[N], w: Vector[N]): N = innerProduct(v, w) / (norm(v) * norm(w)).arccos()
+
+          def norm(v: Vector[N])(implicit f: Field[N]): N =
+               v.elements.map(e => e ^ Number.TWO[N]).reduceLeft(_ + _)
+
+          def size(v: Vector[N]): Int = v.elements.length
+
+          /*private def innerProdRealLike(v: Vector[R], w: Vector[R]): R =
                v.elements.zip(w.elements).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
 
           def angle(v: Vector[R], w: Vector[R]): R = innerProdRealLike(v, w) / (norm(v) * norm(w)).arccos()
 
           def norm(v: Vector[R])(implicit div: Field[R]): R =
-               v.elements.map(e => e ^ Number.TWO[R]).reduceLeft(_ + _)
-
-          def size(v: Vector[N]): Int = v.elements.length
+               v.elements.map(e => e ^ Number.TWO[R]).reduceLeft(_ + _)*/
      }
 }
 

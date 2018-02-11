@@ -1,7 +1,6 @@
 package linalg.syntax
 
 import linalg.numeric._
-import linalg.numeric.Number._
 import linalg.vector._
 
 import scala.language.higherKinds
@@ -17,7 +16,8 @@ import scala.language.implicitConversions
 
 object VectorLikeSyntax {
 
-     implicit class VecLikeOps[V[_], N: Number](current: V[N])(implicit vecLike: VectorLike[V[N], N]){
+     implicit class VecLikeOps[V[_], N: Number: Trig: Compare](current: V[N])
+                                                              (implicit vecLike: VectorLike[V[N], N]){
 
 
           def +(other: V[N]): V[N] = vecLike.plus(current, other)
