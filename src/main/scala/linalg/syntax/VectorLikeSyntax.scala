@@ -20,8 +20,7 @@ import scala.language.implicitConversions
 object VectorLikeSyntax {
 
      implicit class VecLikeOps[V[_], N: Number: Trig: Root: Absolute: Compare](current: V[N])
-                                                              (implicit vecLike: VectorLike[V[N], N],
-                                                               sz: SizeChecker[V[N]]){
+                                                              (implicit vecLike: VectorLike[V[N], N]){
 
           /** Vector like */
           def -(other: V[N]): V[N] = vecLike.minus(current, other)
