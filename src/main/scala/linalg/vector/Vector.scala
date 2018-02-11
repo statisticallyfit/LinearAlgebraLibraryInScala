@@ -38,9 +38,10 @@ trait VectorLike[V, F]
      // inherited - plus, negate, scale, innerProduct, norm, angle
      def minus(v: V, w: V): V = plus(v, negate(w))
      def isZero(v: V): Boolean
-     def crossProduct(v: V, w: V): Option[SetOfVectors[F]]  //maybe won't work
+     def crossProduct(v: V, w: V): Option[V]  //maybe won't work
      def outerProduct(v: V, w: V): SetOfVectors[F]
 
+     def get(v: V, i: Int): F
      //def size(v: V)(implicit d: Dimension[V]): Int //todo replace with Dimension trait result
 }
 
@@ -84,10 +85,18 @@ object VectorLike {
 
           def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = ??? //todo
 
-          def crossProduct(v: Vector[N], w: Vector[N]): Option[SetOfVectors[N]] = {
-               //step 1 - check vectors are both 3x3
-               //u x v = (u2*v3 - u3*v2, u3*v1 -u1*v3, u1*v2-u2*v1)
-               def isThreeByThree(v: Vector[N]): Boolean 
+          def crossProduct(u: Vector[N], v: Vector[N]): Option[Vector[N]] = {
+
+               def isThreeByThree(v: Vector[N]) = size(v) == 3
+
+               if(isThreeByThree(u) && isThreeByThree(v)){
+                    //todo check if need () order of operations?
+                    val w1: N = (get(u,2) * get(v,3)) - (get(u,3) * get(v,2))
+                    val w2: N = (get(u,3) * get(v,1)) - (get(u,1) * get(v,3))
+                    val w3: N = (get(u,1) * get(v,2)) - (get(u,2) * get(v,1))
+                    Some(Vector(w1, w2, w3))
+
+               } else None
           }
 
           def angle(v: Vector[N], w: Vector[N]): N = innerProduct(v, w) / (norm(v) * norm(w)).arccos()
@@ -96,6 +105,11 @@ object VectorLike {
                v.elements.map(e => e ^ Number.TWO[N]).reduceLeft(_ + _)
 
           def size(v: Vector[N]): Int = v.elements.length
+
+          def get(v: Vector[N], i: Int): N = {
+               val elements = v.elements.toList
+               elements(i)
+          }
 
           /*private def innerProdRealLike(v: Vector[R], w: Vector[R]): R =
                v.elements.zip(w.elements).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)

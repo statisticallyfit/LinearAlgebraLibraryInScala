@@ -19,7 +19,6 @@ object VectorLikeSyntax {
      implicit class VecLikeOps[V[_], N: Number: Trig: Compare](current: V[N])
                                                               (implicit vecLike: VectorLike[V[N], N]){
 
-
           def +(other: V[N]): V[N] = vecLike.plus(current, other)
           def -(other: V[N]): V[N] = vecLike.minus(current, other)
           def negate(): V[N] = vecLike.negate(current)
@@ -31,9 +30,11 @@ object VectorLikeSyntax {
 
           def innerProduct(other: V[N]): N = vecLike.innerProduct(current, other)
           def dotProduct(other: V[N]): N = vecLike.dotProduct(current, other)
-          def crossProduct(other: V[N]): Option[SetOfVectors[N]] = vecLike.crossProduct(current, other)
+          def crossProduct(other: V[N]): Option[V[N]] = vecLike.crossProduct(current, other)
           def outerProduct(other: V[N]): SetOfVectors[N]= vecLike.outerProduct(current, other)
 
           def isZero(): Boolean = vecLike.isZero(current)
+
+          def get(i: Int): N = vecLike.get(current, i)
      }
 }
