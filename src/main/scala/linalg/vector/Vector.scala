@@ -4,15 +4,15 @@ package linalg.vector
 import linalg.theory._
 import linalg.theory.space._
 import linalg.theory.basis._
-import linalg.syntax.VectorLikeSyntax._
-import linalg.syntax.VectorSpaceSyntax._
 import linalg.numeric._ //{Number, Trig, Compare, Root0, Root}
 import linalg.numeric.Number._
-import linalg.syntax.RootSyntax._
 import linalg.syntax.NumberSyntax._
+import linalg.syntax.RootSyntax._
 import linalg.syntax.TrigSyntax._
 import linalg.syntax.ShowSyntax._
 import linalg.syntax.CompareSyntax._
+import linalg.syntax.VectorLikeSyntax._
+import linalg.syntax.VectorSpaceSyntax._
 import linalg.util.Exception._
 import linalg.util.Util.SizeChecker
 
@@ -44,12 +44,11 @@ trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
      def get(v: V, i: Int): F
 }
 
+
 object VectorLike {
 
-     implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root: Absolute]/*(implicit check: SizeChecker[Vector[N]])*/ =
-          new VectorLike[Vector[N], N] with Dimension[Vector[N]] with Eq[Vector[N]]
-               /*with SizeChecker[Vector[N]]*//*with Basis[Vector[N],
-          N] */{
+     implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root: Absolute] = new VectorLike[Vector[N], N]
+          with Dimension[Vector[N]] with Eq[Vector[N]] with SizeChecker[Vector[N]] /*with Basis[Vector[N], N]*/ {
 
           /*implicit val vectorSpaceHasDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
                def dimension(v: Vector[N]): Int = v.elements.length

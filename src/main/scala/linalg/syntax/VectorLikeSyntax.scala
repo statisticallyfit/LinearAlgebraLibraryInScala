@@ -2,6 +2,7 @@ package linalg.syntax
 
 import linalg.numeric._
 import linalg.vector._
+import linalg.util.Util.SizeChecker
 
 import cats.Eq
 
@@ -19,7 +20,8 @@ import scala.language.implicitConversions
 object VectorLikeSyntax {
 
      implicit class VecLikeOps[V[_], N: Number: Trig: Root: Absolute: Compare](current: V[N])
-                                                              (implicit vecLike: VectorLike[V[N], N]){
+                                                              (implicit vecLike: VectorLike[V[N], N],
+                                                               sz: SizeChecker[V[N]]){
 
           /** Vector like */
           def -(other: V[N]): V[N] = vecLike.minus(current, other)
