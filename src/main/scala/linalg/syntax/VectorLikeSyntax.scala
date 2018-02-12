@@ -2,10 +2,10 @@ package linalg.syntax
 
 import linalg.numeric._
 import linalg.vector._
-import linalg.util.Util.SizeChecker
-
+import linalg.vector.VectorLike._
 import cats.Eq
 
+import scala.collection.mutable.ListBuffer
 import scala.language.higherKinds
 import scala.language.implicitConversions
 
@@ -29,6 +29,9 @@ object VectorLikeSyntax {
           def outerProduct(other: V[N]): SetOfVectors[N]= vecLike.outerProduct(current, other)
           def isZero(): Boolean = vecLike.isZero(current)
           def get(i: Int): N = vecLike.get(current, i)
+          def set(i: Int, value: N): Unit = vecLike.set(current, i, value)
+          def toList: List[N] = vecLike.toList(current)
+          def toBuff: ListBuffer[N] = vecLike.toBuff(current)
 
           /** Inner product space */
           def innerProduct(other: V[N]): N = vecLike.innerProduct(current, other)

@@ -4,7 +4,7 @@ package linalg.vector
 import linalg.theory._
 import linalg.theory.space._
 import linalg.theory.basis._
-import linalg.numeric._ //{Number, Trig, Compare, Root0, Root}
+import linalg.numeric._
 import linalg.numeric.Number._
 import linalg.syntax.NumberSyntax._
 import linalg.syntax.RootSyntax._
@@ -18,6 +18,7 @@ import linalg.util.Util.SizeChecker
 
 import cats.Eq
 
+import scala.collection.mutable.ListBuffer
 import scala.language.implicitConversions
 import scala.language.higherKinds
 
@@ -42,13 +43,16 @@ trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
      def outerProduct(v: V, w: V): SetOfVectors[F]
 
      def get(v: V, i: Int): F
+     def set(v: V, i: Int, value: F): Unit
+     def toList(v: V): List[F]
+     def toBuff(v: V): ListBuffer[F]
 }
 
 
 object VectorLike {
 
      implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root: Absolute] = new VectorLike[Vector[N], N]
-          with Dimension[Vector[N]] with Eq[Vector[N]] with SizeChecker[Vector[N]] /*with Basis[Vector[N], N]*/ {
+          with Dimension[Vector[N]] with Eq[Vector[N]] with SizeChecker[Vector[N]] /*with Span[Vector[N], N]*/ {
 
           /*implicit val vectorSpaceHasDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
                def dimension(v: Vector[N]): Int = v.elements.length
@@ -89,7 +93,7 @@ object VectorLike {
 
                val result: Seq[Seq[N]] = as.map(a => bs.map(b => a * b))
 
-               SetOfVectors.fromSequences(result:_*)
+               SetOfVectors.fromSeqs(result:_*)
           }
 
           def innerProduct(v: Vector[N], w: Vector[N]): N = {
@@ -116,10 +120,11 @@ object VectorLike {
 
           def dimension(v: Vector[N]): Int = v.elements.length
 
-          def get(v: Vector[N], i: Int): N = {
-               val elements = v.elements.toList
-               elements(i)
-          }
+          def get(v: Vector[N], i: Int): N = v.elements(i)
+          def set(v: Vector[N], i: Int, value: N): Unit = ListBuffer(v.elements:_*)(i) = value  //todo check if sticks
+
+          def toList(v: Vector[N]): List[N] = v.elements.toList
+          def toBuff(v: Vector[N]): ListBuffer[N] = ListBuffer(toList(v):_*)
      }
 }
 
@@ -161,5 +166,6 @@ object VectorTester extends App {
      println(v1.dotProduct(v2))
      println(v1.norm())
      println(v1.isNormalized())
+     println(v2.get(3))
 
 }

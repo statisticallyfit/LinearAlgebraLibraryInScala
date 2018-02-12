@@ -26,7 +26,7 @@ import linalg.theory.space._
 
 //todo - decide overall if should use extension to specify type of the 'smaller' parameters.
 
-trait MatrixLike[M, F] extends SetOfVectorsLike[M, F] {
+trait MatrixLike[M, F] extends SetVecLike[M, F] {
 
      val identity: M
 
