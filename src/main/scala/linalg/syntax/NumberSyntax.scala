@@ -13,6 +13,8 @@ object NumberSyntax {
      import Number._ //note if we want miniature implicits tests tow ork
      implicit class NumberLikeOps[N](current: N)(implicit numLike: NumberLike[N]){
 
+          //val n = implicitly[Number[N]]
+
           // Number like stuff
           def +(other: N): N = numLike.plus(current, other)
           def -(other: N): N = numLike.minus(current, other)
@@ -55,22 +57,26 @@ object NumberSyntax {
      }
 
 
-     implicit class NumberOps[N](current: N)(implicit number: Number[N]){
+     implicit class NumberOps[N[_], R](current: N[R])(implicit number: Number[N[R]], numR: Number[R]){
 
           //type RE <: RealNumber[RE]
-          type REAL = number.RE
+          //type REAL_ = number.REAL
+          //type REAL_ = RE forSome {type RE <: RealNumber[RE]}
           //type REAL = RE forSome {type RE = RealNumber[RE]}
 
-          private val _root: _Root[N, REAL] = number._root
-          private val _abs: _Absolute[N, REAL] = number._abs
+          //type REAL = number.RE
+
+          private val _root: _Root[N[R], R] = number._root
+          private val _abs: _Absolute[N[R], R] = number._abs
+
 
           // Root stuff
-          def ^(exp: REAL): N = _root.power(current, exp)
+          def ^(exp: N[R]): N = _root.power(current, exp)
           def sqrt(): N = _root.squareRoot(current)
-          def nRoot(n: REAL): N = _root.nRoot(current, n)
+          def nRoot(n: N[R]): N = _root.nRoot(current, n)
 
           // Absolute stuff
-          def abs(): REAL = _abs.absoluteValue(current)
+          def abs(): N[R] = _abs.absoluteValue(current)
      }
      Complex(1,2).nRoot(2)
      Complex[Double](-1, 2).abs()

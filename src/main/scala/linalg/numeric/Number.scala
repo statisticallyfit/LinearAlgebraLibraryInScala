@@ -58,7 +58,7 @@ trait Comparing[E] {
      def greaterThanOrEqual(x: E, y: E): Boolean = greaterThan(x, y) || equal(x, y)
 }
 
-trait _Absolute[N, R] {
+trait _Absolute[N, R] extends RealNumber[R] {
      def absoluteValue(x: N): R
 }
 
@@ -66,14 +66,17 @@ trait Absolute[A] extends _Absolute[A, A]{
      //override def absoluteValue(x: A) = abs0.absoluteValue(x)
 }
 
-trait _Root[N, R] {
+trait _Root[N[_], R] extends RealNumber[R] {
 
      val rOne: R
      val rTwo: R
 
-     def power(base: N, exp: R): N
+     def power(base: N[R], exp: R): N[R]
+     def nRoot(base: N[R], n: R)(implicit f: Field[R]): N[R] = power(base, f.divide(rOne, n))
+     def squareRoot(base: N[R])(implicit f: Field[R]): N[R] = nRoot(base, rTwo)
+     /*def power(base: N, exp: R): N
      def nRoot(base: N, n: R)(implicit f: Field[R]): N = power(base, f.divide(rOne, n))
-     def squareRoot(base: N)(implicit f: Field[R]): N = nRoot(base, rTwo)
+     def squareRoot(base: N)(implicit f: Field[R]): N = nRoot(base, rTwo)*/
 }
 
 trait Root[R] extends _Root[R, R] {
@@ -137,14 +140,12 @@ private[linalg] trait NumberLike[N] extends Field[N] /*with Trig[N] with Compara
 }
 
 
-trait Number[N] extends NumberLike[N]  /*with _Root[Number[N], N] with _Absolute[Number[N], N] */ { self =>
+trait Number[N[R]] extends NumberLike[N]  /*with _Root[Number[N], N] with _Absolute[Number[N], N] */ { self =>
 
-     //val selfNumber: Number[N, R] = self
 
-     type RE = RealNumber[RE]
-
-     implicit def _root: _Root[N, RE]
-     implicit def _abs: _Absolute[N, RE]
+     //_Root[N, RE forSome {type RE <: NumberLike[RE]}]
+     implicit def _root: _Root[N[R], R]
+     implicit def _abs: _Absolute[Number[N], N]
 
      /*override implicit def numLikeHasTrig: Trig[N] = selfNumLike.numLikeHasTrig
      override implicit def numLikeHasCompare: Compare[N] = selfNumLike.numLikeHasCompare*/

@@ -48,14 +48,14 @@ trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
 
 object VectorLike {
 
-     implicit def VectorIsVectorLike[N, R:RealNumber](implicit num: Number[N, R]) = new VectorLike[Vector[N], N]
+     implicit def VectorIsVectorLike[N: Number] = new VectorLike[Vector[N], N]
           with Dimension[Vector[N]] with Eq[Vector[N]] /*with Span[Vector[N], N]*/ {
 
           /*implicit val vectorSpaceHasDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
                def dimension(v: Vector[N]): Int = v.elements.length
           }*/
-          val zero: Vector[N] = Vector(Number.ZERO[N, R]) //just vector with one element
-          val one: Vector[N] = Vector(Number.ONE[N, R]) //just vector with one element
+          val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
+          val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
 
           /** Eq part */
           def eqv(v: Vector[N], w: Vector[N]): Boolean = v.getElements() == w.getElements()
@@ -70,7 +70,7 @@ object VectorLike {
 
           def scale(v: Vector[N], factor: N): Vector[N] = Vector(v.getElements().map(e => e * factor):_*)
 
-          def isZero(v: Vector[N]): Boolean = v.getElements().forall(e => e :==: Number.ZERO[N, R])
+          def isZero(v: Vector[N]): Boolean = v.getElements().forall(e => e :==: Number.ZERO[N])
 
           def projection(v: Vector[N], onto: Vector[N]): Vector[N] = scale(onto,  innerProduct(v, onto) / norm(onto))
 
@@ -104,8 +104,7 @@ object VectorLike {
 
           def angle(v: Vector[N], w: Vector[N]): N = innerProduct(v, w) / (norm(v) * norm(w)).arccos()
 
-          def norm(v: Vector[N])(implicit f: Field[N]): N =
-               v.getElements().map(e => e ^ Number.TWO[N, R]).reduceLeft(_ + _)
+          def norm(v: Vector[N])(implicit f: Field[N]): N = v.getElements().map(e => e ^ Number.TWO[N]).reduceLeft(_ + _)
 
           def dimension(v: Vector[N]): Int = v.getElements().length
 
@@ -121,7 +120,7 @@ object VectorLike {
 
 
 
-case class Vector[N](private val elems: N*)(implicit num: Number[N, RE forSome {type RE <: RealNumber[RE]}]) {
+case class Vector[N: Number](private val elems: N*) {
 
      private val elements: Seq[N] = Seq(elems:_*)
 
@@ -159,13 +158,13 @@ object VectorTester extends App {
      val v1: Vector[Int] = Vector(1,2,3)
      val v2: Vector[Int] = Vector(2,0,4, 5)
 
-     println(v1.negate())
+     /*println(v1.negate())
      println(v1 + v2)
      println(Vector(2,3,4) + Vector(-2, 3, -6))
      println(v1.isZero)
      println(v1.dotProduct(v2))
      println(v1.norm())
      println(v1.isNormalized())
-     println(v2.get(3))
+     println(v2.get(3))*/
 
 }

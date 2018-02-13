@@ -38,8 +38,8 @@ trait SetVecLike[V, F] extends VectorSpace[V, F]{
 
 object SetVecLike {
 
-     implicit def VectorSetIsVectorSetLike[V[_], N: Number: Trigonometric: Absolute: Root: Comparing](implicit vecLike:
-     VectorSpace[V[N], N]) = new SetVecLike[SetOfVectors[N], N] with Dimension[SetOfVectors[N]] {
+     implicit def SetVecisSetVecLike[V[_], N: Number](implicit vecLike: VectorLike[V[N], N]) = new
+               SetVecLike[SetOfVectors[N], N] with Dimension[SetOfVectors[N]] {
 
           val zero: SetOfVectors[N] = SetOfVectors(Vector.ZERO[N](1))
           val one: SetOfVectors[N] = SetOfVectors(Vector.ONE[N](1))
@@ -127,7 +127,7 @@ import SetVecLike._
 
 
 
-case class SetOfVectors[N: Number:Trigonometric:Root:Absolute:Comparing](private val cols: Vector[N]*) {
+case class SetOfVectors[N: Number](private val cols: Vector[N]*)(implicit d: Dimension[SetOfVectors[N]]) {
 
      private val columns: Seq[Vector[N]] = Seq(cols:_*)
      val numRows: Int = this.dimension()
@@ -172,29 +172,26 @@ object SetOfVectors {
 
      //def apply[N: Number:Trig:Root:Absolute:Compare](cols: Vector[N]*): SetOfVectors[N] = new SetOfVectors(cols:_*)
 
-     def apply[N: Number:Trigonometric:Root:Absolute:Comparing](nr:Int, nc:Int): SetOfVectors[N] =
+     def apply[N: Number](nr:Int, nc:Int): SetOfVectors[N] =
           new SetOfVectors(Vector(Seq.fill[N](nr * nc)(Number.ZERO[N]):_*))
 
-     def ZERO[N: Number:Trigonometric:Root:Absolute:Comparing](numCols: Int, numRows: Int): SetOfVectors[N] =
+     def ZERO[N: Number](numCols: Int, numRows: Int): SetOfVectors[N] =
           SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number.ZERO[N]):_*)
 
-     def ONE[N: Number:Trigonometric:Root:Absolute:Comparing](numCols: Int, numRows: Int): SetOfVectors[N] =
+     def ONE[N: Number](numCols: Int, numRows: Int): SetOfVectors[N] =
           SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number.ONE[N]):_*)
 
-     def IDENTITY[N: Number:Trigonometric:Root:Absolute:Comparing](size: Int)
-                                                                  (implicit ev: SetVecLike[SetOfVectors[N], N]):SetOfVectors[N] =
+     def IDENTITY[N: Number](size: Int)(implicit ev: SetVecLike[SetOfVectors[N], N]):SetOfVectors[N] =
           ev.identity(size)
 
-     def IDENTITY[N: Number:Trigonometric:Root:Absolute:Comparing](vset: SetOfVectors[N])
-                                                                  (implicit ev: SetVecLike[SetOfVectors[N], N],
-                                                        dim: Dimension[SetOfVectors[N]]): SetOfVectors[N] =
+     def IDENTITY[N: Number](vset: SetOfVectors[N])(implicit ev: SetVecLike[SetOfVectors[N], N],
+                                                    dim: Dimension[SetOfVectors[N]]): SetOfVectors[N] =
           ev.identity(vset.dimension())
 
-     def fromSeqs[N: Number:Trigonometric:Root:Absolute:Comparing](seqs: Seq[N]*): SetOfVectors[N] =
-          SetOfVectors(seqs.map(aSeq => Vector(aSeq:_*)):_*)
+     def fromSeqs[N: Number](seqs: Seq[N]*): SetOfVectors[N] = SetOfVectors(seqs.map(aSeq => Vector(aSeq:_*)):_*)
 
      //assume data is along column
-     def fromSingleSeq[N: Number:Trigonometric:Root:Absolute:Comparing](numRows: Int, numCols: Int, seq: Seq[N]): SetOfVectors[N] =
+     def fromSingleSeq[N: Number](numRows: Int, numCols: Int, seq: Seq[N]): SetOfVectors[N] =
           fromSeqs(seq.grouped(numCols).toList:_*) //.toList.map(_.toList)
 
 }
@@ -205,7 +202,7 @@ object SetOfVectors {
 
 object SetVecTester extends App {
 
-     val s1: SetOfVectors[Double] = SetOfVectors(Vector(1,2,3,4,5), Vector(8,8,1,2,3),
+     /*val s1: SetOfVectors[Double] = SetOfVectors(Vector(1,2,3,4,5), Vector(8,8,1,2,3),
           Vector(-8,9,-3,0,1))
      println(s1.get(1,2)) //should be 9
      s1.getColumn(1).set(1)(333)
@@ -213,5 +210,5 @@ object SetVecTester extends App {
      println(s1)
      println(s1.get(0,0))
 
-     s1.copy()
+     s1.copy()*/
 }

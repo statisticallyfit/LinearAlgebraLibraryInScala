@@ -31,19 +31,20 @@ object Show {
           def show(x: Complex[R]): String = x.re.toString + Imaginary(x.im).toString
      }
 
-     implicit def VectorHasShow[N: Number:Trigonometric:Root:Absolute:Comparing] = new Show[Vector[N]]{
+     implicit def VectorHasShow[N: Number] = new Show[Vector[N]]{
           def show(v: Vector[N]): String = showVecSet(SetOfVectors(v))
      }
 
-     implicit def PolynomialHasShow[R: RealNumber:Trigonometric:Root:Absolute:Comparing] = new Show[Polynomial[R]]{
+     //todo
+     /*implicit def PolynomialHasShow[R: RealNumber] = new Show[Polynomial[R]]{
           def show(poly: Polynomial[R]): String = showVecSet(SetOfVectors(poly))
-     }
+     }*/
 
-     implicit def SetVecHasShow[N: Number:Trigonometric:Root:Absolute:Comparing] = new Show[SetOfVectors[N]]{
+     implicit def SetVecHasShow[N: Number] = new Show[SetOfVectors[N]]{
           def show(vset: SetOfVectors[N]): String = showVecSet(vset)
      }
 
-     private def showVecSet[N:Number:Trigonometric:Root:Absolute:Comparing](vset: SetOfVectors[N]): String ={
+     private def showVecSet[N:Number](vset: SetOfVectors[N]): String ={
           val colsStr: Seq[Seq[String]] = vset.getColumns().map(vec => vec.getElements().map(elem => elem.toString))
 
           // max widths measured per col

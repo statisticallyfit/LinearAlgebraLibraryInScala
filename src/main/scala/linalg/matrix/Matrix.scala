@@ -5,7 +5,7 @@ import linalg.util._
 //import linalg.util.Implicits._
 
 import linalg.vector._
-import linalg.temp_factorization._
+//import linalg.temp_factorization._
 
 import org.apache.commons.lang3.StringUtils
 import scala.collection.IndexedSeq

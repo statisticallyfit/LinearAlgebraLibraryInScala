@@ -3,6 +3,7 @@ package linalg.syntax
 import linalg.numeric._
 import linalg.vector._
 import linalg.vector.VectorLike._
+
 import cats.Eq
 
 import scala.collection.mutable.ListBuffer
@@ -19,8 +20,7 @@ import scala.language.implicitConversions
 
 object VectorLikeSyntax {
 
-     implicit class VecLikeOps[V[_], N: Number: Trigonometric: Root: Absolute: Comparing](current: V[N])
-                                                                                         (implicit vecLike: VectorLike[V[N], N]){
+     implicit class VecLikeOps[V[_], N: Number](current: V[N])(implicit vecLike: VectorLike[V[N], N]){
 
           /** Vector like */
           def -(other: V[N]): V[N] = vecLike.minus(current, other)
@@ -40,4 +40,7 @@ object VectorLikeSyntax {
           def isNormalized()(implicit eqVec: Eq[V[N]]): Boolean = vecLike.isNormalized(current)
           def distance(other: V[N]): N = vecLike.distance(current, other)
      }
+     import Number._
+     import linalg.syntax.NumberSyntax._
+     Vector(1,2,3).isZero
 }
