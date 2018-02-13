@@ -22,14 +22,14 @@ trait NumericConversion[F, T] {
 
 object NumericConversion {
      //mechanism: takes something that implements RealNumber and gives it .i accessor, returning Imaginary.
-     implicit class ToImaginary[R: RealLike](private val imaginaryPart: R){
+     implicit class ToImaginary[R: RealNumber](private val imaginaryPart: R){
 
           def i: Imaginary[R] = Imaginary(imaginaryPart)
      }
 
      //mechanism: takes something that implements RealNumber and makes it addable with Imaginary (which BTW cannot
      // implement Number because i*i = -1, not imaginary)
-     implicit class ToComplex[R: RealLike](private val realPart: R)/*(implicit compLike: ComplexLike[Imaginary[R], R])*/ {
+     implicit class ToComplex[R: RealNumber](private val realPart: R)/*(implicit compLike: ComplexLike[Imaginary[R], R])*/ {
 
           def +(that: Imaginary[R]) = Complex(realPart, that.im) //compLike.imag(that)) //can just do that.im
           def -(that: Imaginary[R]) = Complex(realPart, that.im.negate()) //compLike.imag(that).negate())
@@ -37,7 +37,7 @@ object NumericConversion {
 
      // ---------------------------------------------------------------------------------------------
 
-     implicit def GeneralRealToComplex[R: RealLike]
+     implicit def GeneralRealToComplex[R: RealNumber]
      /*(implicit root0: Root0[Complex[R], R])*/: NumericConversion[R, Complex[R]] = new NumericConversion[R, Complex[R]]{
 
           def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)

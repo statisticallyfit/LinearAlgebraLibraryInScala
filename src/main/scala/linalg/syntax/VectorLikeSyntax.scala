@@ -19,8 +19,8 @@ import scala.language.implicitConversions
 
 object VectorLikeSyntax {
 
-     implicit class VecLikeOps[V[_], N: Number: Trig: Root: Absolute: Compare](current: V[N])
-                                                              (implicit vecLike: VectorLike[V[N], N]){
+     implicit class VecLikeOps[V[_], N: Number: Trigonometric: Root: Absolute: Comparing](current: V[N])
+                                                                                         (implicit vecLike: VectorLike[V[N], N]){
 
           /** Vector like */
           def -(other: V[N]): V[N] = vecLike.minus(current, other)
@@ -28,10 +28,7 @@ object VectorLikeSyntax {
           def crossProduct(other: V[N]): Option[V[N]] = vecLike.crossProduct(current, other)
           def outerProduct(other: V[N]): SetOfVectors[N]= vecLike.outerProduct(current, other)
           def isZero: Boolean = vecLike.isZero(current)
-          /*def get(i: Int): N = vecLike.get(current, i)
-          def set(i: Int, value: N): Unit = vecLike.set(current, i, value)
-          def toList: List[N] = vecLike.toList(current)
-          def toBuff: ListBuffer[N] = vecLike.toBuff(current)*/
+          def projection(onto: V[N]): V[N] = vecLike.projection(current, onto)
 
           /** Inner product space */
           def innerProduct(other: V[N]): N = vecLike.innerProduct(current, other)

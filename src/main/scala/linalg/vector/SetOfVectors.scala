@@ -10,8 +10,12 @@ import linalg.vector.VectorLike._
 import linalg.syntax.VectorLikeSyntax._
 import linalg.syntax.VectorSpaceSyntax._
 import linalg.syntax.SetVecLikeSyntax._
+import linalg.show.Show
+import linalg.syntax.ShowSyntax._
 import linalg.util.Util
+import org.apache.commons.lang3.StringUtils
 
+import scala.collection.mutable
 import scala.collection.mutable.{ListBuffer, Seq}
 import scala.language.higherKinds
 import scala.language.implicitConversions
@@ -29,31 +33,12 @@ trait SetVecLike[V, F] extends VectorSpace[V, F]{
      def rowEchelon(m: V): V
      def minus(v: V, w: V): V = plus(v, negate(w))
      def isZero(v: V): Boolean
-
-     /*def copy(v: V): V
-
-     def numRows(v: V): Int
-     def numCols(v: V): Int
-
-     def getRows(v: V): ListBuffer[Vector[F]]
-     def getRow(v: V, rowIndex: Int): Vector[F] //todo ok? will polymorph e.g. polynomial?
-
-     def getColumns(v: V): ListBuffer[Vector[F]]
-     def getColumn(v: V, colIndex: Int): Vector[F]
-
-     def get(v: V, rowIndex: Int, colIndex: Int)(implicit vec: VectorLike[Vector[F],F]): F =
-          vec.get(getRow(v, rowIndex), colIndex) //todo why doesn't implicit work?
-
-
-     /*def setRow(v: V, rowIndex: Int): Unit
-     def setColumn(v: V, colIndex: Int): Unit*/ //todo major
-     def set(v: V, rowIndex: Int, colIndex: Int, value: F): Unit*/
 }
 
 
 object SetVecLike {
 
-     implicit def VectorSetIsVectorSetLike[V[_], N: Number: Trig: Absolute: Root: Compare](implicit vecLike:
+     implicit def VectorSetIsVectorSetLike[V[_], N: Number: Trigonometric: Absolute: Root: Comparing](implicit vecLike:
      VectorSpace[V[N], N]) = new SetVecLike[SetOfVectors[N], N] with Dimension[SetOfVectors[N]] {
 
           val zero: SetOfVectors[N] = SetOfVectors(Vector.ZERO[N](1))
@@ -61,18 +46,18 @@ object SetVecLike {
 
           def plus(vset: SetOfVectors[N], wset: SetOfVectors[N]): SetOfVectors[N] ={
                Util.Gen.ensureSize(vset, wset)
-               SetOfVectors(vset.columns.zip(wset.columns).map(colPair => colPair._1 + colPair._2):_*)
+               SetOfVectors(vset.getColumns().zip(wset.getColumns()).map(colPair => colPair._1 + colPair._2):_*)
           }
 
-          def negate(vset: SetOfVectors[N]): SetOfVectors[N] = SetOfVectors(vset.columns.map(c => c.negate()):_*)
+          def negate(vset: SetOfVectors[N]): SetOfVectors[N] = SetOfVectors(vset.getColumns().map(c => c.negate()):_*)
 
           def scale(v: SetOfVectors[N], factor: N): SetOfVectors[N] =
-               SetOfVectors(v.columns.map(col => col.scale(factor)):_*)
+               SetOfVectors(v.getColumns().map(col => col.scale(factor)):_*)
 
-          def isZero(v: SetOfVectors[N]): Boolean = v.columns.forall(col => col.isZero)
+          def isZero(v: SetOfVectors[N]): Boolean = v.getColumns().forall(col => col.isZero)
 
 
-          def dimension(vset: SetOfVectors[N]): Int = vset.columns.head.dimension() //just get length of any column
+          def dimension(vset: SetOfVectors[N]): Int = vset.getColumns().head.dimension() //just get length of any column
 
           def identity(size: Int): SetOfVectors[N] ={
                val list = ListBuffer.fill[N](size, size)(Number.ZERO[N])
@@ -86,31 +71,6 @@ object SetVecLike {
           }
 
 
-
-          //util things
-          /*def copy(vset: SetOfVectors[N]): SetOfVectors[N] = SetOfVectors(vset.columns:_*)
-
-          def getRow(vset: SetOfVectors[N], rowIndex: Int): Vector[N] = getRows(vset)(rowIndex)
-          def getRows(vset: SetOfVectors[N]): ListBuffer[Vector[N]] = {
-               val rows: ListBuffer[Vector[N]] = ListBuffer()
-               for(r <- 0 until numRows(vset)) rows += Vector(vset.columns.map(colVec => colVec.get(r)):_*)
-               rows
-          }
-
-          def getColumns(vset: SetOfVectors[N]): ListBuffer[Vector[N]] = ListBuffer(vset.columns:_*)
-          def getColumn(vset: SetOfVectors[N], colIndex: Int): Vector[N] = getColumns(vset)(colIndex)
-
-          //todo may not work if vec set doesn't work!
-          def set(vset: SetOfVectors[N], rowIndex: Int, colIndex:Int, value: N): Unit ={
-               vset.columns(colIndex).set(rowIndex)(value)
-          }
-
-          def numRows(vset: SetOfVectors[N]): Int = dimension(vset)
-          def numCols(vset: SetOfVectors[N]): Int = vset.columns.length*/
-
-
-
-          //todo put in implicit class
           def rowEchelon(vset: SetOfVectors[N]): SetOfVectors[N] = rref(vset, reduced = false)
 
           def rowReducedEchelon(vset: SetOfVectors[N]): SetOfVectors[N] = {
@@ -167,11 +127,13 @@ import SetVecLike._
 
 
 
-case class SetOfVectors[N: Number:Trig:Root:Absolute:Compare](private val cols: Vector[N]*) {
+case class SetOfVectors[N: Number:Trigonometric:Root:Absolute:Comparing](private val cols: Vector[N]*) {
 
-     var columns: Seq[Vector[N]] = Seq(cols:_*)
+     private val columns: Seq[Vector[N]] = Seq(cols:_*)
      val numRows: Int = this.dimension()
      val numCols: Int = columns.length
+
+     private val s = implicitly[Show[SetOfVectors[N]]]
 
      def copy(): SetOfVectors[N] = SetOfVectors(columns:_*)
      def copy(cols: Seq[Vector[N]]): SetOfVectors[N] = SetOfVectors(cols:_*)
@@ -200,7 +162,9 @@ case class SetOfVectors[N: Number:Trig:Root:Absolute:Compare](private val cols: 
      def get(rowIndex: Int, colIndex: Int): N = this.getRow(rowIndex).get(colIndex)
      def set(rowIndex: Int, colIndex:Int)(value: N): Unit = columns(colIndex).set(rowIndex)(value)
 
-     //tostring todo
+
+
+     override def toString: String = s.show(this)
 }
 
 
@@ -208,29 +172,29 @@ object SetOfVectors {
 
      //def apply[N: Number:Trig:Root:Absolute:Compare](cols: Vector[N]*): SetOfVectors[N] = new SetOfVectors(cols:_*)
 
-     def apply[N: Number:Trig:Root:Absolute:Compare](nr:Int, nc:Int): SetOfVectors[N] =
+     def apply[N: Number:Trigonometric:Root:Absolute:Comparing](nr:Int, nc:Int): SetOfVectors[N] =
           new SetOfVectors(Vector(Seq.fill[N](nr * nc)(Number.ZERO[N]):_*))
 
-     def ZERO[N: Number:Trig:Root:Absolute:Compare](numCols: Int, numRows: Int): SetOfVectors[N] =
+     def ZERO[N: Number:Trigonometric:Root:Absolute:Comparing](numCols: Int, numRows: Int): SetOfVectors[N] =
           SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number.ZERO[N]):_*)
 
-     def ONE[N: Number:Trig:Root:Absolute:Compare](numCols: Int, numRows: Int): SetOfVectors[N] =
+     def ONE[N: Number:Trigonometric:Root:Absolute:Comparing](numCols: Int, numRows: Int): SetOfVectors[N] =
           SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number.ONE[N]):_*)
 
-     def IDENTITY[N: Number:Trig:Root:Absolute:Compare](size: Int)
-                                                       (implicit ev: SetVecLike[SetOfVectors[N], N]):SetOfVectors[N] =
+     def IDENTITY[N: Number:Trigonometric:Root:Absolute:Comparing](size: Int)
+                                                                  (implicit ev: SetVecLike[SetOfVectors[N], N]):SetOfVectors[N] =
           ev.identity(size)
 
-     def IDENTITY[N: Number:Trig:Root:Absolute:Compare](vset: SetOfVectors[N])
-                                                       (implicit ev: SetVecLike[SetOfVectors[N], N],
+     def IDENTITY[N: Number:Trigonometric:Root:Absolute:Comparing](vset: SetOfVectors[N])
+                                                                  (implicit ev: SetVecLike[SetOfVectors[N], N],
                                                         dim: Dimension[SetOfVectors[N]]): SetOfVectors[N] =
           ev.identity(vset.dimension())
 
-     def fromSeqs[N: Number:Trig:Root:Absolute:Compare](seqs: Seq[N]*): SetOfVectors[N] =
+     def fromSeqs[N: Number:Trigonometric:Root:Absolute:Comparing](seqs: Seq[N]*): SetOfVectors[N] =
           SetOfVectors(seqs.map(aSeq => Vector(aSeq:_*)):_*)
 
      //assume data is along column
-     def fromSingleSeq[N: Number:Trig:Root:Absolute:Compare](numRows: Int, numCols: Int, seq: Seq[N]): SetOfVectors[N] =
+     def fromSingleSeq[N: Number:Trigonometric:Root:Absolute:Comparing](numRows: Int, numCols: Int, seq: Seq[N]): SetOfVectors[N] =
           fromSeqs(seq.grouped(numCols).toList:_*) //.toList.map(_.toList)
 
 }

@@ -49,12 +49,21 @@ object Util {
                (double * factor).round / factor
           }
 
-          def getNonZeroRows[N:Number:Trig:Root:Absolute:Compare](vset: SetOfVectors[N]): Seq[Vector[N]] =
+          def getNonZeroRows[N:Number:Trigonometric:Root:Absolute:Comparing](vset: SetOfVectors[N]): Seq[Vector[N]] =
                vset.getRows().filterNot(row => row.isZero)
 
-          def attach[N:Number](v: Vector[N], w: Vector[N]): Vector[N] = Vector((v.elements ++ w.elements):_*)
+          def lengthCombine[N:Number:Trigonometric:Root:Absolute:Comparing](v: Vector[N], w: Vector[N]): Vector[N] =
+               Vector((v.getElements() ++ w.getElements()):_*)
 
-          def ensureSize[N:Number](v: Vector[N], w: Vector[N], SIZE: Int = 0)(implicit d: Dimension[Vector[N]]): Unit = {
+          def colCombine[N:Number:Trigonometric:Root:Absolute:Comparing](v: Vector[N], w: Vector[N]): SetOfVectors[N] =
+               SetOfVectors(v, w)
+
+          def colCombine[N:Number:Trigonometric:Root:Absolute:Comparing](vset: SetOfVectors[N],
+                                                                         wset: SetOfVectors[N]): SetOfVectors[N] =
+               SetOfVectors((vset.getColumns() ++ wset.getColumns()):_*)
+
+          def ensureSize[N:Number:Trigonometric:Root:Absolute:Comparing](v: Vector[N], w: Vector[N],
+                                                                         SIZE: Int = 0): Unit = {
 
                val caseVectorsAreDifferentSize: Boolean = (SIZE == 0 || SIZE < 0) && (v.dimension() != w.dimension())
                val caseVectorsAreDifferentThanSpecificSize: Boolean = SIZE != v.dimension() || SIZE != w.dimension()
@@ -64,7 +73,7 @@ object Util {
                }
           }
 
-          def ensureSize[N:Number:Trig:Root:Absolute:Compare](vset: SetOfVectors[N], wset: SetOfVectors[N]): Unit = {
+          def ensureSize[N:Number:Trigonometric:Root:Absolute:Comparing](vset: SetOfVectors[N], wset: SetOfVectors[N]): Unit = {
 
                if(vset.numRows != wset.numRows || vset.numCols != wset.numCols) {
                     throw VectorLikeSizeException("SetOfVectors are not same size; cannot continue operation.")
@@ -80,9 +89,9 @@ object Util {
             * @param factor The scale factor (amount to be multiplied by)
             * @return The new Matrix with the row scaled
             */
-          def scaleRow[N:Number:Trig:Root:Absolute:Compare](row: Int, factor: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
+          def scaleRow[N:Number:Trigonometric:Root:Absolute:Comparing](row: Int, factor: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
 
-               val rowMat: Seq[N] = vset.getRows().reduceLeft((accRow, yRow) => attach(accRow, yRow)).toSeq
+               val rowMat: Seq[N] = vset.getRows().reduceLeft((accRow, yRow) => lengthCombine(accRow, yRow)).getElements()
 
                for (i <- row * vset.numCols until ((row + 1) * vset.numCols)) {
                     rowMat(i) = rowMat(i) * factor
@@ -101,8 +110,8 @@ object Util {
             * @param scale The scale factor.
             * @return A new matrix, with the columns changed appropriately.
             */
-          def sumRows[N:Number:Trig:Root:Absolute:Compare](rowA: Int, rowB: Int, scale: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
-               val oldMatList: Seq[N] = vset.getRows().reduceLeft((accRow, yRow) => attach(accRow, yRow)).toSeq
+          def sumRows[N:Number:Trigonometric:Root:Absolute:Comparing](rowA: Int, rowB: Int, scale: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
+               val oldMatList: Seq[N] = vset.getRows().reduceLeft((accRow, yRow) => lengthCombine(accRow, yRow)).getElements()
                val newMatList: Seq[N] = oldMatList
                for (i <- 0 until vset.numCols) { // for each value in rowA
                     newMatList(rowA * vset.numCols + i) += oldMatList(rowB * vset.numCols + i) * scale //
@@ -121,8 +130,8 @@ object Util {
             * @param scale The scale factor.
             * @return A new matrix, with the columns changed appropriately.
             */
-          def sumCols[N:Number:Trig:Root:Absolute:Compare](colA: Int, colB: Int, scale: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
-               val oldMatList: Seq[N] = vset.getColumns().reduceLeft((accCol, yCol) => attach(accCol, yCol)).toSeq
+          def sumCols[N:Number:Trigonometric:Root:Absolute:Comparing](colA: Int, colB: Int, scale: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
+               val oldMatList: Seq[N] = vset.getColumns().reduceLeft((accCol, yCol) => lengthCombine(accCol, yCol)).getElements()
                val newMatList: Seq[N] = oldMatList
                for (i <- 0 until vset.numRows) { // for each value in rowA
                     newMatList(colA * vset.numRows + i) += oldMatList(colB * vset.numRows + i) * scale //
@@ -138,7 +147,7 @@ object Util {
             * @param rowB Second Row to be swapped
             * @return A matrix with rows A and B swapped.
             */
-          def swapRows[N:Number:Trig:Root:Absolute:Compare](rowA: Int, rowB: Int, vset: SetOfVectors[N]): SetOfVectors[N] = {
+          def swapRows[N:Number:Trigonometric:Root:Absolute:Comparing](rowA: Int, rowB: Int, vset: SetOfVectors[N]): SetOfVectors[N] = {
                val rows: Seq[Vector[N]] = vset.getRows()
                //swapping
                val temp: Vector[N] = rows(rowA)
@@ -148,7 +157,7 @@ object Util {
                SetOfVectors(expressRowsAsCols[N](rows): _*)
           }
 
-          def swapCols[N:Number:Trig:Root:Absolute:Compare](colA: Int, colB: Int, vset: SetOfVectors[N]): SetOfVectors[N] = {
+          def swapCols[N:Number:Trigonometric:Root:Absolute:Comparing](colA: Int, colB: Int, vset: SetOfVectors[N]): SetOfVectors[N] = {
                val cols: Seq[Vector[N]] = vset.getColumns()
                //swapping
                val temp: Vector[N] = cols(colA)
@@ -158,7 +167,7 @@ object Util {
                SetOfVectors(cols: _*)
           }
 
-          def seqToVecSet[N:Number:Trig:Root:Absolute:Compare](seq: N*): SetOfVectors[N] = {
+          def seqToVecSet[N:Number:Trigonometric:Root:Absolute:Comparing](seq: N*): SetOfVectors[N] = {
                val vset = SetOfVectors[N](seq.length, 0)
                for (i <- 0 until seq.length) vset.set(i, 0)(seq(i))
                vset
@@ -168,12 +177,12 @@ object Util {
 
 
           //precondition: expects the rref to come from undetermined system -- used for Solver
-          def getIndicesOfFreeColumns[N:Number:Trig:Root:Absolute:Compare](rref: SetOfVectors[N]): Array[Int] = {
-               def countNonZero(v: Vector[N]): Int = v.toList.count(e => e != 0)
+          def getIndicesOfFreeColumns[N:Number:Trigonometric:Root:Absolute:Comparing](rref: SetOfVectors[N]): Array[Int] = {
+               def countNonZero(v: Vector[N]): Int = v.getElements().count(e => e != 0)
 
                //assumes we only have a single element in the vector
                def itsSingleElemIsNotOne(v: Vector[N]): Boolean = countNonZero(v) == 1 &&
-                    v.toList.exists(e => e != 1 && e != 0)
+                    v.getElements().exists(e => e != 1 && e != 0)
 
                val vecIndexPair: Seq[(Vector[N], Int)] = rref.getColumns().zipWithIndex
 
@@ -189,7 +198,7 @@ object Util {
                indices2
           }
 
-          def expressRowsAsCols[N:Number:Trig:Root:Absolute:Compare](rows: Seq[Vector[N]]): Seq[Vector[N]] = {
+          def expressRowsAsCols[N:Number:Trigonometric:Root:Absolute:Comparing](rows: Seq[Vector[N]]): Seq[Vector[N]] = {
                //converting from row to col representation
                val ncol: Int = rows.head.dimension()
                val nrow: Int = rows.length
@@ -201,19 +210,9 @@ object Util {
                colBuff.map(buff => new Vector(buff: _*))
           }
 
-          /*def expressRowsAsCols[N:Number:Trig:Root:Absolute:Compare](rows: List[List[N]]): List[List[N]] = {
-               val result = expressRowsAsCols(Seq(rows.map(list => seqToVec(list)): _*))
-               result.map(vec => vec.toList).toList
-          }*/
-
-          def expressColsAsRows[N:Number:Trig:Root:Absolute:Compare](cols: Seq[Vector[N]]): Seq[Vector[N]] = {
+          def expressColsAsRows[N:Number:Trigonometric:Root:Absolute:Comparing](cols: Seq[Vector[N]]): Seq[Vector[N]] = {
                expressRowsAsCols(cols)
           }
-
-          /*def expressColsAsRows[N:Number:Trig:Root:Absolute:Compare](cols: List[List[N]]): List[List[N]] = {
-               val result = expressColsAsRows(Seq(cols.map(list => seqToVec(list)): _*))
-               result.map(vec => vec.toList).toList
-          }*/
      }
 }
 

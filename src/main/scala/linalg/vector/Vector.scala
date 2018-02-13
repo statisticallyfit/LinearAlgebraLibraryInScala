@@ -41,6 +41,7 @@ trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
      def crossProduct(v: V, w: V): Option[V]  //maybe won't work
      def outerProduct(v: V, w: V): SetOfVectors[F]
 
+     def projection(v: V, onto: V): V
      /*def get(v: V, i: Int): F
      def set(v: V, i: Int, value: F): Unit
      def toList(v: V): List[F]
@@ -50,7 +51,7 @@ trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
 
 object VectorLike {
 
-     implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root: Absolute] = new VectorLike[Vector[N], N]
+     implicit def VectorIsVectorLike[N: Number: Trigonometric: Root: Absolute: Comparing] = new VectorLike[Vector[N], N]
           with Dimension[Vector[N]] with Eq[Vector[N]] /*with Span[Vector[N], N]*/ {
 
           /*implicit val vectorSpaceHasDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
@@ -59,27 +60,28 @@ object VectorLike {
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
 
-
           /** Eq part */
-          def eqv(v: Vector[N], w: Vector[N]): Boolean = v.elements == w.elements
+          def eqv(v: Vector[N], w: Vector[N]): Boolean = v.getElements() == w.getElements()
 
           /** VectorLike part */
           def plus(v: Vector[N], w: Vector[N]): Vector[N] ={
                Util.Gen.ensureSize(v, w)
-               Vector(v.elements.zip(w.elements).map(pair => pair._1 + pair._2):_*)
+               Vector(v.getElements().zip(w.getElements()).map(pair => pair._1 + pair._2):_*)
           }
 
-          def negate(v: Vector[N]): Vector[N] = Vector(v.elements.map(e => e.negate()):_*)
+          def negate(v: Vector[N]): Vector[N] = Vector(v.getElements().map(e => e.negate()):_*)
 
-          def scale(v: Vector[N], factor: N): Vector[N] = Vector(v.elements.map(e => e * factor):_*)
+          def scale(v: Vector[N], factor: N): Vector[N] = Vector(v.getElements().map(e => e * factor):_*)
 
-          def isZero(v: Vector[N]): Boolean = v.elements.forall(e => e :==: Number.ZERO[N])
+          def isZero(v: Vector[N]): Boolean = v.getElements().forall(e => e :==: Number.ZERO[N])
+
+          def projection(v: Vector[N], onto: Vector[N]): Vector[N] = scale(onto,  innerProduct(v, onto) / norm(onto))
 
           def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = {
                Util.Gen.ensureSize(v, w)
 
-               val as: Seq[N] = v.elements
-               val bs: Seq[N] = w.elements
+               val as: Seq[N] = v.getElements()
+               val bs: Seq[N] = w.getElements()
 
                val result: Seq[Seq[N]] = as.map(a => bs.map(b => a * b))
 
@@ -88,7 +90,7 @@ object VectorLike {
 
           def innerProduct(v: Vector[N], w: Vector[N]): N = {
                Util.Gen.ensureSize(v, w)
-               v.elements.zip(w.elements).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
+               v.getElements().zip(w.getElements()).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
           }
 
           def crossProduct(u: Vector[N], v: Vector[N]): Option[Vector[N]] = {
@@ -106,9 +108,9 @@ object VectorLike {
           def angle(v: Vector[N], w: Vector[N]): N = innerProduct(v, w) / (norm(v) * norm(w)).arccos()
 
           def norm(v: Vector[N])(implicit f: Field[N]): N =
-               v.elements.map(e => e ^ Number.TWO[N]).reduceLeft(_ + _)
+               v.getElements().map(e => e ^ Number.TWO[N]).reduceLeft(_ + _)
 
-          def dimension(v: Vector[N]): Int = v.elements.length
+          def dimension(v: Vector[N]): Int = v.getElements().length
 
           /*def get(v: Vector[N], i: Int): N = v.elements(i)
           //def set(v: Vector[N], i: Int, value: N): Unit = ListBuffer(v.elements:_*)(i) = value  //todo check if sticks
@@ -122,19 +124,20 @@ object VectorLike {
 
 
 
-case class Vector[N: Number](private val elems: N*){
+case class Vector[N: Number:Trigonometric:Root:Absolute:Comparing](private val elems: N*){
 
-     var elements: Seq[N] = Seq(elems:_*)
+     private val elements: Seq[N] = Seq(elems:_*)
 
      def copy(): Vector[N] = Vector(elements:_*)
      def copy(es: Seq[N]): Vector[N] = Vector(es:_*)
 
      def set(index: Int)(value: N): Unit = elements(index) = value
      def get(index: Int): N = elements(index)
-     def toList: List[N] = elements.toList
-     def toSeq: Seq[N] = Seq(elements:_*)
+     def getElements(): Seq[N] = Seq(elements:_*)
+     /*def toList: List[N] = elements.toList
+     def toSeq: Seq[N] = Seq(elements:_*)*/
 
-     override def toString: String = Vector(elements:_*).show
+     override def toString: String = this.asInstanceOf[Vector[N]].show
 }
 
 
