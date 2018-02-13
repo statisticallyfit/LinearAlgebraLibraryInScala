@@ -55,7 +55,28 @@ object NumberSyntax {
      }
 
 
-     implicit class NumberOps[N[_], R: RealNumber](current: N[R])(implicit number: Number[N[R], R]){
+     implicit class NumberOps[N](current: N)(implicit number: Number[N]){
+
+          //type RE <: RealNumber[RE]
+          type REAL = number.RE
+          //type REAL = RE forSome {type RE = RealNumber[RE]}
+
+          private val _root: _Root[N, REAL] = number._root
+          private val _abs: _Absolute[N, REAL] = number._abs
+
+          // Root stuff
+          def ^(exp: REAL): N = _root.power(current, exp)
+          def sqrt(): N = _root.squareRoot(current)
+          def nRoot(n: REAL): N = _root.nRoot(current, n)
+
+          // Absolute stuff
+          def abs(): REAL = _abs.absoluteValue(current)
+     }
+     Complex(1,2).nRoot(2)
+     Complex[Double](-1, 2).abs()
+
+     //note for use when Number[N, R]
+     /*implicit class NumberOps[N[_], R: RealNumber](current: N[R])(implicit number: Number[N[R], R]){
           private val _root = number._root
           private val _abs = number._abs
 
@@ -66,7 +87,7 @@ object NumberSyntax {
 
           // Absolute stuff
           def abs(): R = _abs.absoluteValue(current)
-     }
+     }*/
 
 
 
@@ -82,44 +103,4 @@ object NumberSyntax {
           // Absolute stuff
           def abs(): R = ab.absoluteValue(current)
      }
-//
-//     //note: can only use number.power(...) if we get Number[N] extends _Root... to work properly..
-//     implicit class NumberOps[N, R:RealNumber](current: N)(implicit number: Number[N],
-//                                                      root0: _Root[N, R],
-//                                                      ab: _Absolute[N, R]){
-//
-//          // Root stuff
-//          def ^(exp: R): N = root0.power(current, exp)
-//          def sqrt(): N = root0.squareRoot(current)
-//          def nRoot(n: R): N = root0.nRoot(current, n)
-//
-//          // Absolute stuff
-//          def abs(): R = ab.absoluteValue(current)
-//     }
-//     Complex(1,2).abs()
-//
-//     implicit class RealNumberOps[R: RealNumber](current: R)(implicit real: RealNumber[R]){
-//          //Root stuff
-//          def ^(exp: R): R = real.power(current, exp)
-//          def sqrt(): R = real.squareRoot(current)
-//          def nRoot(n: R): R = real.nRoot(current, n)
-//
-//          //Absolute stuff
-//          def abs(): R = real.absoluteValue(current)
-//     }
-//     Rational(2) ^ Rational(2)
-
-     /*implicit class NumberOps[N](current: N)(implicit number: Number[N])  {
-
-          def +(other: N): N = number.plus(current, other)
-          def -(other: N): N = number.minus(current, other)
-          def *(other: N): N = number.times(current, other)
-          def /(other: N): N = number.divide(current, other)
-          def negate(): N = number.negate(current)
-          def inverse(): N = number.inverse(current)
-          def isZero: Boolean = number.isZero(current)
-          def isNegative: Boolean = number.isNegative(current)
-          def toDouble: Double = number.doubleValue(current)
-          def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!
-     }*/
 }

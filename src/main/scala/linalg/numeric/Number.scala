@@ -137,12 +137,14 @@ private[linalg] trait NumberLike[N] extends Field[N] /*with Trig[N] with Compara
 }
 
 
-trait Number[N, R] extends NumberLike[N]  /*with _Root[Number[N], N] with _Absolute[Number[N], N] */ { self =>
+trait Number[N] extends NumberLike[N]  /*with _Root[Number[N], N] with _Absolute[Number[N], N] */ { self =>
 
      //val selfNumber: Number[N, R] = self
 
-     implicit def _root: _Root[N, R]
-     implicit def _abs: _Absolute[N, R]
+     type RE = RealNumber[RE]
+
+     implicit def _root: _Root[N, RE]
+     implicit def _abs: _Absolute[N, RE]
 
      /*override implicit def numLikeHasTrig: Trig[N] = selfNumLike.numLikeHasTrig
      override implicit def numLikeHasCompare: Compare[N] = selfNumLike.numLikeHasCompare*/
@@ -168,16 +170,19 @@ trait RealNumber[R] extends NumberLike[R] /*with Root[R] with Absolute[R]*/ {
 
 object Number {
 
-     def ZERO[N, R](implicit gen: Number[N, R]): N = gen.zero
-     def ONE[N, R](implicit gen: Number[N, R]): N = gen.one
-     def TWO[N, R](implicit gen: Number[N, R]): N = gen.two
+     def ZERO[N: Number](implicit gen: Number[N]): N = gen.zero
+     def ONE[N: Number](implicit gen: Number[N]): N = gen.one
+     def TWO[N: Number](implicit gen: Number[N]): N = gen.two
+     /*def ZERO[N, R:RealNumber](implicit gen: Number[N, R]): N = gen.zero
+     def ONE[N, R:RealNumber](implicit gen: Number[N, R]): N = gen.one
+     def TWO[N, R:RealNumber](implicit gen: Number[N, R]): N = gen.two*/
 
 
 
      //note: need to keep rr and pos as base 0 types not Root[R] since otherwise
      // note: the tests below don't work
 
-     implicit def ComplexIsNumber[R: RealNumber] = new Number[Complex[R], R] {
+     implicit def ComplexIsNumber[R: RealNumber] = new Number[Complex[R]] {
           /*with _Root[Complex[R],R] with _Absolute[Complex[R], R]*/
           /*with Compare[Complex[R]] with _Root[Complex[R],R] with _Absolute[Complex[R], R] with Trig[Complex[R]]*/
 
@@ -207,7 +212,7 @@ object Number {
 
 
           /** Root part */
-          implicit def _root: _Root[Complex[R], R] = new _Root[Complex[R], R]{
+          implicit def _root: _Root[Complex[R], R] = new _Root[Complex[R], R] {
                val rOne: R = realLike.one
                val rTwo: R = realLike.two
                def power(base: Complex[R], exp: R): Complex[R] =
