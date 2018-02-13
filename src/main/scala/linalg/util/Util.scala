@@ -4,11 +4,13 @@ package linalg.util
 
 import linalg.numeric._
 import linalg.vector._
+import linalg.theory.basis.Dimension
 import linalg.syntax.NumberSyntax._
 import linalg.vector.VectorLike._
 import linalg.syntax.DimensionSyntax._
 import linalg.syntax.VectorLikeSyntax._
 import linalg.syntax.SetVecLikeSyntax._
+import linalg.util.Exception.VectorLikeSizeException
 import linalg.vector.SetVecLike._
 
 import scala.collection.mutable.ListBuffer
@@ -19,11 +21,11 @@ import scala.collection.mutable.ListBuffer
 
 object Util {
 
-     trait SizeChecker[V] {
+     /*trait SizeChecker[V] {
           def ensureSize(v: V, w: V, SIZE: Int = 0): Unit //throw exception
-     }
+     }*/
 
-     object GenOps {
+     object Gen {
 
           /**
             * Inserts element at position i, leaving list the same length as before.
@@ -47,8 +49,28 @@ object Util {
                (double * factor).round / factor
           }
 
+          def getNonZeroRows[N:Number:Trig:Root:Absolute:Compare](vset: SetOfVectors[N]): ListBuffer[Vector[N]] =
+               vset.getRows().filterNot(row => row.isZero)
 
           def attach[N:Number](v: Vector[N], w: Vector[N]): Vector[N] = Vector((v.elements ++ w.elements):_*)
+
+          def ensureSize[N:Number](v: Vector[N], w: Vector[N], SIZE: Int = 0)(implicit d: Dimension[Vector[N]]): Unit = {
+
+               val caseVectorsAreDifferentSize: Boolean = (SIZE == 0 || SIZE < 0) && (v.dimension() != w.dimension())
+               val caseVectorsAreDifferentThanSpecificSize: Boolean = SIZE != v.dimension() || SIZE != w.dimension()
+
+               if(caseVectorsAreDifferentSize || caseVectorsAreDifferentThanSpecificSize){
+                    throw VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
+               }
+          }
+
+          def ensureSize[N:Number:Trig:Root:Absolute:Compare](vset: SetOfVectors[N], wset: SetOfVectors[N]): Unit = {
+
+               if(vset.numRows != wset.numRows || vset.numCols != wset.numCols) {
+                    throw VectorLikeSizeException("SetOfVectors are not same size; cannot continue operation.")
+               }
+          }
+
           /**
             * Scales a row of a matrix.
             *
@@ -61,7 +83,7 @@ object Util {
           def scaleRow[N:Number:Trig:Root:Absolute:Compare](row: Int, factor: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
 
                val rowMat: ListBuffer[N] = vset.getRows().reduceLeft((accRow, yRow) => attach(accRow, yRow))
-                    .toBuff
+                    .toSeq
 
                for (i <- row * vset.numCols until ((row + 1) * vset.numCols)) {
                     rowMat(i) = rowMat(i) * factor
@@ -82,7 +104,7 @@ object Util {
             */
           def sumRows[N:Number:Trig:Root:Absolute:Compare](rowA: Int, rowB: Int, scale: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
                val oldMatList: ListBuffer[N] = vset.getRows().reduceLeft((accRow, yRow) => attach(accRow, yRow))
-                    .toBuff
+                    .toSeq
                val newMatList: ListBuffer[N] = oldMatList
                for (i <- 0 until vset.numCols) { // for each value in rowA
                     newMatList(rowA * vset.numCols + i) += oldMatList(rowB * vset.numCols + i) * scale //
@@ -103,7 +125,7 @@ object Util {
             */
           def sumCols[N:Number:Trig:Root:Absolute:Compare](colA: Int, colB: Int, scale: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
                val oldMatList: ListBuffer[N] = vset.getColumns().reduceLeft((accCol, yCol) => attach(accCol, yCol))
-                    .toBuff
+                    .toSeq
                val newMatList: ListBuffer[N] = oldMatList
                for (i <- 0 until vset.numRows) { // for each value in rowA
                     newMatList(colA * vset.numRows + i) += oldMatList(colB * vset.numRows + i) * scale //

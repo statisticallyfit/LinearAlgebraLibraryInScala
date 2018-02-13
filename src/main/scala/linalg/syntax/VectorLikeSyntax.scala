@@ -27,11 +27,11 @@ object VectorLikeSyntax {
           def angle(other: V[N]): N = vecLike.angle(current, other)
           def crossProduct(other: V[N]): Option[V[N]] = vecLike.crossProduct(current, other)
           def outerProduct(other: V[N]): SetOfVectors[N]= vecLike.outerProduct(current, other)
-          def isZero(): Boolean = vecLike.isZero(current)
-          def get(i: Int): N = vecLike.get(current, i)
+          def isZero: Boolean = vecLike.isZero(current)
+          /*def get(i: Int): N = vecLike.get(current, i)
           def set(i: Int, value: N): Unit = vecLike.set(current, i, value)
           def toList: List[N] = vecLike.toList(current)
-          def toBuff: ListBuffer[N] = vecLike.toBuff(current)
+          def toBuff: ListBuffer[N] = vecLike.toBuff(current)*/
 
           /** Inner product space */
           def innerProduct(other: V[N]): N = vecLike.innerProduct(current, other)

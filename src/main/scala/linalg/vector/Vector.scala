@@ -13,12 +13,11 @@ import linalg.syntax.ShowSyntax._
 import linalg.syntax.CompareSyntax._
 import linalg.syntax.VectorLikeSyntax._
 import linalg.syntax.VectorSpaceSyntax._
-import linalg.util.Exception._
-import linalg.util.Util.SizeChecker
+import linalg.util.Util
 
 import cats.Eq
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, Seq}
 import scala.language.implicitConversions
 import scala.language.higherKinds
 
@@ -42,17 +41,17 @@ trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
      def crossProduct(v: V, w: V): Option[V]  //maybe won't work
      def outerProduct(v: V, w: V): SetOfVectors[F]
 
-     def get(v: V, i: Int): F
+     /*def get(v: V, i: Int): F
      def set(v: V, i: Int, value: F): Unit
      def toList(v: V): List[F]
-     def toBuff(v: V): ListBuffer[F]
+     def toBuff(v: V): ListBuffer[F]*/
 }
 
 
 object VectorLike {
 
      implicit def VectorIsVectorLike[N: Number: Trig: Compare: Root: Absolute] = new VectorLike[Vector[N], N]
-          with Dimension[Vector[N]] with Eq[Vector[N]] with SizeChecker[Vector[N]] /*with Span[Vector[N], N]*/ {
+          with Dimension[Vector[N]] with Eq[Vector[N]] /*with Span[Vector[N], N]*/ {
 
           /*implicit val vectorSpaceHasDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
                def dimension(v: Vector[N]): Int = v.elements.length
@@ -60,22 +59,13 @@ object VectorLike {
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
 
-          def ensureSize(v: Vector[N], w: Vector[N], SIZE: Int = 0): Unit = {
-
-               val caseVectorsAreDifferentSize: Boolean = (SIZE == 0 || SIZE < 0) && (dimension(v) != dimension(w))
-               val caseVectorsAreDifferentThanSpecificSize: Boolean = SIZE != dimension(v) || SIZE != dimension(w)
-
-               if(caseVectorsAreDifferentSize || caseVectorsAreDifferentThanSpecificSize){
-                    throw VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
-               }
-          }
 
           /** Eq part */
           def eqv(v: Vector[N], w: Vector[N]): Boolean = v.elements == w.elements
 
           /** VectorLike part */
           def plus(v: Vector[N], w: Vector[N]): Vector[N] ={
-               ensureSize(v, w)
+               Util.Gen.ensureSize(v, w)
                Vector(v.elements.zip(w.elements).map(pair => pair._1 + pair._2):_*)
           }
 
@@ -86,7 +76,7 @@ object VectorLike {
           def isZero(v: Vector[N]): Boolean = v.elements.forall(e => e :==: Number.ZERO[N])
 
           def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = {
-               ensureSize(v, w)
+               Util.Gen.ensureSize(v, w)
 
                val as: Seq[N] = v.elements
                val bs: Seq[N] = w.elements
@@ -97,16 +87,16 @@ object VectorLike {
           }
 
           def innerProduct(v: Vector[N], w: Vector[N]): N = {
-               ensureSize(v, w)
+               Util.Gen.ensureSize(v, w)
                v.elements.zip(w.elements).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
           }
 
           def crossProduct(u: Vector[N], v: Vector[N]): Option[Vector[N]] = {
 
                if(dimension(u) == 3 && dimension(v) == 3){
-                    val w1: N = (get(u,2) * get(v,3)) - (get(u,3) * get(v,2))
-                    val w2: N = (get(u,3) * get(v,1)) - (get(u,1) * get(v,3))
-                    val w3: N = (get(u,1) * get(v,2)) - (get(u,2) * get(v,1))
+                    val w1: N = (u.get(2) * v.get(3)) - (u.get(3) * v.get(2))
+                    val w2: N = (u.get(3) * v.get(1)) - (u.get(1) * v.get(3))
+                    val w3: N = (u.get(1) * v.get(2)) - (u.get(2) * v.get(1))
 
                     Some(Vector(w1, w2, w3))
 
@@ -120,11 +110,11 @@ object VectorLike {
 
           def dimension(v: Vector[N]): Int = v.elements.length
 
-          def get(v: Vector[N], i: Int): N = v.elements(i)
-          def set(v: Vector[N], i: Int, value: N): Unit = ListBuffer(v.elements:_*)(i) = value  //todo check if sticks
+          /*def get(v: Vector[N], i: Int): N = v.elements(i)
+          //def set(v: Vector[N], i: Int, value: N): Unit = ListBuffer(v.elements:_*)(i) = value  //todo check if sticks
 
           def toList(v: Vector[N]): List[N] = v.elements.toList
-          def toBuff(v: Vector[N]): ListBuffer[N] = ListBuffer(toList(v):_*)
+          def toBuff(v: Vector[N]): ListBuffer[N] = ListBuffer(toList(v):_*)*/
      }
 }
 
@@ -132,7 +122,17 @@ object VectorLike {
 
 
 
-class Vector[N: Number](val elements: N*){
+case class Vector[N: Number](private val elems: N*){
+
+     var elements: Seq[N] = Seq(elems:_*)
+
+     def copy(): Vector[N] = Vector(elements:_*)
+     def copy(es: Seq[N]): Vector[N] = Vector(es:_*)
+
+     def set(index: Int)(value: N): Unit = elements(index) = value
+     def get(index: Int): N = elements(index)
+     def toList(v: Vector[N]): List[N] = v.elements.toList
+     def toSeq(v: Vector[N]): Seq[N] = ListBuffer(toList(v):_*)
 
      override def toString: String = Vector(elements:_*).show
 }
@@ -143,7 +143,7 @@ object Vector {
      def ZERO[N: Number](len: Int): Vector[N] = Vector(List.fill[N](len)(Number.ZERO[N]):_*)
      def ONE[N: Number](len: Int): Vector[N] = Vector(List.fill[N](len)(Number.ONE[N]):_*)
 
-     def apply[N: Number](elems: N*): Vector[N] = new Vector(elems:_*)
+     //def apply[N: Number](elems: N*): Vector[N] = new Vector(elems:_*)
 }
 
 
@@ -162,7 +162,7 @@ object VectorTester extends App {
      println(v1.negate())
      println(v1 + v2)
      println(Vector(2,3,4) + Vector(-2, 3, -6))
-     println(v1.isZero())
+     println(v1.isZero)
      println(v1.dotProduct(v2))
      println(v1.norm())
      println(v1.isNormalized())
