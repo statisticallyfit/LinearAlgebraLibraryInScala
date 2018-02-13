@@ -26,8 +26,8 @@ object NumberSyntax {
           def toInt: Int = numLike.doubleValue(current).toInt // todo check this can be chopped off!
 
           // ---------------------------------------------------------------------------
-          private val trig: Trigonometric[N] = numLike.numLikeHasTrig
-          private val comp: Comparing[N] = numLike.numLikeHasCompare
+          private val trig: Trigonometric[N] = numLike.trig
+          private val comp: Comparing[N] = numLike.compare
 
           // Trig stuff
           def sin(): N = trig.sin(current)
@@ -42,6 +42,7 @@ object NumberSyntax {
           def arccsc(): N = trig.arccsc(current)
           def arcsec(): N = trig.arcsec(current)
           def arccot(): N = trig.arccot(current)
+          def theta(x: N): N = trig.theta(current, x)
 
           //Compare stuff
           def :==:(other: N): Boolean = comp.equal(current, other)
@@ -54,9 +55,9 @@ object NumberSyntax {
      }
 
 
-     implicit class NumberOps[N[_], R: Field](current: N[R])(implicit number: Number[N[R], R]){
-          private val _root = number.numberHasRoot
-          private val _abs = number.numberHasAbsoluteValue
+     implicit class NumberOps[N[_], R: RealNumber](current: N[R])(implicit number: Number[N[R], R]){
+          private val _root = number._root
+          private val _abs = number._abs
 
           // Root stuff
           def ^(exp: R): N[R] = _root.power(current, exp)
@@ -66,11 +67,12 @@ object NumberSyntax {
           // Absolute stuff
           def abs(): R = _abs.absoluteValue(current)
      }
-     Complex(1,2).nRoot(2)
 
-     implicit class RealNumberOps[R: RealNumber](current: R)(implicit realNum: RealNumber[R]) {
-          private val root: Root[R] = realNum.realNumHasRoot
-          private val ab: Absolute[R] = realNum.realNumHasAbsoluteValue
+
+
+     implicit class RealNumberOps[R](current: R)(implicit realNum: RealNumber[R]) {
+          private val root: Root[R] = realNum.root
+          private val ab: Absolute[R] = realNum.abs
 
           //Root stuff
           def ^(exp: R): R = root.power(current, exp)

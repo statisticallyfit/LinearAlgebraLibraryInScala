@@ -3,13 +3,13 @@ package linalg.numeric
 
 import linalg.show.Show._
 import linalg.theory._
-import linalg.syntax.AbsoluteSyntax._
-import linalg.syntax.CompareSyntax._
 import linalg.syntax.NumberSyntax._
-import linalg.syntax.RootSyntax._
 import linalg.syntax.ShowSyntax._
-import linalg.syntax.TrigSyntax._
 import linalg.numeric.NumericConversion._
+/*import linalg.syntax.AbsoluteSyntax._
+import linalg.syntax.CompareSyntax._
+import linalg.syntax.RootSyntax._
+import linalg.syntax.TrigSyntax._*/
 
 
 import org.apache.commons.lang3.math.Fraction
@@ -114,7 +114,7 @@ trait Trigonometric[T] {
 
 private[linalg] trait NumberLike[N] extends Field[N] /*with Trig[N] with Comparable[N]*/ { self =>
 
-     val selfNumLike: NumberLike[N] = self
+     //val selfNumLike: NumberLike[N] = self
 
      val zero: N
      val one: N
@@ -132,17 +132,17 @@ private[linalg] trait NumberLike[N] extends Field[N] /*with Trig[N] with Compara
      def doubleValue(x: N): Double
 
 
-     implicit def numLikeHasTrig: Trigonometric[N]
-     implicit def numLikeHasCompare: Comparing[N]
+     implicit def trig: Trigonometric[N]
+     implicit def compare: Comparing[N]
 }
 
 
 trait Number[N, R] extends NumberLike[N]  /*with _Root[Number[N], N] with _Absolute[Number[N], N] */ { self =>
 
-     val selfNumber: Number[N, R] = self
+     //val selfNumber: Number[N, R] = self
 
-     implicit def numberHasRoot: _Root[N, R]
-     implicit def numberHasAbsoluteValue: _Absolute[N, R]
+     implicit def _root: _Root[N, R]
+     implicit def _abs: _Absolute[N, R]
 
      /*override implicit def numLikeHasTrig: Trig[N] = selfNumLike.numLikeHasTrig
      override implicit def numLikeHasCompare: Compare[N] = selfNumLike.numLikeHasCompare*/
@@ -153,8 +153,8 @@ trait Number[N, R] extends NumberLike[N]  /*with _Root[Number[N], N] with _Absol
 
 trait RealNumber[R] extends NumberLike[R] /*with Root[R] with Absolute[R]*/ {
 
-     implicit def realNumHasRoot: Root[R]
-     implicit def realNumHasAbsoluteValue: Absolute[R]
+     implicit def root: Root[R]
+     implicit def abs: Absolute[R]
 
      /*override implicit def numLikeHasTrig: Trig[R] = selfNumLike.numLikeHasTrig
      override implicit def numLikeHasCompare: Compare[R] = selfNumLike.numLikeHasCompare*/
@@ -198,7 +198,7 @@ object Number {
                Complex(prod.re / absDenom, prod.im / absDenom)
           }
           def negate(x: Complex[R]): Complex[R] = Complex(x.re.negate(), x.im.negate())
-          def isZero(x: Complex[R]): Boolean = numLikeHasCompare.equal(x, zero)
+          def isZero(x: Complex[R]): Boolean = compare.equal(x, zero)
           def isNegative(x: Complex[R]): Boolean = x.re.isNegative && x.im.isNegative
           def isReal(x: Complex[R]): Boolean = x.im.isZero //todo make this visible in complex class or object.
           def isImaginary(x: Complex[R]): Boolean = !isReal(x)
@@ -207,7 +207,7 @@ object Number {
 
 
           /** Root part */
-          implicit def numberHasRoot: _Root[Complex[R], R] = new _Root[Complex[R], R]{
+          implicit def _root: _Root[Complex[R], R] = new _Root[Complex[R], R]{
                val rOne: R = realLike.one
                val rTwo: R = realLike.two
                def power(base: Complex[R], exp: R): Complex[R] =
@@ -215,19 +215,19 @@ object Number {
           }
 
           /** Absolute part */
-          implicit def numberHasAbsoluteValue: _Absolute[Complex[R], R] = new _Absolute[Complex[R], R] {
+          implicit def _abs: _Absolute[Complex[R], R] = new _Absolute[Complex[R], R] {
                def absoluteValue(z: Complex[R]): R = Complex.magnitude(z)
           }
 
           /** Equality part */
-          implicit def numLikeHasCompare: Comparing[Complex[R]] = new Comparing[Complex[R]] {
+          implicit def compare: Comparing[Complex[R]] = new Comparing[Complex[R]] {
                def equal(x: Complex[R], y: Complex[R]): Boolean = x.re :==: y.re && x.im :==: y.im
                def lessThan(x: Complex[R], y: Complex[R]): Boolean = x.re < y.re || (x.re :==: y.re && x.im < y.im)
           }
 
 
           /** Trig part */
-          implicit def numLikeHasTrig: Trigonometric[Complex[R]] = new Trigonometric[Complex[R]]{
+          implicit def trig: Trigonometric[Complex[R]] = new Trigonometric[Complex[R]]{
                val E: Complex[R] = ??? //Complex(scala.math.E).asInstanceOf[Complex[R]] //todo more graceful way?
                val PI: Complex[R] = ??? //Complex(scala.math.Pi).asInstanceOf[Complex[R]]
 
@@ -264,31 +264,31 @@ object Number {
           def times(x: Real, y: Real): Real = Real(x.double * y.double)
           def divide(x: Real, y: Real): Real = Real(x.double / y.double)
           def negate(x: Real): Real = Real(-x.double)
-          def isZero(x: Real): Boolean = numLikeHasCompare.equal(x, zero)
+          def isZero(x: Real): Boolean = compare.equal(x, zero)
           def isNegative(x: Real): Boolean = x.double < 0
           def doubleValue(x: Real): Double = x.double
           def from(x: Int): Real = Real(x)
 
           /** Root part */
-          implicit def realNumHasRoot: Root[Real] = new Root[Real]{
+          implicit def root: Root[Real] = new Root[Real]{
                val rOne: Real = one
                val rTwo: Real = two
                def power(base: Real, exp: Real): Real = Real(math.pow(base.double, exp.double))
           }
 
           /** Absolute value part */
-          implicit def realNumHasAbsoluteValue: Absolute[Real] = new Absolute[Real]{
+          implicit def abs: Absolute[Real] = new Absolute[Real]{
                def absoluteValue(x: Real): Real = Real(math.abs(x.double))
           }
 
           /** Equality part */
-          implicit def numLikeHasCompare: Comparing[Real] = new Comparing[Real]{
+          implicit def compare: Comparing[Real] = new Comparing[Real]{
                def equal(x: Real, y: Real): Boolean = x.double == y.double
                def lessThan(x: Real, y: Real): Boolean = x.double < y.double
           }
 
           /** Trig part **/
-          implicit def numLikeHasTrig: Trigonometric[Real] = new Trigonometric[Real] {
+          implicit def trig: Trigonometric[Real] = new Trigonometric[Real] {
 
                val E: Real = Real(scala.math.E)
                val PI: Real = Real(scala.math.Pi)
@@ -324,32 +324,32 @@ object Number {
           def times(x: Rational, y: Rational): Rational = Rational(x.num * y.num, x.den * y.den)
           def divide(x: Rational, y: Rational): Rational = Rational(x.num * y.den, x.den * y.num)
           def negate(x: Rational): Rational = Rational(-x.num, -x.den)
-          def isZero(x: Rational): Boolean = numLikeHasCompare.equal(x, zero)
+          def isZero(x: Rational): Boolean = compare.equal(x, zero)
           def isNegative(x: Rational): Boolean = x.num < 0
           def doubleValue(x: Rational): Double = x.num * 1.0 / x.den
           def from(x: Int): Rational = Rational(x)
 
 
           /** Root part */
-          implicit def realNumHasRoot: Root[Rational] = new Root[Rational]{
+          implicit def root: Root[Rational] = new Root[Rational]{
                val rOne: Rational = one
                val rTwo: Rational = two
                def power(base: Rational, exp: Rational): Rational = Rational(math.pow(doubleValue(base), doubleValue(exp)))
           }
 
           /** Absolute value part */
-          implicit def realNumHasAbsoluteValue: Absolute[Rational] = new Absolute[Rational]{
+          implicit def abs: Absolute[Rational] = new Absolute[Rational]{
                def absoluteValue(x: Rational): Rational = Rational(math.abs(x.num), math.abs(x.den))
           }
 
           /** Equality part */
-          implicit def numLikeHasCompare: Comparing[Rational] = new Comparing[Rational]{
+          implicit def compare: Comparing[Rational] = new Comparing[Rational]{
                def equal(x: Rational, y: Rational): Boolean = x.num * y.den == y.num * x.den
                def lessThan(x: Rational, y: Rational): Boolean = x.num * y.den < y.num * x.den
           }
 
           /** Trig part **/
-          implicit def numLikeHasTrig: Trigonometric[Rational] = new Trigonometric[Rational] {
+          implicit def trig: Trigonometric[Rational] = new Trigonometric[Rational] {
                val E: Rational = Rational(scala.math.E)
                val PI: Rational = Rational(scala.math.Pi) // this is what spire does too, because these are finit     e.
 
@@ -390,25 +390,25 @@ object Number {
           def from(x: Int): Int = x
 
           /** Root part */
-          implicit def realNumHasRoot: Root[Int] = new Root[Int]{
+          implicit def root: Root[Int] = new Root[Int]{
                val rOne: Int = 1
                val rTwo: Int = 2
                def power(base: Int, exp: Int): Int = math.pow(base, exp).toInt //not chopped off
           }
 
           /** Absolute value part */
-          implicit def realNumHasAbsoluteValue: Absolute[Int] = new Absolute[Int]{
+          implicit def abs: Absolute[Int] = new Absolute[Int]{
                def absoluteValue(x: Int): Int = math.abs(x)
           }
 
           /** Equality part */
-          implicit def numLikeHasCompare: Comparing[Int] = new Comparing[Int]{
+          implicit def compare: Comparing[Int] = new Comparing[Int]{
                def equal(x: Int, y: Int): Boolean = x == y
                def lessThan(x: Int, y: Int): Boolean = x < y
           }
 
           /** Trig part **/
-          implicit def numLikeHasTrig: Trigonometric[Int] = new Trigonometric[Int] {
+          implicit def trig: Trigonometric[Int] = new Trigonometric[Int] {
                val E: Int = 2
                val PI: Int = 3 //just approximations! - note: int is not good for calculations
 
@@ -429,7 +429,7 @@ object Number {
                def theta(y: Int, x: Int): Int = math.tan(y / x).toInt
           }
      }
-     
+
 
      implicit object DoubleIsRealNumber extends RealNumber[Double] /*with Trig[Double] with Absolute[Double]
           with Root[Double] with Compare[Double]*/{
@@ -448,25 +448,25 @@ object Number {
           def from(x: Int): Double = x * 1.0
 
           /** Root part */
-          implicit def realNumHasRoot: Root[Double] = new Root[Double]{
+          implicit def root: Root[Double] = new Root[Double]{
                val rOne: Double = 1.0
                val rTwo: Double = 2.0
                def power(base: Double, exp: Double): Double = math.pow(base, exp)
           }
 
           /** Absolute value part */
-          implicit def realNumHasAbsoluteValue: Absolute[Double] = new Absolute[Double]{
+          implicit def abs: Absolute[Double] = new Absolute[Double]{
                def absoluteValue(x: Double): Double = math.abs(x)
           }
 
           /** Equality part */
-          implicit def numLikeHasCompare: Comparing[Double] = new Comparing[Double]{
+          implicit def compare: Comparing[Double] = new Comparing[Double]{
                def equal(x: Double, y: Double): Boolean = x == y
                def lessThan(x: Double, y: Double): Boolean = x < y
           }
 
           /** Trig part **/
-          implicit def numLikeHasTrig: Trigonometric[Double] = new Trigonometric[Double] {
+          implicit def trig: Trigonometric[Double] = new Trigonometric[Double] {
                val E: Double = scala.math.E
                val PI: Double = scala.math.Pi
 
@@ -541,32 +541,33 @@ object Complex {
 
 
      // --- Operations ---
-     def polar[R: RealNumber](z: Complex[R])(implicit rr: Root[R], t: Trigonometric[R]): Complex[R] =
-          Complex(magnitude(z), angle(z))
+     /*(implicit rr: Root[R], t: Trigonometric[R])*/
+     def polar[R: RealNumber](z: Complex[R]): Complex[R] = Complex(magnitude(z), angle(z))
 
-     def magnitude[R: RealNumber](z: Complex[R])(implicit rr: Root[R]): R =
+     def magnitude[R: RealNumber](z: Complex[R])/*(implicit rr: Root[R])*/: R =
           (z.re * z.re + z.im * z.im).sqrt()
 
      //just returns the value of theta for the complex number: theta = arctan(b / a), where c = a + bi
-     def angle[R: RealNumber](z: Complex[R])(implicit trig: Trigonometric[R]): R = trig.theta(z.re, z.im)
+     /*(implicit trig: Trigonometric[R])*/
+     def angle[R](z: Complex[R])(implicit realNum: RealNumber[R]): R = z.re.theta(z.im)
 
      /** Returns the nth root of a complex number - in tuple form = (modulus root n, list of all roots) */
-     def nthRootComplex[R](z: Complex[R], n: R)(implicit gen: RealNumber[R],
+     def nthRootComplex[R](z: Complex[R], n: R)(implicit gen: RealNumber[R])/*,
                                                 trig: Trigonometric[R],
-                                                rr: Root[R]): (R, List[R]) ={
+                                                rr: Root[R])*/: (R, List[R]) ={
 
           val two: R = gen.one + gen.one
           val polarComplex: Complex[R] = polar(z)
           val (modulus, theta): (R, R) = (polarComplex.re, polarComplex.im)
 
-          val theNRoots: List[R] = List.tabulate[R](n.toInt)(k => (theta + two * gen.from(k) * trig.PI) / n)
+          val theNRoots: List[R] = List.tabulate[R](n.toInt)(k => (theta + two * gen.from(k) * gen.trig.PI) / n)
 
           (modulus.nRoot(n), theNRoots)
      }
 
-     def nthRootsOfUnity[R](z: Complex[R], n: R)(implicit gen: RealNumber[R], trig: Trigonometric[R]): List[R] = {
+     def nthRootsOfUnity[R](z: Complex[R], n: R)(implicit gen: RealNumber[R]/*, trig: Trigonometric[R]*/): List[R] = {
           val two: R = gen.one + gen.one
-          List.tabulate[R](n.toInt)(k => (two * gen.from(k) * trig.PI) / n)
+          List.tabulate[R](n.toInt)(k => (two * gen.from(k) * gen.trig.PI) / n)
      }
 
      def conjugate[R: RealNumber](z: Complex[R]): Complex[R] = Complex(z.re, z.im.negate())
@@ -621,16 +622,16 @@ object NumberTester extends App {
      //------
      //TODO start here tomrorow
 
-     val rootC: _Root[Complex[Double], Double] = implicitly[_Root[Complex[Double], Double]]
-     println("NROOT TEST: " + rootC.nRoot(Complex(1.0, 2.0), 2.0))
+     //val rootC: _Root[Complex[Double], Double] = implicitly[_Root[Complex[Double], Double]]
+     //println("NROOT TEST: " + rootC.nRoot(Complex(1.0, 2.0), 2.0))
      println("NROOT TEST: " + Complex(1.0, 2.0).nRoot(2.0))
      println("NROOT TEST: " + (Rational(2) ^ Rational(2)))
      println("ABS TEST: " + Real(-2).abs())
 
-     import linalg.syntax.AbsoluteSyntax._
+     //import linalg.syntax.AbsoluteSyntax._
      import scala.runtime.{RichInt => _, _}
      import scala.runtime.{ScalaNumberProxy => _, _}
-     println("ABS TEST: " + (-23).abs()) //todo this uses RichInt's abs method how to stop this?
+     //println("ABS TEST: " + (-24).abs()) //todo this uses RichInt's abs method how to stop this?
      println("ABS TEST: " + Complex[Double](-1, 2).abs())
 
      /*import linalg.vector._
