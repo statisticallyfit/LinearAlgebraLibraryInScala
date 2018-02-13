@@ -131,8 +131,8 @@ case class Vector[N: Number](private val elems: N*){
 
      def set(index: Int)(value: N): Unit = elements(index) = value
      def get(index: Int): N = elements(index)
-     def toList(v: Vector[N]): List[N] = v.elements.toList
-     def toSeq(v: Vector[N]): Seq[N] = ListBuffer(toList(v):_*)
+     def toList: List[N] = elements.toList
+     def toSeq: Seq[N] = Seq(elements:_*)
 
      override def toString: String = Vector(elements:_*).show
 }

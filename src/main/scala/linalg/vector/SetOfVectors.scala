@@ -26,6 +26,7 @@ trait SetVecLike[V, F] extends VectorSpace[V, F]{
 
      def identity(size: Int): V
      def rowReducedEchelon(m: V): V
+     def rowEchelon(m: V): V
      def minus(v: V, w: V): V = plus(v, negate(w))
      def isZero(v: V): Boolean
 
@@ -118,10 +119,10 @@ object SetVecLike {
           }
 
           private def rref(vset: SetOfVectors[N], reduced: Boolean): SetOfVectors[N] ={
-               var echelonMatrix: SetOfVectors[N] = copy(vset)
+               var echelonMatrix: SetOfVectors[N] = vset.copy()
                var lead: Int = 0
-               val nRows: Int = numRows(vset)
-               val nCols: Int = numCols(vset)
+               val nRows: Int = vset.numRows
+               val nCols: Int = vset.numCols
 
                breakable {
                     for(r <- 0 until nRows){
@@ -129,7 +130,7 @@ object SetVecLike {
                               break
                          }
                          var i: Int = r
-                         while (get(echelonMatrix, i, lead).isZero) { //then find the pivot element
+                         while (echelonMatrix.get(i, lead).isZero) { //then find the pivot element
                               i = i + 1
                               if (i == nRows){
                                    i = r
@@ -144,12 +145,12 @@ object SetVecLike {
                          if(i != r) echelonMatrix = Util.Gen.swapRows(i, r, echelonMatrix)
 
                          //divide row r by rref[r][lead]
-                         echelonMatrix = Util.Gen.scaleRow(r, get(echelonMatrix, r, lead).inverse(), echelonMatrix)
+                         echelonMatrix = Util.Gen.scaleRow(r, echelonMatrix.get(r, lead).inverse(), echelonMatrix)
 
                          for(j <- 0 until nRows){ //back-substitute upwards
                               if(j != r){  //subtract row r * -rref[j][lead] from row j
                                    echelonMatrix = Util.Gen.sumRows(j, r,
-                                        get(echelonMatrix, j, lead).negate(),
+                                        echelonMatrix.get(j, lead).negate(),
                                         echelonMatrix)
                               }
                          }
@@ -162,33 +163,42 @@ object SetVecLike {
           }
      }
 }
+import SetVecLike._
 
 
 
-case class SetOfVectors[N: Number](columns: Vector[N]*)(implicit d: Dimension[SetOfVectors[N]]) {
+case class SetOfVectors[N: Number:Trig:Root:Absolute:Compare](private val cols: Vector[N]*) {
 
-     import SetVecLike._
+     var columns: Seq[Vector[N]] = Seq(cols:_*)
+     val numRows: Int = this.dimension()
+     val numCols: Int = columns.length
 
-
-     def copy(): SetOfVectors[N] = SetOfVectors(this.columns:_*)
+     def copy(): SetOfVectors[N] = SetOfVectors(columns:_*)
      def copy(cols: Seq[Vector[N]]): SetOfVectors[N] = SetOfVectors(cols:_*)
+
+
+     def getColumns(): Seq[Vector[N]] = Seq(columns:_*)
+
+     def getColumn(colIndex: Int): Vector[N] = columns(colIndex)
 
      def getRow(rowIndex: Int): Vector[N] = this.getRows()(rowIndex)
 
      def getRows(): Seq[Vector[N]] = {
-          val rows: ListBuffer[Vector[N]] = ListBuffer()
-          for(r <- 0 until this.numRows) rows += Vector(columns.map(colVec => colVec.get(r)):_*)
-          Seq(rows:_*)
+          val rows: Seq[Vector[N]] = Seq()
+          for(r <- 0 until this.numRows) rows(r) = Vector(columns.map(colVec => colVec.get(r)):_*)
+          rows
      }
 
-     def getColumns(): Seq[Vector[N]] = Seq(columns:_*)
-     def getColumn(colIndex: Int): Vector[N] = columns(colIndex)
+     def setColumn(colIndex: Int, col: Vector[N]): Unit = columns(colIndex) = col
+     def setRow(rowIndex: Int, row: Vector[N]): Unit = {
+          for(c <- 0 until numCols){
+               this.set(rowIndex, c)(row.get(c))
+          }
+     }
 
-     def set(rowIndex: Int, colIndex:Int)(value: N): Unit = columns(colIndex).set(rowIndex)(value)
+
      def get(rowIndex: Int, colIndex: Int): N = this.getRow(rowIndex).get(colIndex)
-
-     def numRows: Int = this.dimension() //d.dimension(this)
-     def numCols: Int = columns.length
+     def set(rowIndex: Int, colIndex:Int)(value: N): Unit = columns(colIndex).set(rowIndex)(value)
 
      //tostring todo
 }
@@ -199,7 +209,7 @@ object SetOfVectors {
      //def apply[N: Number:Trig:Root:Absolute:Compare](cols: Vector[N]*): SetOfVectors[N] = new SetOfVectors(cols:_*)
 
      def apply[N: Number:Trig:Root:Absolute:Compare](nr:Int, nc:Int): SetOfVectors[N] =
-          new SetOfVectors(Vector(ListBuffer.fill[N](nr * nc)(Number.ZERO[N]):_*))
+          new SetOfVectors(Vector(Seq.fill[N](nr * nc)(Number.ZERO[N]):_*))
 
      def ZERO[N: Number:Trig:Root:Absolute:Compare](numCols: Int, numRows: Int): SetOfVectors[N] =
           SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number.ZERO[N]):_*)
@@ -230,8 +240,6 @@ object SetOfVectors {
 
 
 object SetVecTester extends App {
-
-     import SetVecLike._
 
      val s1: SetOfVectors[Double] = SetOfVectors(Vector(1,2,3,4,5), Vector(8,8,1,2,3),
           Vector(-8,9,-3,0,1))

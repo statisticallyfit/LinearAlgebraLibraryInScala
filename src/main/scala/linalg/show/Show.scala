@@ -33,6 +33,10 @@ object Show {
      }
 
      implicit def PolynomialHasShow[R: RealLike] = new Show[Polynomial[R]]{
-          def show(v: Polynomial[R]): String = ??? //todo
+          def show(v: Polynomial[R]): String = "nothing here" //todo to implement
+     }
+
+     implicit def SetVecHasShow[N: Number] = new Show[SetOfVectors[N]]{
+          def show(vset: SetOfVectors[N]): String = "nothing here" //todo to implement
      }
 }

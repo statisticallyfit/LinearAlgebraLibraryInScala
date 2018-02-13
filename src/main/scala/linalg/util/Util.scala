@@ -13,7 +13,7 @@ import linalg.syntax.SetVecLikeSyntax._
 import linalg.util.Exception.VectorLikeSizeException
 import linalg.vector.SetVecLike._
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, Seq}
 
 /**
   *
@@ -49,7 +49,7 @@ object Util {
                (double * factor).round / factor
           }
 
-          def getNonZeroRows[N:Number:Trig:Root:Absolute:Compare](vset: SetOfVectors[N]): ListBuffer[Vector[N]] =
+          def getNonZeroRows[N:Number:Trig:Root:Absolute:Compare](vset: SetOfVectors[N]): Seq[Vector[N]] =
                vset.getRows().filterNot(row => row.isZero)
 
           def attach[N:Number](v: Vector[N], w: Vector[N]): Vector[N] = Vector((v.elements ++ w.elements):_*)
@@ -82,15 +82,14 @@ object Util {
             */
           def scaleRow[N:Number:Trig:Root:Absolute:Compare](row: Int, factor: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
 
-               val rowMat: ListBuffer[N] = vset.getRows().reduceLeft((accRow, yRow) => attach(accRow, yRow))
-                    .toSeq
+               val rowMat: Seq[N] = vset.getRows().reduceLeft((accRow, yRow) => attach(accRow, yRow)).toSeq
 
                for (i <- row * vset.numCols until ((row + 1) * vset.numCols)) {
                     rowMat(i) = rowMat(i) * factor
                }
 
                //converting from row to col representation
-               val rows: ListBuffer[Vector[N]] = ListBuffer(rowMat.toList.grouped(vset.numCols).toList
+               val rows: Seq[Vector[N]] = Seq(rowMat.toList.grouped(vset.numCols).toList
                     .map(list => Vector(list: _*)): _*)
 
                SetOfVectors(expressRowsAsCols[N](rows): _*)
@@ -103,15 +102,14 @@ object Util {
             * @return A new matrix, with the columns changed appropriately.
             */
           def sumRows[N:Number:Trig:Root:Absolute:Compare](rowA: Int, rowB: Int, scale: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
-               val oldMatList: ListBuffer[N] = vset.getRows().reduceLeft((accRow, yRow) => attach(accRow, yRow))
-                    .toSeq
-               val newMatList: ListBuffer[N] = oldMatList
+               val oldMatList: Seq[N] = vset.getRows().reduceLeft((accRow, yRow) => attach(accRow, yRow)).toSeq
+               val newMatList: Seq[N] = oldMatList
                for (i <- 0 until vset.numCols) { // for each value in rowA
                     newMatList(rowA * vset.numCols + i) += oldMatList(rowB * vset.numCols + i) * scale //
                }
 
                // using grouped so we get cols again
-               val rows: ListBuffer[Vector[N]] = ListBuffer(newMatList.grouped(vset.numCols).toList
+               val rows: Seq[Vector[N]] = Seq(newMatList.grouped(vset.numCols).toList
                     .map(list => new Vector(list: _*)): _*)
 
                SetOfVectors(expressRowsAsCols[N](rows): _*)
@@ -124,9 +122,8 @@ object Util {
             * @return A new matrix, with the columns changed appropriately.
             */
           def sumCols[N:Number:Trig:Root:Absolute:Compare](colA: Int, colB: Int, scale: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
-               val oldMatList: ListBuffer[N] = vset.getColumns().reduceLeft((accCol, yCol) => attach(accCol, yCol))
-                    .toSeq
-               val newMatList: ListBuffer[N] = oldMatList
+               val oldMatList: Seq[N] = vset.getColumns().reduceLeft((accCol, yCol) => attach(accCol, yCol)).toSeq
+               val newMatList: Seq[N] = oldMatList
                for (i <- 0 until vset.numRows) { // for each value in rowA
                     newMatList(colA * vset.numRows + i) += oldMatList(colB * vset.numRows + i) * scale //
                }
@@ -142,7 +139,7 @@ object Util {
             * @return A matrix with rows A and B swapped.
             */
           def swapRows[N:Number:Trig:Root:Absolute:Compare](rowA: Int, rowB: Int, vset: SetOfVectors[N]): SetOfVectors[N] = {
-               val rows: ListBuffer[Vector[N]] = vset.getRows()
+               val rows: Seq[Vector[N]] = vset.getRows()
                //swapping
                val temp: Vector[N] = rows(rowA)
                rows(rowA) = rows(rowB)
@@ -152,7 +149,7 @@ object Util {
           }
 
           def swapCols[N:Number:Trig:Root:Absolute:Compare](colA: Int, colB: Int, vset: SetOfVectors[N]): SetOfVectors[N] = {
-               val cols: ListBuffer[Vector[N]] = vset.getColumns()
+               val cols: Seq[Vector[N]] = vset.getColumns()
                //swapping
                val temp: Vector[N] = cols(colA)
                cols(colA) = cols(colB)
@@ -178,7 +175,7 @@ object Util {
                def itsSingleElemIsNotOne(v: Vector[N]): Boolean = countNonZero(v) == 1 &&
                     v.toList.exists(e => e != 1 && e != 0)
 
-               val vecIndexPair: ListBuffer[(Vector[N], Int)] = rref.getColumns().zipWithIndex
+               val vecIndexPair: Seq[(Vector[N], Int)] = rref.getColumns().zipWithIndex
 
                val indices = vecIndexPair.map({
                     case (v, i) =>
@@ -192,11 +189,11 @@ object Util {
                indices2
           }
 
-          def expressRowsAsCols[N:Number:Trig:Root:Absolute:Compare](rows: ListBuffer[Vector[N]]): ListBuffer[Vector[N]] = {
+          def expressRowsAsCols[N:Number:Trig:Root:Absolute:Compare](rows: Seq[Vector[N]]): Seq[Vector[N]] = {
                //converting from row to col representation
                val ncol: Int = rows.head.dimension()
                val nrow: Int = rows.length
-               val colBuff: ListBuffer[ListBuffer[N]] = ListBuffer.fill[N](ncol, nrow)(Number.ZERO[N])
+               val colBuff: Seq[Seq[N]] = Seq.fill[N](ncol, nrow)(Number.ZERO[N])
 
                for (c <- 0 until ncol) {
                     colBuff(c) = rows.map(row => row.get(c))
@@ -204,19 +201,19 @@ object Util {
                colBuff.map(buff => new Vector(buff: _*))
           }
 
-          def expressRowsAsCols[N:Number:Trig:Root:Absolute:Compare](rows: List[List[N]]): List[List[N]] = {
-               val result = expressRowsAsCols(ListBuffer(rows.map(list => seqToVec(list)): _*))
+          /*def expressRowsAsCols[N:Number:Trig:Root:Absolute:Compare](rows: List[List[N]]): List[List[N]] = {
+               val result = expressRowsAsCols(Seq(rows.map(list => seqToVec(list)): _*))
                result.map(vec => vec.toList).toList
-          }
+          }*/
 
-          def expressColsAsRows[N:Number:Trig:Root:Absolute:Compare](cols: ListBuffer[Vector[N]]): ListBuffer[Vector[N]] = {
+          def expressColsAsRows[N:Number:Trig:Root:Absolute:Compare](cols: Seq[Vector[N]]): Seq[Vector[N]] = {
                expressRowsAsCols(cols)
           }
 
-          def expressColsAsRows[N:Number:Trig:Root:Absolute:Compare](cols: List[List[N]]): List[List[N]] = {
-               val result = expressColsAsRows(ListBuffer(cols.map(list => seqToVec(list)): _*))
+          /*def expressColsAsRows[N:Number:Trig:Root:Absolute:Compare](cols: List[List[N]]): List[List[N]] = {
+               val result = expressColsAsRows(Seq(cols.map(list => seqToVec(list)): _*))
                result.map(vec => vec.toList).toList
-          }
+          }*/
      }
 }
 
