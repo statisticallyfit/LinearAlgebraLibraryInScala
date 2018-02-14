@@ -119,29 +119,30 @@ trait Number[N] extends Field[N] {
      def doubleValue(x: N): Double
      def from(x: Int): N
 
-
+     implicit def trig: Trigonometric[N]
+     implicit def eq: Equality[N]
 }
 //todo - prep name this Number and name Number as NumberLike or just have one Number[N, R] with these defs in it
-trait _Number[N, R] extends Number[N] {
+/*trait _Number[N, R] extends Number[N] {
      implicit def complexRoot: RootLike[N, R]
      implicit def complexAbs: AbsoluteLike[N, R]
      implicit def trig: Trigonometric[N]
      implicit def eq: Equality[N]
+}*/
+
+trait ComplexNumber[R] extends Number[Complex[R]] {
+
+     implicit def complexRoot: RootLike[Complex[R], R]
+     implicit def complexAbs: AbsoluteLike[Complex[R], R]
 }
 
-trait ComplexNumber[R] extends _Number[Complex[R], R] {
-
-     /*implicit def complexRoot: RootLike[Complex[R], R]
-     implicit def complexAbs: AbsoluteLike[Complex[R], R]*/
-}
-
-trait RealNumber[R] extends _Number[R,R] {
+trait RealNumber[R] extends Number[R] {
 
      implicit def root: Root[R]
      implicit def abs: Absolute[R]
 
-     override def complexRoot: RootLike[R,R] = root
-     override def complexAbs: AbsoluteLike[R,R] = abs
+     /*override def complexRoot: RootLike[R,R] = root
+     override def complexAbs: AbsoluteLike[R,R] = abs*/
 }
 
 
