@@ -128,7 +128,11 @@ trait Number[N] extends Field[N] with Trigonometric[N] with Equality[N] {
 
 trait RealNumber[R] extends Number[R] with Absolute[R] with Root[R]
 
-
+object RealNumber {
+     def ZERO[R](implicit gen: RealNumber[R]): R = gen.zero
+     def ONE[R](implicit gen: RealNumber[R]): R = gen.one
+     def TWO[R](implicit gen: RealNumber[R]): R = gen.two
+}
 
 
 object Number {

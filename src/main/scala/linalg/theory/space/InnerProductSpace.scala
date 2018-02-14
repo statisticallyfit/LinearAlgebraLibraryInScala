@@ -33,9 +33,9 @@ trait InnerProductSpace[I, F] extends VectorSpace[I, F] { self =>
           val root: Root[F] = ev
           val innerSpace: InnerProductSpace[I, F] = self
 
-          implicit val vectorSpaceDimension: Dimension[I] = new Dimension[I] {
+          /*implicit val vectorSpaceDimension: Dimension[I] = new Dimension[I] {
                def dimension(i: I): Int = innerSpace.vectorSpaceDimension.dimension(i)
-          }
+          }*/
      }
 }
 

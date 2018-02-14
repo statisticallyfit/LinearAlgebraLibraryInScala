@@ -38,8 +38,8 @@ trait SetVecLike[V, F] extends VectorSpace[V, F]{
 
 object SetVecLike {
 
-     implicit def SetVecisSetVecLike[V[_], N: Number](implicit vecLike: VectorLike[V[N], N]) = new
-               SetVecLike[SetOfVectors[N], N] with Dimension[SetOfVectors[N]] {
+     /*(implicit vecLike: VectorLike[V[N], N])*/
+     implicit def SetVecsSetVecLike[N: Number] = new SetVecLike[SetOfVectors[N], N] with Dimension[SetOfVectors[N]] {
 
           val zero: SetOfVectors[N] = SetOfVectors(Vector.ZERO[N](1))
           val one: SetOfVectors[N] = SetOfVectors(Vector.ONE[N](1))
@@ -127,7 +127,7 @@ import SetVecLike._
 
 
 
-case class SetOfVectors[N: Number](private val cols: Vector[N]*)(implicit d: Dimension[SetOfVectors[N]]) {
+case class SetOfVectors[N: Number](private val cols: Vector[N]*) {
 
      private val columns: Seq[Vector[N]] = Seq(cols:_*)
      val numRows: Int = this.dimension()

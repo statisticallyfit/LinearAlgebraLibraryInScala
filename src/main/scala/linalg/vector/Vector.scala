@@ -49,40 +49,33 @@ trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
 
 object VectorLike {
 
-     //TODO - actually cannot implement both at same time.
-     //todo - consider keeping the implicits in the typeclass like here - dimension serves purpose of having just the
-     //todo dimension in methods like spire and then we have also the has-a relation too - ebst of both worlds. Carry
-     //todo  out with Number so that we can do implicit trig: Trig[N] and have trig.PI instead of gen.trig.PI
 
-     implicit def VectorIsVectorLike[N[_], R:RealNumber]
-     (implicit num: Number[N, R]) = new VectorLike[Vector[N,R], N]
-
-          /*with Dimension[Vector[N]]*/ with Eq[Vector[N,R]] /*with Span[Vector[N], N]*/ {
+     implicit def VectorIsVectorLike[N: Number] = new VectorLike[Vector[N], N]
+          with Dimension[Vector[N]] with Eq[Vector[N]] /*with Span[Vector[N], N]*/ {
 
 
-          val zero: Vector[N,R] = Vector(Number.ZERO[N, R]) //just vector with one element
-          val one: Vector[N,R] = Vector(Number.ONE[N, R]) //just vector with one element
+          val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
+          val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
 
           /** Dimension part */
-          implicit val vectorSpaceDimension: Dimension[Vector[N,R]] = new Dimension[Vector[N,R]] {
-               def dimension(v: Vector[N,R]): Int = v.getElements().length
-          }
-          import vectorSpaceDimension._
+          def dimension(v: Vector[N]): Int = v.getElements().length
+               //todo decide later if can revert stuff in Number back to implicit def version like in here and just
+               //todo while leaving the RootLike etc as add-on in Number Complex declaration - but sort of messy.
 
           /** Eq part */
-          def eqv(v: Vector[N,R], w: Vector[N,R]): Boolean = v.getElements() == w.getElements()
+          def eqv(v: Vector[N], w: Vector[N]): Boolean = v.getElements() == w.getElements()
 
           /** VectorLike part */
-          def plus(v: Vector[N,R], w: Vector[N,R]): Vector[N,R] ={
+          def plus(v: Vector[N], w: Vector[N]): Vector[N] ={
                Util.Gen.ensureSize(v, w)
                Vector(v.getElements().zip(w.getElements()).map(pair => pair._1 + pair._2):_*)
           }
 
-          def negate(v: Vector[N,R]): Vector[N,R] = Vector(v.getElements().map(e => e.negate()):_*)
+          def negate(v: Vector[N]): Vector[N] = Vector(v.getElements().map(e => e.negate()):_*)
 
-          def scale(v: Vector[N,R], factor: N): Vector[N,R] = Vector(v.getElements().map(e => e * factor):_*)
+          def scale(v: Vector[N], factor: N): Vector[N] = Vector(v.getElements().map(e => e * factor):_*)
 
-          def isZero(v: Vector[N,R]): Boolean = v.getElements().forall(e => e :==: Number.ZERO[N])
+          def isZero(v: Vector[N]): Boolean = v.getElements().forall(e => e :==: Number.ZERO[N])
 
           def projection(v: Vector[N], onto: Vector[N]): Vector[N] = scale(onto,  innerProduct(v, onto) / norm(onto))
 
@@ -116,18 +109,8 @@ object VectorLike {
 
           def angle(v: Vector[N], w: Vector[N]): N = innerProduct(v, w) / (norm(v) * norm(w)).arccos()
 
-          def norm(v: Vector[N])(implicit f: Field[N]): N =
-               v.getElements().map(e => e ^ Number.TWO[N]).reduceLeft(_ + _)
-
-          //def dimension(v: Vector[N]): Int = v.getElements().length
-
-
-
-          /*def get(v: Vector[N], i: Int): N = v.elements(i)
-          //def set(v: Vector[N], i: Int, value: N): Unit = ListBuffer(v.elements:_*)(i) = value  //todo check if sticks
-
-          def toList(v: Vector[N]): List[N] = v.elements.toList
-          def toBuff(v: Vector[N]): ListBuffer[N] = ListBuffer(toList(v):_*)*/
+          def norm[R](v: Vector[N])(implicit f: Field[N], r: RootLike[N, R]): N =
+               v.getElements().map(e => r.power(e, RealNumber.TWO[R])).reduceLeft[N]((acc, y) => f.plus(acc,y))
      }
 }
 
@@ -135,12 +118,12 @@ object VectorLike {
 
 
 
-case class Vector[N, R:RealNumber](private val elems: N*)(implicit num: Number[N, R]) {
+case class Vector[N: Number](private val elems: N*) {
 
      private val elements: Seq[N] = Seq(elems:_*)
 
-     def copy(): Vector[N, R] = Vector(elements:_*)
-     def copy(es: Seq[N]): Vector[N, R] = Vector(es:_*)
+     def copy(): Vector[N] = Vector(elements:_*)
+     def copy(es: Seq[N]): Vector[N] = Vector(es:_*)
 
      def set(index: Int)(value: N): Unit = elements(index) = value
      def get(index: Int): N = elements(index)
@@ -148,17 +131,14 @@ case class Vector[N, R:RealNumber](private val elems: N*)(implicit num: Number[N
      /*def toList: List[N] = elements.toList
      def toSeq: Seq[N] = Seq(elements:_*)*/
 
-     override def toString: String = this.asInstanceOf[Vector[N, R]].show
+     override def toString: String = this.asInstanceOf[Vector[N]].show
 }
 
 
 object Vector {
 
-     def ZERO[N, R:RealNumber](len: Int)(implicit n: Number[N, R]): Vector[N, R] =
-          Vector(List.fill[N](len)(Number.ZERO[N, R]):_*)
-
-     def ONE[N, R:RealNumber](len: Int)(implicit n: Number[N, R]): Vector[N, R] =
-          Vector(List.fill[N](len)(Number.ONE[N, R]):_*)
+     def ZERO[N: Number](len: Int): Vector[N] = Vector(List.fill[N](len)(Number.ZERO[N]):_*)
+     def ONE[N: Number](len: Int): Vector[N] = Vector(List.fill[N](len)(Number.ONE[N]):_*)
 
      //def apply[N: Number](elems: N*): Vector[N] = new Vector(elems:_*)
 }
