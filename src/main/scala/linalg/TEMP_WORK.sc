@@ -10,20 +10,16 @@ trait Root[R] extends RootLike[R, R]
 
 trait NumberLike[N[_], R] {
 
-     implicit def root: RootLike[N, R] //todo maybe numlike not number[n]??
+     implicit def root: RootLike[Number[N[R]], RealNumber[R]] //todo maybe numlike not number[n]??
 }
 
-trait Number[N] extends NumberLike[Number[N], N]{
-
+trait Number[N] extends NumberLike[Number[N], RealNumber[N]]{
      def plus(x: N, y: N): N
 }
-
 trait RealNumber[R] extends Number[R]{
      implicit def realRoot: Root[R]
-
      override def root: RootLike[R, R] = realRoot
 }
-
 case class Complex[R: RealNumber](re: R, im: R)
 
 object implicitSyntax {

@@ -64,6 +64,8 @@ trait RootLike[N, R] {
      val rOne: R
      val rTwo: R
 
+     //implicit def num: Number[N]
+
      def power(base: N, exp: R): N
      def nRoot(base: N, n: R)(implicit f: Field[R]): N = power(base, f.divide(rOne, n))
      def squareRoot(base: N)(implicit f: Field[R]): N = nRoot(base, rTwo)
