@@ -11,7 +11,7 @@ import scala.language.higherKinds
 object NumberSyntax {
 
      import Number._ //note if we want miniature implicits tests tow ork
-     implicit class NumberLikeOps[N](current: N)(implicit numLike: NumberLike[N]){
+     implicit class NumberOps[N, R](current: N)(implicit numLike: GenericNumber[N, R]){
 
           //val n = implicitly[Number[N]]
 
@@ -29,7 +29,7 @@ object NumberSyntax {
 
           // ---------------------------------------------------------------------------
           private val trig: Trigonometric[N] = numLike.trig
-          private val comp: Comparing[N] = numLike.compare
+          private val comp: Equality[N] = numLike.eq
 
           // Trig stuff
           def sin(): N = trig.sin(current)
@@ -57,49 +57,24 @@ object NumberSyntax {
      }
 
 
-     implicit class NumberOps[N[_], R](current: N[R])(implicit number: Number[N[R]], numR: Number[R]){
-
-          //type RE <: RealNumber[RE]
-          //type REAL_ = number.REAL
-          //type REAL_ = RE forSome {type RE <: RealNumber[RE]}
-          //type REAL = RE forSome {type RE = RealNumber[RE]}
-
-          //type REAL = number.RE
-
-          private val _root: _Root[N[R], R] = number._root
-          private val _abs: _Absolute[N[R], R] = number._abs
-
+     implicit class ComplexNumberOps[C[_], R: RealNumber](current: C[R])(implicit c: ComplexNumber[C[R], R]){
+          private val _root = c.complexRoot
+          private val _abs = c.complexAbs
 
           // Root stuff
-          def ^(exp: N[R]): N = _root.power(current, exp)
-          def sqrt(): N = _root.squareRoot(current)
-          def nRoot(n: N[R]): N = _root.nRoot(current, n)
-
-          // Absolute stuff
-          def abs(): N[R] = _abs.absoluteValue(current)
-     }
-     Complex(1,2).nRoot(2)
-     Complex[Double](-1, 2).abs()
-
-     //note for use when Number[N, R]
-     /*implicit class NumberOps[N[_], R: RealNumber](current: N[R])(implicit number: Number[N[R], R]){
-          private val _root = number._root
-          private val _abs = number._abs
-
-          // Root stuff
-          def ^(exp: R): N[R] = _root.power(current, exp)
-          def sqrt(): N[R] = _root.squareRoot(current)
-          def nRoot(n: R): N[R] = _root.nRoot(current, n)
+          def ^(exp: R): C[R] = _root.power(current, exp)
+          def sqrt(): C[R] = _root.squareRoot(current)
+          def nRoot(n: R): C[R] = _root.nRoot(current, n)
 
           // Absolute stuff
           def abs(): R = _abs.absoluteValue(current)
-     }*/
+     }
 
 
 
      implicit class RealNumberOps[R](current: R)(implicit realNum: RealNumber[R]) {
           private val root: Root[R] = realNum.root
-          private val ab: Absolute[R] = realNum.abs
+          private val ab: AbsoluteValue[R] = realNum.abs
 
           //Root stuff
           def ^(exp: R): R = root.power(current, exp)

@@ -31,10 +31,11 @@ trait InnerProductSpace[I, F] extends VectorSpace[I, F] { self =>
 
      def normed(implicit ev: Root[F]): NormedVectorSpace[I, F] = new NormedInnerProductSpace[I, F] {
           val root: Root[F] = ev
-          val innerSpace = self
-          /*implicit val vectorSpaceHasDimension: Dimension[I] = new Dimension[I] {
-               def dimension(i: I): Int = self.vectorSpaceHasDimension.dimension(i)
-          }*/
+          val innerSpace: InnerProductSpace[I, F] = self
+
+          implicit val vectorSpaceDimension: Dimension[I] = new Dimension[I] {
+               def dimension(i: I): Int = innerSpace.vectorSpaceDimension.dimension(i)
+          }
      }
 }
 

@@ -59,11 +59,11 @@ object Util {
                SetOfVectors(v, w)
 
           def colCombine[N:Number](vset: SetOfVectors[N],
-                                                                         wset: SetOfVectors[N]): SetOfVectors[N] =
+                                   wset: SetOfVectors[N]): SetOfVectors[N] =
                SetOfVectors((vset.getColumns() ++ wset.getColumns()):_*)
 
           def ensureSize[N:Number](v: Vector[N], w: Vector[N],
-                                                                         SIZE: Int = 0): Unit = {
+                                   SIZE: Int = 0): Unit = {
 
                val caseVectorsAreDifferentSize: Boolean = (SIZE == 0 || SIZE < 0) && (v.dimension() != w.dimension())
                val caseVectorsAreDifferentThanSpecificSize: Boolean = SIZE != v.dimension() || SIZE != w.dimension()

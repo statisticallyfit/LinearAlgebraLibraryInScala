@@ -51,9 +51,7 @@ object VectorLike {
      implicit def VectorIsVectorLike[N: Number] = new VectorLike[Vector[N], N]
           with Dimension[Vector[N]] with Eq[Vector[N]] /*with Span[Vector[N], N]*/ {
 
-          /*implicit val vectorSpaceHasDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
-               def dimension(v: Vector[N]): Int = v.elements.length
-          }*/
+
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
 
@@ -106,7 +104,11 @@ object VectorLike {
 
           def norm(v: Vector[N])(implicit f: Field[N]): N = v.getElements().map(e => e ^ Number.TWO[N]).reduceLeft(_ + _)
 
-          def dimension(v: Vector[N]): Int = v.getElements().length
+          //def dimension(v: Vector[N]): Int = v.getElements().length
+
+          implicit val vectorSpaceDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
+               def dimension(v: Vector[N]): Int = v.getElements().length
+          }
 
           /*def get(v: Vector[N], i: Int): N = v.elements(i)
           //def set(v: Vector[N], i: Int, value: N): Unit = ListBuffer(v.elements:_*)(i) = value  //todo check if sticks

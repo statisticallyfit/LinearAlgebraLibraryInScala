@@ -50,7 +50,7 @@ import scala.language.higherKinds
 // TODO we have interoperability automatically.
 
 
-trait Comparing[E] {
+trait Equality[E] {
      def equal(x: E, y: E): Boolean
      def lessThan(x: E, y: E): Boolean
      def greaterThan(x: E, y: E): Boolean = lessThan(y, x)
@@ -58,32 +58,23 @@ trait Comparing[E] {
      def greaterThanOrEqual(x: E, y: E): Boolean = greaterThan(x, y) || equal(x, y)
 }
 
-trait _Absolute[N, R] extends RealNumber[R] {
+trait ComplexAbsoluteValue[N, R] {
      def absoluteValue(x: N): R
 }
 
-trait Absolute[A] extends _Absolute[A, A]{
-     //override def absoluteValue(x: A) = abs0.absoluteValue(x)
-}
-
-trait _Root[N[_], R] extends RealNumber[R] {
+trait ComplexRoot[N, R] {
 
      val rOne: R
      val rTwo: R
 
-     def power(base: N[R], exp: R): N[R]
-     def nRoot(base: N[R], n: R)(implicit f: Field[R]): N[R] = power(base, f.divide(rOne, n))
-     def squareRoot(base: N[R])(implicit f: Field[R]): N[R] = nRoot(base, rTwo)
-     /*def power(base: N, exp: R): N
+     def power(base: N, exp: R): N
      def nRoot(base: N, n: R)(implicit f: Field[R]): N = power(base, f.divide(rOne, n))
-     def squareRoot(base: N)(implicit f: Field[R]): N = nRoot(base, rTwo)*/
+     def squareRoot(base: N)(implicit f: Field[R]): N = nRoot(base, rTwo)
 }
 
-trait Root[R] extends _Root[R, R] {
-     /*override val rOne: R = root0.rOne
-     override val rTwo: R = root0.rTwo
-     override def power(base: R, exp: R): R = root0.power(base, exp)*/
-}
+trait AbsoluteValue[A] extends ComplexAbsoluteValue[A, A]
+
+trait Root[R] extends ComplexRoot[R, R]
 
 trait Trigonometric[T] {
 
@@ -115,9 +106,7 @@ trait Trigonometric[T] {
 //followup note: root doesn't have to know about number:
 //note -  https://insight.io/github.com/non/spire/blob/master/core/shared/src/main/scala/spire/algebra/NRoot.scala
 
-private[linalg] trait NumberLike[N] extends Field[N] /*with Trig[N] with Comparable[N]*/ { self =>
-
-     //val selfNumLike: NumberLike[N] = self
+private[linalg] trait GenericNumber[N, R] extends Field[N] {
 
      val zero: N
      val one: N
@@ -133,36 +122,28 @@ private[linalg] trait NumberLike[N] extends Field[N] /*with Trig[N] with Compara
      def isNegative(x: N): Boolean
 
      def doubleValue(x: N): Double
-
+     def from(x: Int): N
 
      implicit def trig: Trigonometric[N]
-     implicit def compare: Comparing[N]
+     implicit def eq: Equality[N]
+     implicit def complexRoot: ComplexRoot[N, R]
+     implicit def complexAbs: ComplexAbsoluteValue[N, R]
 }
 
+trait Number[N] extends GenericNumber[N, _]
 
-trait Number[N[R]] extends NumberLike[N]  /*with _Root[Number[N], N] with _Absolute[Number[N], N] */ { self =>
+/*trait ComplexNumber[N, R] extends GenericNumber[N] {
 
+     implicit def complexRoot: ComplexRoot[N, R]
+     implicit def complexAbs: ComplexAbsoluteValue[N, R]
+}*/
 
-     //_Root[N, RE forSome {type RE <: NumberLike[RE]}]
-     implicit def _root: _Root[N[R], R]
-     implicit def _abs: _Absolute[Number[N], N]
-
-     /*override implicit def numLikeHasTrig: Trig[N] = selfNumLike.numLikeHasTrig
-     override implicit def numLikeHasCompare: Compare[N] = selfNumLike.numLikeHasCompare*/
-
-     def from(x: Int): N
-}
-
-
-trait RealNumber[R] extends NumberLike[R] /*with Root[R] with Absolute[R]*/ {
+trait RealNumber[R] extends GenericNumber[R, R] {
 
      implicit def root: Root[R]
-     implicit def abs: Absolute[R]
+     implicit def abs: AbsoluteValue[R]
 
-     /*override implicit def numLikeHasTrig: Trig[R] = selfNumLike.numLikeHasTrig
-     override implicit def numLikeHasCompare: Compare[R] = selfNumLike.numLikeHasCompare*/
-
-     def from(x: Int): R
+     //def from(x: Int): R
 }
 
 
@@ -174,22 +155,12 @@ object Number {
      def ZERO[N: Number](implicit gen: Number[N]): N = gen.zero
      def ONE[N: Number](implicit gen: Number[N]): N = gen.one
      def TWO[N: Number](implicit gen: Number[N]): N = gen.two
-     /*def ZERO[N, R:RealNumber](implicit gen: Number[N, R]): N = gen.zero
-     def ONE[N, R:RealNumber](implicit gen: Number[N, R]): N = gen.one
-     def TWO[N, R:RealNumber](implicit gen: Number[N, R]): N = gen.two*/
 
-
-
-     //note: need to keep rr and pos as base 0 types not Root[R] since otherwise
-     // note: the tests below don't work
 
      implicit def ComplexIsNumber[R: RealNumber] = new Number[Complex[R]] {
-          /*with _Root[Complex[R],R] with _Absolute[Complex[R], R]*/
-          /*with Compare[Complex[R]] with _Root[Complex[R],R] with _Absolute[Complex[R], R] with Trig[Complex[R]]*/
 
           val realLike = implicitly[RealNumber[R]]
 
-          //def absoluteValue(x: Number[Complex[R]]): Complex[R] = ???
 
           /** Number part */
           val zero: Complex[R] = Complex.ZERO[R]
@@ -204,7 +175,7 @@ object Number {
                Complex(prod.re / absDenom, prod.im / absDenom)
           }
           def negate(x: Complex[R]): Complex[R] = Complex(x.re.negate(), x.im.negate())
-          def isZero(x: Complex[R]): Boolean = compare.equal(x, zero)
+          def isZero(x: Complex[R]): Boolean = eq.equal(x, zero)
           def isNegative(x: Complex[R]): Boolean = x.re.isNegative && x.im.isNegative
           def isReal(x: Complex[R]): Boolean = x.im.isZero //todo make this visible in complex class or object.
           def isImaginary(x: Complex[R]): Boolean = !isReal(x)
@@ -213,7 +184,7 @@ object Number {
 
 
           /** Root part */
-          implicit def _root: _Root[Complex[R], R] = new _Root[Complex[R], R] {
+          implicit def complexRoot: ComplexRoot[Complex[R], R] = new ComplexRoot[Complex[R], R] {
                val rOne: R = realLike.one
                val rTwo: R = realLike.two
                def power(base: Complex[R], exp: R): Complex[R] =
@@ -221,12 +192,12 @@ object Number {
           }
 
           /** Absolute part */
-          implicit def _abs: _Absolute[Complex[R], R] = new _Absolute[Complex[R], R] {
+          implicit def complexAbs: ComplexAbsoluteValue[Complex[R], R] = new ComplexAbsoluteValue[Complex[R], R] {
                def absoluteValue(z: Complex[R]): R = Complex.magnitude(z)
           }
 
           /** Equality part */
-          implicit def compare: Comparing[Complex[R]] = new Comparing[Complex[R]] {
+          implicit def eq: Equality[Complex[R]] = new Equality[Complex[R]] {
                def equal(x: Complex[R], y: Complex[R]): Boolean = x.re :==: y.re && x.im :==: y.im
                def lessThan(x: Complex[R], y: Complex[R]): Boolean = x.re < y.re || (x.re :==: y.re && x.im < y.im)
           }
@@ -270,7 +241,7 @@ object Number {
           def times(x: Real, y: Real): Real = Real(x.double * y.double)
           def divide(x: Real, y: Real): Real = Real(x.double / y.double)
           def negate(x: Real): Real = Real(-x.double)
-          def isZero(x: Real): Boolean = compare.equal(x, zero)
+          def isZero(x: Real): Boolean = eq.equal(x, zero)
           def isNegative(x: Real): Boolean = x.double < 0
           def doubleValue(x: Real): Double = x.double
           def from(x: Int): Real = Real(x)
@@ -283,12 +254,12 @@ object Number {
           }
 
           /** Absolute value part */
-          implicit def abs: Absolute[Real] = new Absolute[Real]{
+          implicit def abs: AbsoluteValue[Real] = new AbsoluteValue[Real]{
                def absoluteValue(x: Real): Real = Real(math.abs(x.double))
           }
 
           /** Equality part */
-          implicit def compare: Comparing[Real] = new Comparing[Real]{
+          implicit def eq: Equality[Real] = new Equality[Real]{
                def equal(x: Real, y: Real): Boolean = x.double == y.double
                def lessThan(x: Real, y: Real): Boolean = x.double < y.double
           }
@@ -330,7 +301,7 @@ object Number {
           def times(x: Rational, y: Rational): Rational = Rational(x.num * y.num, x.den * y.den)
           def divide(x: Rational, y: Rational): Rational = Rational(x.num * y.den, x.den * y.num)
           def negate(x: Rational): Rational = Rational(-x.num, -x.den)
-          def isZero(x: Rational): Boolean = compare.equal(x, zero)
+          def isZero(x: Rational): Boolean = eq.equal(x, zero)
           def isNegative(x: Rational): Boolean = x.num < 0
           def doubleValue(x: Rational): Double = x.num * 1.0 / x.den
           def from(x: Int): Rational = Rational(x)
@@ -344,12 +315,12 @@ object Number {
           }
 
           /** Absolute value part */
-          implicit def abs: Absolute[Rational] = new Absolute[Rational]{
+          implicit def abs: AbsoluteValue[Rational] = new AbsoluteValue[Rational]{
                def absoluteValue(x: Rational): Rational = Rational(math.abs(x.num), math.abs(x.den))
           }
 
           /** Equality part */
-          implicit def compare: Comparing[Rational] = new Comparing[Rational]{
+          implicit def eq: Equality[Rational] = new Equality[Rational]{
                def equal(x: Rational, y: Rational): Boolean = x.num * y.den == y.num * x.den
                def lessThan(x: Rational, y: Rational): Boolean = x.num * y.den < y.num * x.den
           }
@@ -403,12 +374,12 @@ object Number {
           }
 
           /** Absolute value part */
-          implicit def abs: Absolute[Int] = new Absolute[Int]{
+          implicit def abs: AbsoluteValue[Int] = new AbsoluteValue[Int]{
                def absoluteValue(x: Int): Int = math.abs(x)
           }
 
           /** Equality part */
-          implicit def compare: Comparing[Int] = new Comparing[Int]{
+          implicit def eq: Equality[Int] = new Equality[Int]{
                def equal(x: Int, y: Int): Boolean = x == y
                def lessThan(x: Int, y: Int): Boolean = x < y
           }
@@ -461,12 +432,12 @@ object Number {
           }
 
           /** Absolute value part */
-          implicit def abs: Absolute[Double] = new Absolute[Double]{
+          implicit def abs: AbsoluteValue[Double] = new AbsoluteValue[Double]{
                def absoluteValue(x: Double): Double = math.abs(x)
           }
 
           /** Equality part */
-          implicit def compare: Comparing[Double] = new Comparing[Double]{
+          implicit def eq: Equality[Double] = new Equality[Double]{
                def equal(x: Double, y: Double): Boolean = x == y
                def lessThan(x: Double, y: Double): Boolean = x < y
           }
