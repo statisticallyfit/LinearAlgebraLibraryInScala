@@ -11,7 +11,7 @@ import scala.language.higherKinds
 object NumberSyntax {
 
      import Number._ //note if we want miniature implicits tests tow ork
-     implicit class NumberOps[N, R](current: N)(implicit numLike: GenericNumber[N, R]){
+     implicit class NumberOps[N](current: N)(implicit numLike: Number[N]){
 
           //val n = implicitly[Number[N]]
 

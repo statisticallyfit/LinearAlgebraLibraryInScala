@@ -106,7 +106,7 @@ trait Trigonometric[T] {
 //followup note: root doesn't have to know about number:
 //note -  https://insight.io/github.com/non/spire/blob/master/core/shared/src/main/scala/spire/algebra/NRoot.scala
 
-private[linalg] trait GenericNumber[N, R] extends Field[N] {
+trait Number[N] extends Field[N] {
 
      val zero: N
      val one: N
@@ -126,19 +126,19 @@ private[linalg] trait GenericNumber[N, R] extends Field[N] {
 
      implicit def trig: Trigonometric[N]
      implicit def eq: Equality[N]
+     /*implicit def complexRoot: ComplexRoot[N, R]
+     implicit def complexAbs: ComplexAbsoluteValue[N, R]*/
+}
+
+//trait Nufmber[N] extends Number[N, _]
+
+trait ComplexNumber[N, R] extends Number[N] {
+
      implicit def complexRoot: ComplexRoot[N, R]
      implicit def complexAbs: ComplexAbsoluteValue[N, R]
 }
 
-trait Number[N] extends GenericNumber[N, _]
-
-/*trait ComplexNumber[N, R] extends GenericNumber[N] {
-
-     implicit def complexRoot: ComplexRoot[N, R]
-     implicit def complexAbs: ComplexAbsoluteValue[N, R]
-}*/
-
-trait RealNumber[R] extends GenericNumber[R, R] {
+trait RealNumber[R] extends Number[R] {
 
      implicit def root: Root[R]
      implicit def abs: AbsoluteValue[R]
@@ -157,7 +157,7 @@ object Number {
      def TWO[N: Number](implicit gen: Number[N]): N = gen.two
 
 
-     implicit def ComplexIsNumber[R: RealNumber] = new Number[Complex[R]] {
+     implicit def ComplexIsNumber[R: RealNumber] = new ComplexNumber[Complex[R], R] {
 
           val realLike = implicitly[RealNumber[R]]
 
