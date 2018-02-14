@@ -32,6 +32,7 @@ import scala.language.higherKinds
 
 trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
 
+
      // inherited - plus, negate, scale, innerProduct, norm, angle
      def minus(v: V, w: V): V = plus(v, negate(w))
      def isZero(v: V): Boolean
@@ -48,12 +49,23 @@ trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
 
 object VectorLike {
 
+     //TODO - actually cannot implement both at same time.
+     //todo - consider keeping the implicits in the typeclass like here - dimension serves purpose of having just the
+     //todo dimension in methods like spire and then we have also the has-a relation too - ebst of both worlds. Carry
+     //todo  out with Number so that we can do implicit trig: Trig[N] and have trig.PI instead of gen.trig.PI
+
      implicit def VectorIsVectorLike[N: Number] = new VectorLike[Vector[N], N]
-          with Dimension[Vector[N]] with Eq[Vector[N]] /*with Span[Vector[N], N]*/ {
+          /*with Dimension[Vector[N]]*/ with Eq[Vector[N]] /*with Span[Vector[N], N]*/ {
 
 
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
+
+          /** Dimension part */
+          implicit val vectorSpaceDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
+               def dimension(v: Vector[N]): Int = v.getElements().length
+          }
+          import vectorSpaceDimension._
 
           /** Eq part */
           def eqv(v: Vector[N], w: Vector[N]): Boolean = v.getElements() == w.getElements()
@@ -102,13 +114,12 @@ object VectorLike {
 
           def angle(v: Vector[N], w: Vector[N]): N = innerProduct(v, w) / (norm(v) * norm(w)).arccos()
 
-          def norm(v: Vector[N])(implicit f: Field[N]): N = v.getElements().map(e => e ^ Number.TWO[N]).reduceLeft(_ + _)
+          def norm(v: Vector[N])(implicit f: Field[N]): N =
+               v.getElements().map(e => e ^ Number.TWO[N]).reduceLeft(_ + _)
 
           //def dimension(v: Vector[N]): Int = v.getElements().length
 
-          implicit val vectorSpaceDimension: Dimension[Vector[N]] = new Dimension[Vector[N]] {
-               def dimension(v: Vector[N]): Int = v.getElements().length
-          }
+
 
           /*def get(v: Vector[N], i: Int): N = v.elements(i)
           //def set(v: Vector[N], i: Int, value: N): Unit = ListBuffer(v.elements:_*)(i) = value  //todo check if sticks

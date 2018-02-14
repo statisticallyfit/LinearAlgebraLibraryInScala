@@ -20,7 +20,7 @@ import scala.language.higherKinds
 object SetVecLikeSyntax {
 
      implicit class SetVecLikeOps[S[_],
-          N: Number: Trigonometric: Root: AbsoluteValue: Equality](current: S[N])(implicit ev: SetVecLike[S[N], N], dim:
+          N: Number: Trigonometric: Root: Absolute: Equality](current: S[N])(implicit ev: SetVecLike[S[N], N], dim:
      Dimension[S[N]]){
 
           def rowEchelon(): S[N] = ev.rowEchelon(current)

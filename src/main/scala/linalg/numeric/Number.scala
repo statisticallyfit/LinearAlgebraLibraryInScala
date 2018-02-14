@@ -58,11 +58,8 @@ trait Equality[E] {
      def greaterThanOrEqual(x: E, y: E): Boolean = greaterThan(x, y) || equal(x, y)
 }
 
-trait ComplexAbsoluteValue[N, R] {
-     def absoluteValue(x: N): R
-}
 
-trait ComplexRoot[N, R] {
+trait RootLike[N, R] {
 
      val rOne: R
      val rTwo: R
@@ -71,10 +68,14 @@ trait ComplexRoot[N, R] {
      def nRoot(base: N, n: R)(implicit f: Field[R]): N = power(base, f.divide(rOne, n))
      def squareRoot(base: N)(implicit f: Field[R]): N = nRoot(base, rTwo)
 }
+trait Root[R] extends RootLike[R, R]
 
-trait AbsoluteValue[A] extends ComplexAbsoluteValue[A, A]
 
-trait Root[R] extends ComplexRoot[R, R]
+trait AbsoluteLike[N, R] {
+     def absoluteValue(x: N): R
+}
+trait Absolute[A] extends AbsoluteLike[A, A]
+
 
 trait Trigonometric[T] {
 
@@ -99,13 +100,7 @@ trait Trigonometric[T] {
      def theta(y: T, x: T): T
 }
 
-//TODO WOW spire example here supports extending Number with Root etc instead of having them INSIDE like now
-// https://insight.io/github.com/non/spire/blob/master/core/shared/src/main/scala/spire/std/bigInt.scala
-//TODO revert back to previous work with separate typeclasses, no mixing with number, like similar to spire here:
-//https://insight.io/github.com/non/spire/blob/master/core/shared/src/main/scala/spire/math/Complex.scala
-//followup note: root doesn't have to know about number:
-//note -  https://insight.io/github.com/non/spire/blob/master/core/shared/src/main/scala/spire/algebra/NRoot.scala
-
+//todo private numeric , rename numerlike
 trait Number[N] extends Field[N] {
 
      val zero: N
@@ -126,24 +121,19 @@ trait Number[N] extends Field[N] {
 
      implicit def trig: Trigonometric[N]
      implicit def eq: Equality[N]
-     /*implicit def complexRoot: ComplexRoot[N, R]
-     implicit def complexAbs: ComplexAbsoluteValue[N, R]*/
 }
 
-//trait Nufmber[N] extends Number[N, _]
 
-trait ComplexNumber[N, R] extends Number[N] {
+trait ComplexNumber[R] extends Number[Complex[R]] {
 
-     implicit def complexRoot: ComplexRoot[N, R]
-     implicit def complexAbs: ComplexAbsoluteValue[N, R]
+     implicit def complexRoot: RootLike[Complex[R], R]
+     implicit def complexAbs: AbsoluteLike[Complex[R], R]
 }
 
 trait RealNumber[R] extends Number[R] {
 
      implicit def root: Root[R]
-     implicit def abs: AbsoluteValue[R]
-
-     //def from(x: Int): R
+     implicit def abs: Absolute[R]
 }
 
 
@@ -157,7 +147,7 @@ object Number {
      def TWO[N: Number](implicit gen: Number[N]): N = gen.two
 
 
-     implicit def ComplexIsNumber[R: RealNumber] = new ComplexNumber[Complex[R], R] {
+     implicit def ComplexIsNumber[R: RealNumber] = new ComplexNumber[R] {
 
           val realLike = implicitly[RealNumber[R]]
 
@@ -184,7 +174,7 @@ object Number {
 
 
           /** Root part */
-          implicit def complexRoot: ComplexRoot[Complex[R], R] = new ComplexRoot[Complex[R], R] {
+          implicit def complexRoot: RootLike[Complex[R], R] = new RootLike[Complex[R], R] {
                val rOne: R = realLike.one
                val rTwo: R = realLike.two
                def power(base: Complex[R], exp: R): Complex[R] =
@@ -192,7 +182,7 @@ object Number {
           }
 
           /** Absolute part */
-          implicit def complexAbs: ComplexAbsoluteValue[Complex[R], R] = new ComplexAbsoluteValue[Complex[R], R] {
+          implicit def complexAbs: AbsoluteLike[Complex[R], R] = new AbsoluteLike[Complex[R], R] {
                def absoluteValue(z: Complex[R]): R = Complex.magnitude(z)
           }
 
@@ -254,7 +244,7 @@ object Number {
           }
 
           /** Absolute value part */
-          implicit def abs: AbsoluteValue[Real] = new AbsoluteValue[Real]{
+          implicit def abs: Absolute[Real] = new Absolute[Real]{
                def absoluteValue(x: Real): Real = Real(math.abs(x.double))
           }
 
@@ -315,7 +305,7 @@ object Number {
           }
 
           /** Absolute value part */
-          implicit def abs: AbsoluteValue[Rational] = new AbsoluteValue[Rational]{
+          implicit def abs: Absolute[Rational] = new Absolute[Rational]{
                def absoluteValue(x: Rational): Rational = Rational(math.abs(x.num), math.abs(x.den))
           }
 
@@ -374,7 +364,7 @@ object Number {
           }
 
           /** Absolute value part */
-          implicit def abs: AbsoluteValue[Int] = new AbsoluteValue[Int]{
+          implicit def abs: Absolute[Int] = new Absolute[Int]{
                def absoluteValue(x: Int): Int = math.abs(x)
           }
 
@@ -432,7 +422,7 @@ object Number {
           }
 
           /** Absolute value part */
-          implicit def abs: AbsoluteValue[Double] = new AbsoluteValue[Double]{
+          implicit def abs: Absolute[Double] = new Absolute[Double]{
                def absoluteValue(x: Double): Double = math.abs(x)
           }
 

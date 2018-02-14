@@ -11,25 +11,25 @@ import scala.language.higherKinds
 object NumberSyntax {
 
      import Number._ //note if we want miniature implicits tests tow ork
-     implicit class NumberOps[N](current: N)(implicit numLike: Number[N]){
+     implicit class NumberOps[N](current: N)(implicit number: Number[N]){
 
           //val n = implicitly[Number[N]]
 
           // Number like stuff
-          def +(other: N): N = numLike.plus(current, other)
-          def -(other: N): N = numLike.minus(current, other)
-          def *(other: N): N = numLike.times(current, other)
-          def /(other: N): N = numLike.divide(current, other)
-          def negate(): N = numLike.negate(current)
-          def inverse(): N = numLike.inverse(current)
-          def isZero: Boolean = numLike.isZero(current)
-          def isNegative: Boolean = numLike.isNegative(current)
-          def toDouble: Double = numLike.doubleValue(current)
-          def toInt: Int = numLike.doubleValue(current).toInt // todo check this can be chopped off!
+          def +(other: N): N = number.plus(current, other)
+          def -(other: N): N = number.minus(current, other)
+          def *(other: N): N = number.times(current, other)
+          def /(other: N): N = number.divide(current, other)
+          def negate(): N = number.negate(current)
+          def inverse(): N = number.inverse(current)
+          def isZero: Boolean = number.isZero(current)
+          def isNegative: Boolean = number.isNegative(current)
+          def toDouble: Double = number.doubleValue(current)
+          def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!
 
           // ---------------------------------------------------------------------------
-          private val trig: Trigonometric[N] = numLike.trig
-          private val comp: Equality[N] = numLike.eq
+          private val trig: Trigonometric[N] = number.trig
+          private val comp: Equality[N] = number.eq
 
           // Trig stuff
           def sin(): N = trig.sin(current)
@@ -57,24 +57,23 @@ object NumberSyntax {
      }
 
 
-     implicit class ComplexNumberOps[C[_], R: RealNumber](current: C[R])(implicit c: ComplexNumber[C[R], R]){
+     implicit class ComplexNumberOps[R: RealNumber](current: Complex[R])(implicit c: ComplexNumber[R]){
           private val _root = c.complexRoot
           private val _abs = c.complexAbs
 
           // Root stuff
-          def ^(exp: R): C[R] = _root.power(current, exp)
-          def sqrt(): C[R] = _root.squareRoot(current)
-          def nRoot(n: R): C[R] = _root.nRoot(current, n)
+          def ^(exp: R): Complex[R] = _root.power(current, exp)
+          def sqrt(): Complex[R] = _root.squareRoot(current)
+          def nRoot(n: R): Complex[R] = _root.nRoot(current, n)
 
           // Absolute stuff
           def abs(): R = _abs.absoluteValue(current)
      }
 
 
-
      implicit class RealNumberOps[R](current: R)(implicit realNum: RealNumber[R]) {
           private val root: Root[R] = realNum.root
-          private val ab: AbsoluteValue[R] = realNum.abs
+          private val ab: Absolute[R] = realNum.abs
 
           //Root stuff
           def ^(exp: R): R = root.power(current, exp)
