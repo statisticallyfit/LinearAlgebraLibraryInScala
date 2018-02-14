@@ -103,7 +103,7 @@ trait Trigonometric[T] {
 }
 
 //todo private numeric , rename numerlike
-trait Number[N] extends Field[N] {
+trait Number[N, R] extends Field[N] {
 
      val zero: N
      val one: N
@@ -121,30 +121,27 @@ trait Number[N] extends Field[N] {
      def doubleValue(x: N): Double
      def from(x: Int): N
 
-     implicit def trig: Trigonometric[N]
-     implicit def eq: Equality[N]
-}
-//todo - prep name this Number and name Number as NumberLike or just have one Number[N, R] with these defs in it
-/*trait _Number[N, R] extends Number[N] {
+
      implicit def complexRoot: RootLike[N, R]
      implicit def complexAbs: AbsoluteLike[N, R]
      implicit def trig: Trigonometric[N]
      implicit def eq: Equality[N]
-}*/
+}
 
-trait ComplexNumber[R] extends Number[Complex[R]] {
+
+/*trait ComplexNumber[R] extends Number[Complex[R]] {
 
      implicit def complexRoot: RootLike[Complex[R], R]
      implicit def complexAbs: AbsoluteLike[Complex[R], R]
-}
+}*/
 
-trait RealNumber[R] extends Number[R] {
+trait RealNumber[R] extends Number[R, R] {
 
      implicit def root: Root[R]
      implicit def abs: Absolute[R]
 
-     /*override def complexRoot: RootLike[R,R] = root
-     override def complexAbs: AbsoluteLike[R,R] = abs*/
+     override def complexRoot: RootLike[R,R] = root
+     override def complexAbs: AbsoluteLike[R,R] = abs
 }
 
 
@@ -153,12 +150,12 @@ trait RealNumber[R] extends Number[R] {
 
 object Number {
 
-     def ZERO[N: Number](implicit gen: Number[N]): N = gen.zero
-     def ONE[N: Number](implicit gen: Number[N]): N = gen.one
-     def TWO[N: Number](implicit gen: Number[N]): N = gen.two
+     def ZERO[N, R:RealNumber](implicit gen: Number[N, R]): N = gen.zero
+     def ONE[N, R:RealNumber](implicit gen: Number[N, R]): N = gen.one
+     def TWO[N, R:RealNumber](implicit gen: Number[N, R]): N = gen.two
 
 
-     implicit def ComplexIsNumber[R: RealNumber] = new ComplexNumber[R] {
+     implicit def ComplexIsNumber[R: RealNumber] = new Number[Complex[R], R] {
 
           val realLike = implicitly[RealNumber[R]]
 
