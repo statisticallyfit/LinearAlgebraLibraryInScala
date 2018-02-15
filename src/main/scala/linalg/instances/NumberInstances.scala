@@ -1,42 +1,44 @@
 package linalg.instances
 
-import linalg.kernel.{Absolute, Complex, Number, Rational, Real, RealNumber, NRoot}
+import linalg.kernel.{Absolute, Complex, NRoot, Number, Rational, Real, RealNumber}
 import linalg.implicits._
+import linalg.theory.{AbelianGroup, Field, Monoid}
 
 /**
   *
   */
+
+//note: cannot write e.g. "NRoot instances" trait because NRoot must go here since otherwise
+// it will complain it doesn't have RealNumber for param R
+//todo remove extending e.g. Number extends Equality to see if we still need Number:Trig:Eq
+// in the type parameters of functions like ensureSize -- can we have separate? so that
+// we can do NRootInstances and so forth? Want to put all NRoot instances in one place
+//like for non-number types (Vector)
+
+
 trait NumberInstances {
-     
+
      implicit def ComplexIsNumber[R: RealNumber] = new Number[Complex[R]] with NRoot[Complex[R], R]
-          with Absolute[Complex[R], R] /*with Trigonometric[Complex[R]] with Equality[Complex[R]]*/ {
-
-          val realLike = implicitly[RealNumber[R]]
-
+          with Absolute[Complex[R], R] {
 
           /** Number part */
           val zero: Complex[R] = Complex.ZERO[R]
           val one: Complex[R] = Complex.ONE[R]
-          //val two: Complex[R] = Complex.TWO[R]
 
           def plus(x: Complex[R], y: Complex[R]): Complex[R] = Complex(x.re + y.re, x.im + y.im)
+          def negate(x: Complex[R]): Complex[R] = Complex(x.re.negate(), x.im.negate())
           def times(x: Complex[R], y: Complex[R]): Complex[R] = Complex(x.re * y.im - y.re * x.im, x.re * y.re + y.im * x.im)
           def divide(x: Complex[R], y: Complex[R]): Complex[R] = {
                val prod: Complex[R] = times(x, y)
                val absDenom: R = Complex.magnitude(y)
                Complex(prod.re / absDenom, prod.im / absDenom)
           }
-          def negate(x: Complex[R]): Complex[R] = Complex(x.re.negate(), x.im.negate())
           def isNegative(x: Complex[R]): Boolean = x.re.isNegative && x.im.isNegative
-          def isReal(x: Complex[R]): Boolean = x.im.isZero //todo make this visible in complex class or object.
-          def isImaginary(x: Complex[R]): Boolean = !isReal(x)
           def doubleValue(x: Complex[R]): Double = Complex.magnitude(x).toDouble
-          def from(x: Int): Complex[R] = Complex(realLike.from(x))
+          def from(x: Int): Complex[R] = Complex(RealNumber[R].from(x))
 
 
           /** Root part */
-          val rOne: R = realLike.one
-          val rTwo: R = realLike.two
           def power(base: Complex[R], exp: R): Complex[R] =
                Complex(Complex.magnitude(base) ^ exp, Complex.angle(base) * exp)
 

@@ -3,6 +3,9 @@ package linalg.syntax
 import linalg.kernel._
 import linalg.theory._
 
+import linalg.implicits._
+import linalg.instances._
+
 import scala.language.implicitConversions
 import scala.language.higherKinds
 /**
@@ -35,12 +38,6 @@ trait NumberSyntax {
           def abs(): R = ab.absoluteValue(current)
      }
 
-     import Number._ //note if we want miniature implicits tests tow ork
-     import CategorySyntax._
-
-
-     import RootLikeSyntax._
-     import AbsoluteLikeSyntax._
 
      Complex(1,2).nRoot(2)
      Rational(2) + Rational(2)

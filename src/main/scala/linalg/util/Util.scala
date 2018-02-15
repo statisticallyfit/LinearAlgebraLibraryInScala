@@ -1,17 +1,13 @@
 package linalg.util
 
 
+import linalg.implicits._
+import linalg.instances._
 
 import linalg.kernel._
 import linalg.vector._
 import linalg.theory.basis.Dimension
-import linalg.syntax.NumberSyntax._
-import linalg.vector.VectorLike._
-import linalg.syntax.DimensionSyntax._
-import linalg.syntax.VectorLikeSyntax._
-import linalg.syntax.SetVecLikeSyntax._
 import linalg.util.Exception.VectorLikeSizeException
-import linalg.vector.SetVecLike._
 
 import scala.collection.mutable.{ListBuffer, Seq}
 

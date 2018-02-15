@@ -1,9 +1,7 @@
-package linalg.theory
+package linalg.theory.basis
 
-import linalg.kernel._
 import linalg.theory.space._
 import linalg.vector._
-import linalg.vector.SetVecLike._
 
 import cats.Eq
 
@@ -13,7 +11,7 @@ import cats.Eq
 //todo theorem 4.2.6 in howard: implement Eq for Span type
 
 
-trait Span[W, F] extends VectorSpace[W, F] {
+trait Span[W, F] /*extends VectorSpace[W, F]*/ {
 
      //private val setLike = implicitly[SetVecLike[W, F]]
 

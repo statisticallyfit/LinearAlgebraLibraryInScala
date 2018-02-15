@@ -3,7 +3,7 @@ package linalg.theory.space
 /**
   * todo
   */
-trait ContinuousFunctionSpace[C, F] extends CoordinateSpace[C, F] {
+trait ContinuousFunctionSpace[C, F]  {
 
 }
 

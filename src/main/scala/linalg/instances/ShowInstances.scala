@@ -1,9 +1,8 @@
 package linalg.instances
 
 import linalg.kernel.{Complex, Imaginary, Number, Rational, Real, RealNumber}
-import linalg.show.Show
+import linalg.util.Show
 import linalg.vector.{SetOfVectors, Vector}
-
 import org.apache.commons.lang3.StringUtils
 
 import scala.collection.mutable.Seq

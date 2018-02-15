@@ -1,6 +1,6 @@
 package linalg.syntax
 
-import linalg.show.Show
+import linalg.util.Show
 
 /**
   *

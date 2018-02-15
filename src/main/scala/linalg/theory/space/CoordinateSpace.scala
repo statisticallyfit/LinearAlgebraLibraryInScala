@@ -3,6 +3,7 @@ package linalg.theory.space
 /** todo
   *
   */
+//todo Number should extend this
 trait CoordinateSpace[C, F] extends VectorSpace[C, F] {
 
 }

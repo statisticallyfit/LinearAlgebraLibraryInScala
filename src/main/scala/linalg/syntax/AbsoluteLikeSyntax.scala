@@ -2,6 +2,7 @@ package linalg.syntax
 
 import linalg.kernel.{Absolute, RealNumber}
 
+import scala.language.higherKinds
 /**
   *
   */

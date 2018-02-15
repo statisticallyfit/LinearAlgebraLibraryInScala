@@ -3,13 +3,10 @@ package linalg.vector
 
 import linalg.theory._
 import linalg.theory.space._
-import linalg.theory.basis._
 import linalg.kernel._
-import linalg.util.Util
 import linalg.implicits._
 import linalg.instances._
-import cats.Eq
-import linalg.show.Show
+import linalg.util.Show
 
 import scala.collection.mutable.{ListBuffer, Seq}
 import scala.language.implicitConversions
@@ -42,81 +39,6 @@ trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
      def toList(v: V): List[F]
      def toBuff(v: V): ListBuffer[F]*/
 }
-
-
-object VectorLike {
-
-
-     implicit def VectorIsVectorLike[N: Number] = new VectorLike[Vector[N], N]
-          with Dimension[Vector[N]] with Eq[Vector[N]] /*with Span[Vector[N], N]*/ {
-
-
-          val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
-          val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
-
-          /** Dimension part */
-          def dimension(v: Vector[N]): Int = v.getElements().length
-               //todo decide later if can revert stuff in Number back to implicit def version like in here and just
-               //todo while leaving the RootLike etc as add-on in Number Complex declaration - but sort of messy.
-
-          /** Eq part */
-          def eqv(v: Vector[N], w: Vector[N]): Boolean = v.getElements() == w.getElements()
-
-          /** VectorLike part */
-          def plus(v: Vector[N], w: Vector[N]): Vector[N] ={
-               Util.Gen.ensureSize(v, w)
-               Vector(v.getElements().zip(w.getElements()).map(pair => pair._1 + pair._2):_*)
-          }
-
-          def negate(v: Vector[N]): Vector[N] = Vector(v.getElements().map(e => e.negate()):_*)
-
-          def scale(v: Vector[N], factor: N): Vector[N] = Vector(v.getElements().map(e => e * factor):_*)
-
-          def isZero(v: Vector[N]): Boolean = v.getElements().forall(e => e :==: Number.ZERO[N])
-
-          def projection[R:RealNumber](v: Vector[N], onto: Vector[N])(implicit field: Field[N],
-                                                                      r: NRoot[N,R]): Vector[N] =
-               scale(onto, field.divide(innerProduct(v, onto), norm[R](onto)) )
-
-          def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = {
-               Util.Gen.ensureSize(v, w)
-
-               val as: Seq[N] = v.getElements()
-               val bs: Seq[N] = w.getElements()
-
-               val result: Seq[Seq[N]] = as.map(a => bs.map(b => a * b))
-
-               SetOfVectors.fromSeqs(result:_*)
-          }
-
-          def innerProduct(v: Vector[N], w: Vector[N]): N = {
-               Util.Gen.ensureSize(v, w)
-               v.getElements().zip(w.getElements()).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
-          }
-
-          def crossProduct(u: Vector[N], v: Vector[N]): Option[Vector[N]] = {
-
-               if(dimension(u) == 3 && dimension(v) == 3){
-                    val w1: N = (u.get(2) * v.get(3)) - (u.get(3) * v.get(2))
-                    val w2: N = (u.get(3) * v.get(1)) - (u.get(1) * v.get(3))
-                    val w3: N = (u.get(1) * v.get(2)) - (u.get(2) * v.get(1))
-
-                    Some(Vector(w1, w2, w3))
-
-               } else None
-          }
-
-          def angle[R:RealNumber](v: Vector[N], w: Vector[N])(implicit t: Trig[N],
-                                                              field: Field[N], r: NRoot[N,R]): N =
-               field.divide(innerProduct(v, w),  field.times(norm[R](v), norm[R](w)).arccos() )
-
-          def norm[R:RealNumber](v: Vector[N])(implicit field: Field[N], root: NRoot[N, R]): N =
-               Util.Gen.total[N](Vector(v.getElements().map(e => root.power(e, RealNumber.TWO[R])):_*))
-          //goal: Util.Gen.total[N](v.map(e => ...))
-          //todo test if this sums well, or if need explicit: .reduceLeft[N]((acc, y) => field.plus(acc,y))
-     }
-}
-
 
 
 
@@ -189,7 +111,6 @@ object Vector {
 
 object VectorTester extends App {
 
-     import VectorLike._
 
      val v1: Vector[Int] = Vector(1,2,3)
      val v2: Vector[Int] = Vector(2,0,4, 5)

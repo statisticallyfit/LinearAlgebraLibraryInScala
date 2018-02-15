@@ -6,7 +6,7 @@ import linalg.theory._
 /**
   *
   */
-trait Basis[B, F] extends VectorSpace[B, F] with Span[B, F] {
+trait Basis[B, F] /*extends VectorSpace[B, F] with Span[B, F]*/ {
 
      //note ifvecset cols are linearly independent, then the vecset is a basis for vecpsace V^n,
      // if not return None. which means this vecset is not a basis for the V^n vecspace.

@@ -1,17 +1,12 @@
 package linalg.kernel
 
 
-import linalg.show.Show._
 import linalg.theory._
 import linalg.implicits._
-import linalg.kernel.NumericConversion._
-/*import linalg.syntax.AbsoluteSyntax._
-import linalg.syntax.CompareSyntax._
-import linalg.syntax.RootSyntax._
-import linalg.syntax.TrigSyntax._*/
+import linalg.instances._
 
 import cats.Eq
-import cats.Monoid
+//import cats.Monoid
 
 import org.apache.commons.lang3.math.Fraction
 
@@ -144,6 +139,10 @@ object Complex {
 
      // --- Operations ---
      /*(implicit rr: Root[R], t: Trigonometric[R])*/
+     def isReal[R: RealNumber](x: Complex[R]): Boolean = x.im.isZero
+
+     def isImaginary[R: RealNumber](x: Complex[R]): Boolean = !isReal(x)
+
      def polar[R: RealNumber](z: Complex[R]): Complex[R] = Complex(magnitude(z), angle(z))
 
      def magnitude[R: RealNumber](z: Complex[R])/*(implicit rr: Root[R])*/: R =

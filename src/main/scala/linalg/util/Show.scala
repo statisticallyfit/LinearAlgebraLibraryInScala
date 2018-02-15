@@ -1,6 +1,4 @@
-package linalg.show
-
-
+package linalg.util
 
 /**
   *
