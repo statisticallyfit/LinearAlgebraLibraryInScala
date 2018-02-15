@@ -76,6 +76,8 @@ package object linalg {
      val HilbertSpace = linalg.theory.space.HilbertSpace
 
      //todo not doing stuff in Category since I might want to use Cats category stuff later!
+     type Monoid[M] = linalg.theory.Monoid[M]
+     val Monoid = linalg.theory.Monoid
 
      //matrix stuff //note - no need to write vec stuff like vectorlike.
      type MatrixLike[M, F] = linalg.matrix.MatrixLike[M, F]

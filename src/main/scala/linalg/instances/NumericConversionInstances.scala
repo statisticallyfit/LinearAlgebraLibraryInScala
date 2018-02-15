@@ -2,7 +2,8 @@ package linalg.instances
 
 import linalg.implicits._
 import linalg.instances._
-import linalg.kernel.{Complex, Imaginary, RealNumber, NRoot}
+import linalg.{RealNumber, Number, Monoid}
+import linalg.kernel.{Complex, Imaginary, NRoot}
 /**
   *
   */
@@ -35,8 +36,6 @@ trait NumericConversionInstances {
 
      implicit def GeneralRealToComplex[R: RealNumber](implicit root: NRoot[Complex[R], R]):
      NumericConversion[R, Complex[R]] = new NumericConversion[R, Complex[R]]{
-
-          import linalg.implicits._
 
           def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)
           def minus(from: R, to: Complex[R]): Complex[R] = Complex(from - to.re, to.im)
