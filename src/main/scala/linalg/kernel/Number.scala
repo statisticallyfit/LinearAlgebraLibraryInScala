@@ -1,10 +1,10 @@
-package linalg.numeric
+package linalg.kernel
 
 
 import linalg.show.Show._
 import linalg.theory._
 import linalg.implicits._
-import linalg.numeric.NumericConversion._
+import linalg.kernel.NumericConversion._
 /*import linalg.syntax.AbsoluteSyntax._
 import linalg.syntax.CompareSyntax._
 import linalg.syntax.RootSyntax._
@@ -50,75 +50,17 @@ import scala.language.higherKinds
 // TODO Real + complex => complex ... so no need for the hardcoded-complex-int conversion,
 // TODO we have interoperability automatically.
 
-//note: might as well declare Eq because Functor in cats uses it, so don't need TWO equals methods.
-trait Equality[E] extends Eq[E] {
-     //def equal(x: E, y: E): Boolean
-     def lessThan(x: E, y: E): Boolean
-     def greaterThan(x: E, y: E): Boolean = lessThan(y, x)
-     def lessThanOrEqual(x: E, y: E): Boolean = lessThan(x, y) || eqv(x, y)
-     def greaterThanOrEqual(x: E, y: E): Boolean = greaterThan(x, y) || eqv(x, y)
-}
 
-
-trait RootLike[N, R] {
-
-     val rOne: R
-     val rTwo: R
-
-     //implicit def num: Number[N]
-
-     def power(base: N, exp: R): N
-     def nRoot(base: N, n: R)(implicit f: Field[R]): N = power(base, f.divide(rOne, n))
-     def squareRoot(base: N)(implicit f: Field[R]): N = nRoot(base, rTwo)
-}
-trait Root[R] extends RootLike[R, R]
-
-
-trait AbsoluteLike[N, R] {
-     def absoluteValue(x: N): R
-}
-trait Absolute[A] extends AbsoluteLike[A, A]
-
-
-trait Trigonometric[T] {
-
-     val E: T
-     val PI: T
-
-     def sin(x: T): T
-     def cos(x: T): T
-     def tan(x: T): T
-     def csc(x: T): T
-     def sec(x: T): T
-     def cot(x: T): T
-
-     def arcsin(x: T): T
-     def arccos(x: T): T
-     def arctan(x: T): T
-     def arccsc(x: T): T
-     def arcsec(x: T): T
-     def arccot(x: T): T
-
-     //returns the theta component of polar (r, theta) of the x-y coordinate (x: T, y: T)
-     def theta(y: T, x: T): T
-}
 
 
 //note cannot have extending AbsoluteLike because of same old problem, so just implement them separately in the
 //implicit typeclass declaration
 
-trait Number[N] extends Field[N] with Trigonometric[N] with Equality[N] with Eq[N] {
+trait Number[N] extends Field[N] with Trig[N] with Equality[N] with Eq[N] {
 
-     //val zero: N
-     //val one: N
      val two: N = plus(one, one)
 
-     //def plus(x: N, y: N): N
      def minus(x: N, y: N): N = plus(x, negate(y))
-     //def times(x: N, y: N): N
-     //def divide(x: N, y: N): N
-     //def negate(x: N): N
-     //def inverse(x: N): N
 
      def isZero(x: N): Boolean = eqv(zero, x)
      def isNegative(x: N): Boolean
@@ -127,21 +69,26 @@ trait Number[N] extends Field[N] with Trigonometric[N] with Equality[N] with Eq[
      def from(x: Int): N
 }
 
-
-trait RealNumber[R] extends Number[R] with Absolute[R] with Root[R]
-
-object RealNumber {
-     def ZERO[R](implicit gen: RealNumber[R]): R = gen.zero
-     def ONE[R](implicit gen: RealNumber[R]): R = gen.one
-     def TWO[R](implicit gen: RealNumber[R]): R = gen.two
-}
-
-
 object Number {
 
      def ZERO[N](implicit gen: Number[N]): N = gen.zero
      def ONE[N](implicit gen: Number[N]): N = gen.one
      def TWO[N](implicit gen: Number[N]): N = gen.two
+
+     @inline final def apply[N](implicit ev: Number[N]): Number[N] = ev
+}
+
+
+
+trait RealNumber[R] extends Number[R] with Abs[R] with Root[R]
+
+
+object RealNumber {
+     def ZERO[R](implicit gen: RealNumber[R]): R = gen.zero
+     def ONE[R](implicit gen: RealNumber[R]): R = gen.one
+     def TWO[R](implicit gen: RealNumber[R]): R = gen.two
+
+     @inline final def apply[R](implicit ev: RealNumber[R]): RealNumber[R] = ev
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -208,7 +155,7 @@ object Complex {
 
      /** Returns the nth root of a complex number - in tuple form = (modulus root n, list of all roots) */
      def nthRootComplex[R](z: Complex[R], n: R)(implicit gen: RealNumber[R],
-                                                trig: Trigonometric[R])/*,
+                                                trig: Trig[R])/*,
                                                 rr: Root[R])*/: (R, List[R]) ={
 
           val two: R = gen.one + gen.one
@@ -220,7 +167,7 @@ object Complex {
           (modulus.nRoot(n), theNRoots)
      }
 
-     def nthRootsOfUnity[R](z: Complex[R], n: R)(implicit gen: RealNumber[R], trig: Trigonometric[R]): List[R] = {
+     def nthRootsOfUnity[R](z: Complex[R], n: R)(implicit gen: RealNumber[R], trig: Trig[R]): List[R] = {
           val two: R = gen.one + gen.one
           List.tabulate[R](n.toInt)(k => (two * gen.from(k) * trig.PI) / n)
      }

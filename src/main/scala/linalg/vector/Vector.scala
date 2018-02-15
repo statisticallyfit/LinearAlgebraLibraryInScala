@@ -4,17 +4,12 @@ package linalg.vector
 import linalg.theory._
 import linalg.theory.space._
 import linalg.theory.basis._
-import linalg.numeric._
-import linalg.numeric.Number._
-import linalg.syntax.NumberSyntax._
-import linalg.syntax.VectorSpaceSyntax._
-import linalg.syntax.ShowSyntax._
+import linalg.kernel._
 import linalg.util.Util
-
+import linalg.implicits._
+import linalg.instances._
 import cats.Eq
-import cats.Functor
-import cats.implicits._
-import cats.instances._
+import linalg.show.Show
 
 import scala.collection.mutable.{ListBuffer, Seq}
 import scala.language.implicitConversions
@@ -41,7 +36,7 @@ trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
      def crossProduct(v: V, w: V): Option[V]  //maybe won't work
      def outerProduct(v: V, w: V): SetOfVectors[F]
 
-     def projection[R:RealNumber](v: V, onto: V)(implicit f: Field[F], r: RootLike[F,R]): V
+     def projection[R:RealNumber](v: V, onto: V)(implicit f: Field[F], r: NRoot[F,R]): V
      /*def get(v: V, i: Int): F
      def set(v: V, i: Int, value: F): Unit
      def toList(v: V): List[F]
@@ -80,7 +75,7 @@ object VectorLike {
           def isZero(v: Vector[N]): Boolean = v.getElements().forall(e => e :==: Number.ZERO[N])
 
           def projection[R:RealNumber](v: Vector[N], onto: Vector[N])(implicit field: Field[N],
-                                                                      r: RootLike[N,R]): Vector[N] =
+                                                                      r: NRoot[N,R]): Vector[N] =
                scale(onto, field.divide(innerProduct(v, onto), norm[R](onto)) )
 
           def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = {
@@ -111,11 +106,11 @@ object VectorLike {
                } else None
           }
 
-          def angle[R:RealNumber](v: Vector[N], w: Vector[N])(implicit t: Trigonometric[N],
-                                                              field: Field[N], r: RootLike[N,R]): N =
+          def angle[R:RealNumber](v: Vector[N], w: Vector[N])(implicit t: Trig[N],
+                                                              field: Field[N], r: NRoot[N,R]): N =
                field.divide(innerProduct(v, w),  field.times(norm[R](v), norm[R](w)).arccos() )
 
-          def norm[R:RealNumber](v: Vector[N])(implicit field: Field[N], root: RootLike[N, R]): N =
+          def norm[R:RealNumber](v: Vector[N])(implicit field: Field[N], root: NRoot[N, R]): N =
                Util.Gen.total[N](Vector(v.getElements().map(e => root.power(e, RealNumber.TWO[R])):_*))
           //goal: Util.Gen.total[N](v.map(e => ...))
           //todo test if this sums well, or if need explicit: .reduceLeft[N]((acc, y) => field.plus(acc,y))
@@ -139,7 +134,8 @@ class Vector[N: Number](private val elems: N*) {
      /*def toList: List[N] = elements.toList
      def toSeq: Seq[N] = Seq(elements:_*)*/
 
-     override def toString: String = this.asInstanceOf[Vector[N]].show
+     //todo how does cats do it? Have Eq[A] not pink but a different blue color, value?
+     override def toString: String = Show[Vector[N]].show(this)
 }
 
 

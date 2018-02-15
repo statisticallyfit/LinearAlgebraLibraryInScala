@@ -2,7 +2,7 @@ package linalg.util
 
 
 
-import linalg.numeric._
+import linalg.kernel._
 import linalg.vector._
 import linalg.theory.basis.Dimension
 import linalg.syntax.NumberSyntax._

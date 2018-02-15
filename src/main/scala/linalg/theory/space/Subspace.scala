@@ -19,5 +19,5 @@ trait Subspace[S, F] extends VectorSpace[S, F] {
 
 
 object Subspace {
-     final def apply[S, R](implicit ev: Subspace[S, R]): Subspace[S, R] = ev
+     @inline final def apply[S, R](implicit ev: Subspace[S, R]): Subspace[S, R] = ev
 }

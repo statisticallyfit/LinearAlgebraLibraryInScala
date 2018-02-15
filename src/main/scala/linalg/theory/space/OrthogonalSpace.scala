@@ -4,15 +4,15 @@ package linalg.theory.space
   *
   */
 
-trait OrthogonalSpace[V, F] extends VectorSpace[V, F] {
+trait OrthogonalSpace[O, F] extends VectorSpace[O, F] {
 
-     def isOrthogonal(v: V): Boolean
-     def areOrthogonal(v1: V, v2: V): Boolean
-     def orthogonalize(v: V): V
+     def isOrthogonal(v: O): Boolean
+     def areOrthogonal(v1: O, v2: O): Boolean
+     def orthogonalize(v: O): O
 }
 
 
 
 object OrthogonalSpace {
-     final def apply[V, R](implicit ev: OrthogonalSpace[V, R]): OrthogonalSpace[V, R] = ev
+     @inline final def apply[O, F](implicit ev: OrthogonalSpace[O, F]): OrthogonalSpace[O, F] = ev
 }

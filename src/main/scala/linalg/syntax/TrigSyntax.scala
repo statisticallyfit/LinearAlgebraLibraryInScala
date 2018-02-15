@@ -1,15 +1,15 @@
 package linalg.syntax
 
-import linalg.numeric.Trigonometric
+import linalg.kernel.Trig
 
 /**
   *
   */
 trait TrigSyntax {
 
-     implicit class TrigOps[T: Trigonometric](current: T){
+     implicit class TrigOps[T: Trig](current: T){
 
-          private val trig: Trigonometric[T] = implicitly[Trigonometric[T]]
+          private val trig: Trig[T] = implicitly[Trig[T]]
 
           // Trig stuff
           def sin(): T = trig.sin(current)

@@ -19,7 +19,7 @@ import scala.util.control.Breaks._
 import cats.Eq
 
 import linalg.vector._
-import linalg.numeric._
+import linalg.kernel._
 import linalg.theory._
 import linalg.theory.space._
 
@@ -41,6 +41,10 @@ trait MatrixLike[M, F] extends SetVecLike[M, F] {
      def determinant(m: M): M
      def trace(m: M): F
 }
+
+object MatrixLike {
+     @inline final def apply[M,F](implicit ev: MatrixLike[M,F]): MatrixLike[M,F] = ev
+}
 //todo have object methods: isIdentity() and isSquare() and so forth
 //note: matrix types:
 //Square, Hessenberg, LowerTri, UpperTri, Unitary,
@@ -50,7 +54,7 @@ trait MatrixLike[M, F] extends SetVecLike[M, F] {
 
 //todo ok to pass no param? instead of passing non-used N?
 
-trait LinearSystem[S, N] extends MatrixLike[S, N] {
+trait LinearSystem[S, F] extends MatrixLike[S, F] {
 
      //this: Number[N] =>
 
@@ -64,6 +68,12 @@ trait LinearSystem[S, N] extends MatrixLike[S, N] {
      def solve(s: S): Option[S]
 }
 
+object LinearSystem {
+     @inline final def apply[S,F](implicit ev: LinearSystem[S,F]): LinearSystem[S,F] = ev
+}
+
+
+//todo move in another file? follow veclikepattern
 
 class Matrix[F: Field](cols: Vector[F]*)
 

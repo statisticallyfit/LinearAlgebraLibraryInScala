@@ -20,5 +20,5 @@ trait BanachSpace[B, F] extends NormedVectorSpace[B, F] {
 }
 
 object BanachSpace {
-     final def apply[B, R](implicit ev: BanachSpace[B, R]): BanachSpace[B, R] = ev
+     @inline final def apply[B, F](implicit ev: BanachSpace[B, F]): BanachSpace[B, F] = ev
 }

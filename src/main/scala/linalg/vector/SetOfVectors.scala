@@ -1,7 +1,7 @@
 package linalg.vector
 
-import linalg.numeric._
-import linalg.numeric.Number._
+import linalg.kernel._
+import linalg.kernel.Number._
 import linalg.theory.space._
 import linalg.theory.basis._
 import linalg.syntax.NumberSyntax._

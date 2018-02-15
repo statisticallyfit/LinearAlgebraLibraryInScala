@@ -17,6 +17,9 @@ trait Monoid[M] extends Group[M] {
      def plus(x: M, y: M): M
 }
 
+object Monoid {
+     @inline final def apply[M](implicit ev: Monoid[M]): Monoid[M] = ev
+}
 
 /**
   * An Abelian group is a group with a binary additive operation (+),
@@ -37,6 +40,10 @@ trait AbelianGroup[A] extends Monoid[A] {
      def negate(x: A): A
 }
 
+object AbelianGroup {
+     @inline final def apply[A](implicit ev: AbelianGroup[A]): AbelianGroup[A] = ev
+}
+
 /**
   * A ring is a set R equipped with two binary operations called addition and
   * multiplication:
@@ -52,6 +59,9 @@ trait Ring[R] extends AbelianGroup[R] with Monoid[R] {
      def times(x: R, y: R): R
 }
 
+object Ring {
+     @inline final def apply[R](implicit ev: Ring[R]): Ring[R] = ev
+}
 
 /**
   * As an algebraic structure, every field is a ring, but not every ring is a field.
@@ -71,4 +81,8 @@ trait Field[F] extends Ring[F] {
      //For each a in F, there exists an element b in F such that a × b = b × a = 1.
      def inverse(x: F): F = divide(one, x)
 
+}
+
+object Field {
+     @inline final def apply[F](implicit ev: Field[F]): Field[F] = ev
 }

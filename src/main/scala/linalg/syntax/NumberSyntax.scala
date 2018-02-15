@@ -1,6 +1,6 @@
 package linalg.syntax
 
-import linalg.numeric._
+import linalg.kernel._
 import linalg.theory._
 
 import scala.language.implicitConversions
@@ -24,7 +24,7 @@ trait NumberSyntax {
 
      implicit class RealNumberOps[R: RealNumber](current: R){
           private val root: Root[R] = implicitly[Root[R]]
-          private val ab: Absolute[R] = implicitly[Absolute[R]]
+          private val ab: Abs[R] = implicitly[Abs[R]]
 
           // Root stuff
           def ^(exp: R): R = root.power(current, exp)

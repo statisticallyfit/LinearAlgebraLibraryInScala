@@ -1,7 +1,7 @@
 package linalg.theory
 
 
-import linalg.numeric._
+import linalg.kernel._
 
 import scala.collection.mutable.ListBuffer
 import scala.reflect.runtime.universe._

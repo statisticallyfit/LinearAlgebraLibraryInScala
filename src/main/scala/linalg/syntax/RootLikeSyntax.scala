@@ -1,13 +1,13 @@
 package linalg.syntax
 
-import linalg.numeric.{RealNumber, RootLike}
+import linalg.kernel.{RealNumber, NRoot}
 
 /**
   *
   */
 trait RootLikeSyntax {
 
-     implicit class RootLikeLAYEROps[N[_], R](current: N[R])(implicit root: RootLike[N[R], R]){
+     implicit class RootLikeLAYEROps[N[_], R](current: N[R])(implicit root: NRoot[N[R], R]){
 
           // Root stuff
           def ^(exp: R): N[R] = root.power(current, exp)

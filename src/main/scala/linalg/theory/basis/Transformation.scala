@@ -10,8 +10,6 @@ trait Transformation[V, W] {
      def transform(x: V): W
 }
 
-
-
 object Transformation {
-     final def apply[V, W](implicit ev: Transformation[V, W]): Transformation[V, W] = ev
+     @inline final def apply[V, W](implicit ev: Transformation[V, W]): Transformation[V, W] = ev
 }

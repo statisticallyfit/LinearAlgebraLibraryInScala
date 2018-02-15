@@ -22,7 +22,7 @@ package linalg.vector
 //}*/
 //
 ///*
-import linalg.numeric._
+import linalg.kernel._
 import linalg.theory._
 import linalg.theory.space._
 

@@ -1,6 +1,6 @@
 package linalg.theory
 
-import linalg.numeric._
+import linalg.kernel._
 import linalg.theory.space._
 import linalg.vector._
 import linalg.vector.SetVecLike._
@@ -48,5 +48,5 @@ trait Span[W, F] extends VectorSpace[W, F] {
 
 
 object Span {
-     final def apply[S, R](implicit ev: Span[S, R]): Span[S, R] = ev
+     @inline final def apply[S, F](implicit ev: Span[S, F]): Span[S, F] = ev
 }

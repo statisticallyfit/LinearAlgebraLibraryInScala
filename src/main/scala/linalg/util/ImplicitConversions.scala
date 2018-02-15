@@ -1,6 +1,6 @@
 package linalg.util
 
-import linalg.numeric._
+import linalg.kernel._
 
 
 import org.apache.commons.lang3.math.Fraction

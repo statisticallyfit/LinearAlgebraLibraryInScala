@@ -1,6 +1,6 @@
 package linalg.theory.space
 
-import linalg.numeric.{RealNumber, RootLike, Trigonometric}
+import linalg.kernel.{RealNumber, NRoot, Trig}
 import linalg.theory.Field
 
 
@@ -13,7 +13,7 @@ import linalg.theory.Field
 trait HilbertSpace[H, F] extends InnerProductSpace[H, F] {
      //∠ : H × H → F
      // Inner product formalizes the geometrical notions such as the length of a vector and the angle between two vectors.
-     def angle[R:RealNumber](v: H, w: H)(implicit t: Trigonometric[F], f: Field[F], r: RootLike[F,R]): F
+     def angle[R:RealNumber](v: H, w: H)(implicit t: Trig[F], f: Field[F], r: NRoot[F,R]): F
 
      // <⋅,⋅> : H × H → F
      // Inner product formalizes the geometrical notions such as the length of a vector and the angle between two vectors.
@@ -22,5 +22,5 @@ trait HilbertSpace[H, F] extends InnerProductSpace[H, F] {
 
 
 object HilbertSpace {
-     final def apply[H, R](implicit ev: HilbertSpace[H, R]): HilbertSpace[H, R] = ev
+     @inline final def apply[H, F](implicit ev: HilbertSpace[H, F]): HilbertSpace[H, F] = ev
 }

@@ -3,7 +3,7 @@ package linalg.theory.space
 
 import linalg.theory._
 import linalg.theory.basis._
-import linalg.numeric._
+import linalg.kernel._
 
 
 
@@ -41,7 +41,7 @@ trait InnerProductSpace[I, F] extends VectorSpace[I, F] { self =>
 
 object InnerProductSpace {
      //todo meaning of final?
-     final def apply[I, R](implicit ev: InnerProductSpace[I, R]): InnerProductSpace[I, R] = ev
+     @inline final def apply[I, R](implicit ev: InnerProductSpace[I, R]): InnerProductSpace[I, R] = ev
 }
 
 
@@ -61,6 +61,6 @@ private[theory] trait NormedInnerProductSpace[V, F] extends NormedVectorSpace[V,
      def minus(v: V, w: V): V = innerSpace.plus(v, innerSpace.negate(w))
      def scale(v: V, constant: F): V = innerSpace.scale(v, constant)
 
-     def norm[R:RealNumber](v: V)(implicit f: Field[F], r: RootLike[F,R]): F =
+     def norm[R:RealNumber](v: V)(implicit f: Field[F], r: NRoot[F,R]): F =
           root.squareRoot(innerSpace.innerProduct(v, v))
 }

@@ -1,6 +1,6 @@
 package linalg.syntax
 
-import linalg.numeric.Equality
+import linalg.kernel.Equality
 
 /**
   *
