@@ -27,14 +27,14 @@ trait Monoid[M] extends Group[M] {
   *       existence of additive opposite
   *       commutativity of addition
   */
-trait AbelianGroup[G] extends Group[G] {
+trait AbelianGroup[A] extends Monoid[A] {
 
      // zero is identity for abelian: a + 0 = a
-     val zero: G
+     //val zero: G
      // the associative operations
-     def plus(x: G, y: G): G
+     //def plus(x: G, y: G): G
      // For each a in G, there exists an element b in G such that a + b = b + a = 0.
-     def negate(x: G): G
+     def negate(x: A): A
 }
 
 /**

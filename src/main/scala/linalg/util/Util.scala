@@ -21,9 +21,6 @@ import scala.collection.mutable.{ListBuffer, Seq}
 
 object Util {
 
-     /*trait SizeChecker[V] {
-          def ensureSize(v: V, w: V, SIZE: Int = 0): Unit //throw exception
-     }*/
 
      object Gen {
 
@@ -48,7 +45,7 @@ object Util {
                val factor: Double = ("1" + List.fill[Int](places)(0).mkString).toDouble
                (double * factor).round / factor
           }
-//:Trigonometric:Root:Absolute:Comparing
+
           def getNonZeroRows[N:Number](vset: SetOfVectors[N]): Seq[Vector[N]] =
                vset.getRows().filterNot(row => row.isZero)
 
@@ -61,6 +58,8 @@ object Util {
           def colCombine[N:Number](vset: SetOfVectors[N],
                                    wset: SetOfVectors[N]): SetOfVectors[N] =
                SetOfVectors((vset.getColumns() ++ wset.getColumns()):_*)
+
+          def total[N:Number](v: Vector[N]): N = v.getElements().reduceLeft[N](_ + _)
 
           def ensureSize[N:Number](v: Vector[N], w: Vector[N],
                                    SIZE: Int = 0): Unit = {

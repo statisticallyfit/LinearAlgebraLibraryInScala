@@ -11,6 +11,8 @@ import linalg.syntax.CompareSyntax._
 import linalg.syntax.RootSyntax._
 import linalg.syntax.TrigSyntax._*/
 
+import cats.Eq
+import cats.Monoid
 
 import org.apache.commons.lang3.math.Fraction
 
@@ -49,13 +51,13 @@ import scala.language.higherKinds
 // TODO Real + complex => complex ... so no need for the hardcoded-complex-int conversion,
 // TODO we have interoperability automatically.
 
-
-trait Equality[E] {
-     def equal(x: E, y: E): Boolean
+//note: might as well declare Eq because Functor in cats uses it, so don't need TWO equals methods.
+trait Equality[E] extends Eq[E] {
+     //def equal(x: E, y: E): Boolean
      def lessThan(x: E, y: E): Boolean
      def greaterThan(x: E, y: E): Boolean = lessThan(y, x)
-     def lessThanOrEqual(x: E, y: E): Boolean = lessThan(x, y) || equal(x, y)
-     def greaterThanOrEqual(x: E, y: E): Boolean = greaterThan(x, y) || equal(x, y)
+     def lessThanOrEqual(x: E, y: E): Boolean = lessThan(x, y) || eqv(x, y)
+     def greaterThanOrEqual(x: E, y: E): Boolean = greaterThan(x, y) || eqv(x, y)
 }
 
 
@@ -106,18 +108,19 @@ trait Trigonometric[T] {
 //note cannot have extending AbsoluteLike because of same old problem, so just implement them separately in the
 //implicit typeclass declaration
 
-trait Number[N] extends Field[N] with Trigonometric[N] with Equality[N] {
+trait Number[N] extends Field[N] with Trigonometric[N] with Equality[N] with Eq[N] {
 
-     val zero: N
-     val one: N
-     val two: N
+     //val zero: N
+     //val one: N
+     val two: N = plus(one, one)
 
-     def plus(x: N, y: N): N
+     //def plus(x: N, y: N): N
      def minus(x: N, y: N): N = plus(x, negate(y))
-     def times(x: N, y: N): N
-     def divide(x: N, y: N): N
-     def negate(x: N): N
-     def inverse(x: N): N
+     //def times(x: N, y: N): N
+     //def divide(x: N, y: N): N
+     //def negate(x: N): N
+     //def inverse(x: N): N
+
      def isZero(x: N): Boolean
      def isNegative(x: N): Boolean
 
@@ -151,7 +154,7 @@ object Number {
           /** Number part */
           val zero: Complex[R] = Complex.ZERO[R]
           val one: Complex[R] = Complex.ONE[R]
-          val two: Complex[R] = Complex.TWO[R]
+          //val two: Complex[R] = Complex.TWO[R]
 
           def plus(x: Complex[R], y: Complex[R]): Complex[R] = Complex(x.re + y.re, x.im + y.im)
           def times(x: Complex[R], y: Complex[R]): Complex[R] = Complex(x.re * y.im - y.re * x.im, x.re * y.re + y.im * x.im)
@@ -161,7 +164,7 @@ object Number {
                Complex(prod.re / absDenom, prod.im / absDenom)
           }
           def negate(x: Complex[R]): Complex[R] = Complex(x.re.negate(), x.im.negate())
-          def isZero(x: Complex[R]): Boolean = equal(x, zero)
+          def isZero(x: Complex[R]): Boolean = eqv(x, zero)
           def isNegative(x: Complex[R]): Boolean = x.re.isNegative && x.im.isNegative
           def isReal(x: Complex[R]): Boolean = x.im.isZero //todo make this visible in complex class or object.
           def isImaginary(x: Complex[R]): Boolean = !isReal(x)
@@ -179,7 +182,8 @@ object Number {
           def absoluteValue(z: Complex[R]): R = Complex.magnitude(z)
 
           /** Equality part */
-          def equal(x: Complex[R], y: Complex[R]): Boolean = x.re :==: y.re && x.im :==: y.im
+          //def equal(x: Complex[R], y: Complex[R]): Boolean = x.re :==: y.re && x.im :==: y.im
+          def eqv(x: Complex[R], y: Complex[R]): Boolean = x.re :==: y.re && x.im :==: y.im
           def lessThan(x: Complex[R], y: Complex[R]): Boolean = x.re < y.re || (x.re :==: y.re && x.im < y.im)
 
 
@@ -212,14 +216,13 @@ object Number {
 
           val zero: Real = Real.ZERO
           val one: Real = Real.ONE
-          val two: Real = Real.TWO
 
 
           def plus(x: Real, y: Real): Real = Real(x.double + y.double)
           def times(x: Real, y: Real): Real = Real(x.double * y.double)
           def divide(x: Real, y: Real): Real = Real(x.double / y.double)
           def negate(x: Real): Real = Real(-x.double)
-          def isZero(x: Real): Boolean = equal(x, zero)
+          def isZero(x: Real): Boolean = eqv(x, zero)
           def isNegative(x: Real): Boolean = x.double < 0
           def doubleValue(x: Real): Double = x.double
           def from(x: Int): Real = Real(x)
@@ -233,7 +236,7 @@ object Number {
           def absoluteValue(x: Real): Real = Real(math.abs(x.double))
 
           /** Equality part */
-          def equal(x: Real, y: Real): Boolean = x.double == y.double
+          def eqv(x: Real, y: Real): Boolean = x.double == y.double
           def lessThan(x: Real, y: Real): Boolean = x.double < y.double
 
           /** Trig part **/
@@ -264,13 +267,12 @@ object Number {
           /** Real part */
           val zero: Rational = Rational.ONE
           val one: Rational = Rational.ONE
-          val two: Rational = Rational.ONE
 
           def plus(x: Rational, y: Rational): Rational = Rational(x.num*y.den + y.num*x.den, x.den*y.den)
           def times(x: Rational, y: Rational): Rational = Rational(x.num * y.num, x.den * y.den)
           def divide(x: Rational, y: Rational): Rational = Rational(x.num * y.den, x.den * y.num)
           def negate(x: Rational): Rational = Rational(-x.num, -x.den)
-          def isZero(x: Rational): Boolean = equal(x, zero)
+          def isZero(x: Rational): Boolean = eqv(x, zero)
           def isNegative(x: Rational): Boolean = x.num < 0
           def doubleValue(x: Rational): Double = x.num * 1.0 / x.den
           def from(x: Int): Rational = Rational(x)
@@ -285,7 +287,7 @@ object Number {
           def absoluteValue(x: Rational): Rational = Rational(math.abs(x.num), math.abs(x.den))
 
           /** Equality part */
-          def equal(x: Rational, y: Rational): Boolean = x.num * y.den == y.num * x.den
+          def eqv(x: Rational, y: Rational): Boolean = x.num * y.den == y.num * x.den
           def lessThan(x: Rational, y: Rational): Boolean = x.num * y.den < y.num * x.den
 
           /** Trig part **/
@@ -316,7 +318,6 @@ object Number {
 
           val zero: Int = 0
           val one: Int = 1
-          val two: Int = 2
 
           def plus(x: Int, y: Int): Int = x + y
           def times(x: Int, y: Int): Int = x * y
@@ -336,7 +337,7 @@ object Number {
           def absoluteValue(x: Int): Int = math.abs(x)
 
           /** Equality part */
-          def equal(x: Int, y: Int): Boolean = x == y
+          def eqv(x: Int, y: Int): Boolean = x == y
           def lessThan(x: Int, y: Int): Boolean = x < y
 
           /** Trig part **/
@@ -366,7 +367,6 @@ object Number {
 
           val zero: Double = 0.0
           val one: Double = 1.0
-          val two: Double = 2.0
 
           def plus(x: Double, y: Double): Double = x + y
           def times(x: Double, y: Double): Double = x * y
@@ -386,7 +386,7 @@ object Number {
           def absoluteValue(x: Double): Double = math.abs(x)
 
           /** Equality part */
-          def equal(x: Double, y: Double): Boolean = x == y
+          def eqv(x: Double, y: Double): Boolean = x == y
           def lessThan(x: Double, y: Double): Boolean = x < y
 
 

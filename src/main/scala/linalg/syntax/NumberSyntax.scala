@@ -12,16 +12,41 @@ object NumberSyntax {
 
      import Number._ //note if we want miniature implicits tests tow ork
 
+     implicit class MonoidOps[M: Monoid](current: M){
+          private val monoid = implicitly[Monoid[M]]
+
+          def +(other: M): M = monoid.plus(current, other)
+     }
+
+     implicit class AbelianGroupOps[A:AbelianGroup](current: A){
+          private val abelian = implicitly[AbelianGroup[A]]
+
+          def negate(): A = abelian.negate(current)
+     }
+
+     implicit class RingOps[R: Ring](current: R){
+          private val ring = implicitly[Ring[R]]
+
+          def *(other: R): R = ring.times(current, other)
+     }
+
+     implicit class FieldOps[F: Field](current: F){
+          private val field = implicitly[Field[F]]
+
+          def /(other: F): F = field.divide(current, other)
+          def inverse(): F = field.inverse(current)
+     }
+
      implicit class NumberOps[N: Number](current: N) {
 
           private val number = implicitly[Number[N]]
 
-          def +(other: N): N = number.plus(current, other)
+          //def +(other: N): N = number.plus(current, other)
           def -(other: N): N = number.minus(current, other)
-          def *(other: N): N = number.times(current, other)
-          def /(other: N): N = number.divide(current, other)
-          def negate(): N = number.negate(current)
-          def inverse(): N = number.inverse(current)
+          //def *(other: N): N = number.times(current, other)
+          //def /(other: N): N = number.divide(current, other)
+          //def negate(): N = number.negate(current)
+          //def inverse(): N = number.inverse(current)
           def isZero: Boolean = number.isZero(current)
           def isNegative: Boolean = number.isNegative(current)
 
@@ -55,8 +80,10 @@ object NumberSyntax {
           private val comp: Equality[E] = implicitly[Equality[E]]
 
           //Compare stuff
-          def :==:(other: E): Boolean = comp.equal(current, other)
-          def !==(other: E): Boolean = ! comp.equal(current, other)
+          //note - must define my own EQ operations :==: and !== because cats.Eq cannot go through Equality and
+          // still use === and =!= on Equality types even though it extends Eq ... weird.
+          def :==:(other: E): Boolean = comp.eqv(current, other)
+          def !==(other: E): Boolean = ! comp.eqv(current, other)
           def <(other: E): Boolean = comp.lessThan(current, other)
           def >(other: E): Boolean = comp.greaterThan(current, other)
           def <=(other: E): Boolean = comp.lessThanOrEqual(current, other)

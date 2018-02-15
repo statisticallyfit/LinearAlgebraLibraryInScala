@@ -7,15 +7,10 @@ import linalg.theory.basis._
 import linalg.syntax.NumberSyntax._
 import linalg.syntax.DimensionSyntax._
 import linalg.vector.VectorLike._
-import linalg.syntax.VectorLikeSyntax._
 import linalg.syntax.VectorSpaceSyntax._
-import linalg.syntax.SetVecLikeSyntax._
 import linalg.show.Show
-import linalg.syntax.ShowSyntax._
 import linalg.util.Util
-import org.apache.commons.lang3.StringUtils
 
-import scala.collection.mutable
 import scala.collection.mutable.{ListBuffer, Seq}
 import scala.language.higherKinds
 import scala.language.implicitConversions
@@ -201,7 +196,7 @@ object SetOfVectors {
 
 object SetVecTester extends App {
 
-     /*val s1: SetOfVectors[Double] = SetOfVectors(Vector(1,2,3,4,5), Vector(8,8,1,2,3),
+     val s1: SetOfVectors[Double] = SetOfVectors(Vector(1,2,3,4,5), Vector(8,8,1,2,3),
           Vector(-8,9,-3,0,1))
      println(s1.get(1,2)) //should be 9
      s1.getColumn(1).set(1)(333)
@@ -209,5 +204,5 @@ object SetVecTester extends App {
      println(s1)
      println(s1.get(0,0))
 
-     s1.copy()*/
+     s1.copy()
 }
