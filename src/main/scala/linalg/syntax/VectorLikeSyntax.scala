@@ -1,6 +1,7 @@
 package linalg.syntax
 
 import linalg.numeric._
+import linalg.theory._
 import linalg.vector._
 import linalg.vector.VectorLike._
 
@@ -24,21 +25,27 @@ object VectorLikeSyntax {
 
           /** Vector like */
           def -(other: V[N]): V[N] = vecLike.minus(current, other)
-          def angle(other: V[N]): N = vecLike.angle(current, other)
+
+          def angle[R:RealNumber](other: V[N])
+                                 (implicit t: Trigonometric[N],
+                                  r: RootLike[N,R]): N = vecLike.angle[R](current, other)
+
           def crossProduct(other: V[N]): Option[V[N]] = vecLike.crossProduct(current, other)
           def outerProduct(other: V[N]): SetOfVectors[N]= vecLike.outerProduct(current, other)
           def isZero: Boolean = vecLike.isZero(current)
-          def projection(onto: V[N]): V[N] = vecLike.projection(current, onto)
+          def projection[R:RealNumber](onto: V[N])(implicit f: Field[N], r: RootLike[N, R]): V[N] = vecLike
+               .projection[R](current, onto)
 
           /** Inner product space */
           def innerProduct(other: V[N]): N = vecLike.innerProduct(current, other)
           def dotProduct(other: V[N]): N = vecLike.dotProduct(current, other)
 
           /** Normed vector space */
-          def norm(): N = vecLike.norm(current)
-          def normalize(): V[N] = vecLike.normalize(current)
-          def isNormalized()(implicit eqVec: Eq[V[N]]): Boolean = vecLike.isNormalized(current)
-          def distance(other: V[N]): N = vecLike.distance(current, other)
+          def norm[R:RealNumber]()(implicit r: RootLike[N,R]): N = vecLike.norm[R](current)
+          def normalize[R:RealNumber]()(implicit r: RootLike[N,R]): V[N] = vecLike.normalize[R](current)
+          def isNormalized[R:RealNumber]()(implicit eqVec: Eq[V[N]],  r: RootLike[N,R]): Boolean =
+               vecLike.isNormalized[R](current)
+          def distance[R:RealNumber](other: V[N])(implicit r: RootLike[N,R]): N = vecLike.distance[R](current, other)
      }
      import Number._
      import linalg.syntax.NumberSyntax._

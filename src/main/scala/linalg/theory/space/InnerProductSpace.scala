@@ -51,10 +51,6 @@ object InnerProductSpace {
 
 private[theory] trait NormedInnerProductSpace[V, F] extends NormedVectorSpace[V, F] {
 
-
-     //this: Field[F] =>
-
-     //val scalar: Field[F] = innerSpace.scalar
      val root: Root[F]
      val innerSpace: InnerProductSpace[V, F]
 
@@ -65,5 +61,6 @@ private[theory] trait NormedInnerProductSpace[V, F] extends NormedVectorSpace[V,
      def minus(v: V, w: V): V = innerSpace.plus(v, innerSpace.negate(w))
      def scale(v: V, constant: F): V = innerSpace.scale(v, constant)
 
-     def norm(v: V)(implicit div: Field[F]): F = root.squareRoot(innerSpace.innerProduct(v, v))
+     def norm[R:RealNumber](v: V)(implicit f: Field[F], r: RootLike[F,R]): F =
+          root.squareRoot(innerSpace.innerProduct(v, v))
 }

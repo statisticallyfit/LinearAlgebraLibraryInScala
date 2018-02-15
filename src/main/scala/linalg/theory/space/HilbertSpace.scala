@@ -1,5 +1,8 @@
 package linalg.theory.space
 
+import linalg.numeric.{RealNumber, RootLike, Trigonometric}
+import linalg.theory.Field
+
 
 /**
   * A Hilbert space is an inner product space, an abstract vector space in which distances and angles
@@ -10,7 +13,7 @@ package linalg.theory.space
 trait HilbertSpace[H, F] extends InnerProductSpace[H, F] {
      //∠ : H × H → F
      // Inner product formalizes the geometrical notions such as the length of a vector and the angle between two vectors.
-     def angle(v: H, w: H): F
+     def angle[R:RealNumber](v: H, w: H)(implicit t: Trigonometric[F], f: Field[F], r: RootLike[F,R]): F
 
      // <⋅,⋅> : H × H → F
      // Inner product formalizes the geometrical notions such as the length of a vector and the angle between two vectors.

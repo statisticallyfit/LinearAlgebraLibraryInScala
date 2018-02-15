@@ -130,7 +130,7 @@ import SetVecLike._
 case class SetOfVectors[N: Number](private val cols: Vector[N]*) {
 
      private val columns: Seq[Vector[N]] = Seq(cols:_*)
-     val numRows: Int = this.dimension()
+     val numRows: Int = this.asInstanceOf[SetOfVectors[N]].dimension()
      val numCols: Int = columns.length
 
      private val s = implicitly[Show[SetOfVectors[N]]]
@@ -184,8 +184,7 @@ object SetOfVectors {
      def IDENTITY[N: Number](size: Int)(implicit ev: SetVecLike[SetOfVectors[N], N]):SetOfVectors[N] =
           ev.identity(size)
 
-     def IDENTITY[N: Number](vset: SetOfVectors[N])(implicit ev: SetVecLike[SetOfVectors[N], N],
-                                                    dim: Dimension[SetOfVectors[N]]): SetOfVectors[N] =
+     def IDENTITY[N: Number](vset: SetOfVectors[N])(implicit ev: SetVecLike[SetOfVectors[N], N]): SetOfVectors[N] =
           ev.identity(vset.dimension())
 
      def fromSeqs[N: Number](seqs: Seq[N]*): SetOfVectors[N] = SetOfVectors(seqs.map(aSeq => Vector(aSeq:_*)):_*)

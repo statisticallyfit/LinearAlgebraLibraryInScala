@@ -1,5 +1,6 @@
 package linalg.theory.space
 
+import linalg.numeric.{RealNumber, RootLike}
 import linalg.theory._
 /**
   *
@@ -7,7 +8,8 @@ import linalg.theory._
 
 trait OrthonormalSpace[V, F] extends OrthogonalSpace[V, F] with NormedVectorSpace[V, F]  {
 
-     def orthonormalize(v: V)(implicit f: Field[F]): V = normalize( orthogonalize(v) )
+     def orthonormalize[R:RealNumber](v: V)(implicit f: Field[F], r: RootLike[F,R]): V =
+          normalize[R]( orthogonalize(v) )
 }
 
 object OrthonormalSpace {
