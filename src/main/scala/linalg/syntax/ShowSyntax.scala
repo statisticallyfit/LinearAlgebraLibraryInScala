@@ -5,7 +5,7 @@ import linalg.show.Show
 /**
   *
   */
-object ShowSyntax {
+trait ShowSyntax {
      implicit class ShowOps[S: Show](current: S) {
           val ev = implicitly[Show[S]]
 

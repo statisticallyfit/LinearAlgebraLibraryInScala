@@ -126,7 +126,7 @@ object VectorLike {
 
 
 
-case class Vector[N: Number](private val elems: N*) {
+class Vector[N: Number](private val elems: N*) {
 
      private val elements: Seq[N] = Seq(elems:_*)
 
@@ -145,6 +145,7 @@ case class Vector[N: Number](private val elems: N*) {
 
 object Vector {
 
+     def apply[N: Number](elems: N*): Vector[N] = new Vector(elems:_*)
      def apply[N: Number](elems: Seq[N]): Vector[N] = new Vector(elems:_*)
      def apply[N: Number](elems: List[N]): Vector[N] = new Vector(elems:_*)
      def apply[N: Number](elems: ListBuffer[N]): Vector[N] = new Vector(elems:_*)

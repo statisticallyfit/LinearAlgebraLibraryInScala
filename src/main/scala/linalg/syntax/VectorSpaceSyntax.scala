@@ -17,8 +17,7 @@ import scala.language.higherKinds
 //note: finall vec implicits worked in file Vector because I imported linalg.numeric.Number._ in file Vector! (I
 // note think that is because Vector file uses Number and so does the implicit class veclikeops)
 
-
-object VectorSpaceSyntax {
+trait VectorSpaceSyntax {
 
 
      implicit class VectorSpaceOps[V[_], F](current: V[F])(implicit vecSpace: VectorSpace[V[F], F]){

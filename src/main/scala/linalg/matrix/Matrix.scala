@@ -30,6 +30,7 @@ trait MatrixLike[M, F] extends SetVecLike[M, F] {
 
      val identity: M
 
+     def power(m: M, exp: F): M //use linear algebra formula for matrix powers
      def inverse(m: M): M
      def transpose(m: M): M
      def conjugateTranspose(m: M): M
@@ -40,6 +41,7 @@ trait MatrixLike[M, F] extends SetVecLike[M, F] {
      def determinant(m: M): M
      def trace(m: M): F
 }
+//todo have object methods: isIdentity() and isSquare() and so forth
 //note: matrix types:
 //Square, Hessenberg, LowerTri, UpperTri, Unitary,
 //Orthogonal, Hermitian, Symmetric, Diagonal, Hilbert

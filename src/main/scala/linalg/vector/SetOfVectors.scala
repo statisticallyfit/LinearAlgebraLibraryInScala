@@ -5,11 +5,16 @@ import linalg.numeric.Number._
 import linalg.theory.space._
 import linalg.theory.basis._
 import linalg.syntax.NumberSyntax._
+import linalg.syntax
 import linalg.syntax.DimensionSyntax._
 import linalg.vector.VectorLike._
 import linalg.syntax.VectorSpaceSyntax._
 import linalg.show.Show
 import linalg.util.Util
+
+import cats.Eq
+import cats.instances._
+import cats.implicits._
 
 import scala.collection.mutable.{ListBuffer, Seq}
 import scala.language.higherKinds
@@ -26,6 +31,7 @@ trait SetVecLike[V, F] extends VectorSpace[V, F]{
      def identity(size: Int): V
      def rowReducedEchelon(m: V): V
      def rowEchelon(m: V): V
+
      def minus(v: V, w: V): V = plus(v, negate(w))
      def isZero(v: V): Boolean
 }
@@ -34,11 +40,13 @@ trait SetVecLike[V, F] extends VectorSpace[V, F]{
 object SetVecLike {
 
      /*(implicit vecLike: VectorLike[V[N], N])*/
-     implicit def SetVecsSetVecLike[N: Number] = new SetVecLike[SetOfVectors[N], N] with Dimension[SetOfVectors[N]] {
+     implicit def VecSetIsSetVecLike[N: Number] = new SetVecLike[SetOfVectors[N], N] with Dimension[SetOfVectors[N]]
+          with Eq[SetOfVectors[N]] {
 
           val zero: SetOfVectors[N] = SetOfVectors(Vector.ZERO[N](1))
           val one: SetOfVectors[N] = SetOfVectors(Vector.ONE[N](1))
 
+          /** Vector space part */ // ---------------------------------------------------------------------------------
           def plus(vset: SetOfVectors[N], wset: SetOfVectors[N]): SetOfVectors[N] ={
                Util.Gen.ensureSize(vset, wset)
                SetOfVectors(vset.getColumns().zip(wset.getColumns()).map(colPair => colPair._1 + colPair._2):_*)
@@ -49,10 +57,21 @@ object SetVecLike {
           def scale(v: SetOfVectors[N], factor: N): SetOfVectors[N] =
                SetOfVectors(v.getColumns().map(col => col.scale(factor)):_*)
 
-          def isZero(v: SetOfVectors[N]): Boolean = v.getColumns().forall(col => col.isZero)
 
 
+          /** Eq part */ // ---------------------------------------------------------------------------------
+          def eqv(vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean = {
+               Util.Gen.ensureSize(vset, wset)
+               vset.getColumns().zip(wset.getColumns()).forall(colPair => colPair._1 :==: colPair._2)
+          }
+
+
+          /** Dimension part */ // ---------------------------------------------------------------------------------
           def dimension(vset: SetOfVectors[N]): Int = vset.getColumns().head.dimension() //just get length of any column
+
+
+          /** Set vec part */ // ---------------------------------------------------------------------------------
+          def isZero(v: SetOfVectors[N]): Boolean = v.getColumns().forall(col => col.isZero)
 
           def identity(size: Int): SetOfVectors[N] ={
                val list = ListBuffer.fill[N](size, size)(Number.ZERO[N])
@@ -122,7 +141,7 @@ import SetVecLike._
 
 
 
-case class SetOfVectors[N: Number](private val cols: Vector[N]*) {
+class SetOfVectors[N: Number](private val cols: Vector[N]*) {
 
      private val columns: Seq[Vector[N]] = Seq(cols:_*)
      val numRows: Int = this.asInstanceOf[SetOfVectors[N]].dimension()
@@ -133,13 +152,11 @@ case class SetOfVectors[N: Number](private val cols: Vector[N]*) {
      def copy(): SetOfVectors[N] = SetOfVectors(columns:_*)
      def copy(cols: Seq[Vector[N]]): SetOfVectors[N] = SetOfVectors(cols:_*)
 
-
+     def getColumnsSeq(): Seq[Seq[N]] = Seq(columns.map(vec => vec.getElements()):_*)
      def getColumns(): Seq[Vector[N]] = Seq(columns:_*)
-
      def getColumn(colIndex: Int): Vector[N] = columns(colIndex)
 
      def getRow(rowIndex: Int): Vector[N] = this.getRows()(rowIndex)
-
      def getRows(): Seq[Vector[N]] = {
           val rows: Seq[Vector[N]] = Seq()
           for(r <- 0 until this.numRows) rows(r) = Vector(columns.map(colVec => colVec.get(r)):_*)
@@ -153,19 +170,18 @@ case class SetOfVectors[N: Number](private val cols: Vector[N]*) {
           }
      }
 
-
      def get(rowIndex: Int, colIndex: Int): N = this.getRow(rowIndex).get(colIndex)
      def set(rowIndex: Int, colIndex:Int)(value: N): Unit = columns(colIndex).set(rowIndex)(value)
-
 
 
      override def toString: String = s.show(this)
 }
 
 
+
 object SetOfVectors {
 
-     //def apply[N: Number:Trig:Root:Absolute:Compare](cols: Vector[N]*): SetOfVectors[N] = new SetOfVectors(cols:_*)
+     def apply[N: Number](cols: Vector[N]*): SetOfVectors[N] = new SetOfVectors(cols:_*)
 
      def apply[N: Number](nr:Int, nc:Int): SetOfVectors[N] =
           new SetOfVectors(Vector(Seq.fill[N](nr * nc)(Number.ZERO[N]):_*))
