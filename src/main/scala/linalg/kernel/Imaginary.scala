@@ -5,7 +5,7 @@ import linalg.implicits._
   *
   */
 //TODO try to implement Imaginary as Number type and see if you still need NumberConversion operations
-case class Imaginary[R: linalg.RealNumber](im: R) {
+case class Imaginary[R: RealNumber](im: R) {
 
      implicit def i: Imaginary[R] = this
 
@@ -23,7 +23,7 @@ case class Imaginary[R: linalg.RealNumber](im: R) {
 
 object Imaginary {
 
-     def ZERO[R](implicit gen: linalg.RealNumber[R]): Imaginary[R] = new Imaginary(gen.zero)
-     def ONE[R](implicit gen: linalg.RealNumber[R]): Imaginary[R] = new Imaginary(gen.one)
-     def TWO[R](implicit gen: linalg.RealNumber[R]): Imaginary[R] = new Imaginary(gen.two)
+     def ZERO[R](implicit gen: RealNumber[R]): Imaginary[R] = new Imaginary(gen.zero)
+     def ONE[R](implicit gen: RealNumber[R]): Imaginary[R] = new Imaginary(gen.one)
+     def TWO[R](implicit gen: RealNumber[R]): Imaginary[R] = new Imaginary(gen.two)
 }

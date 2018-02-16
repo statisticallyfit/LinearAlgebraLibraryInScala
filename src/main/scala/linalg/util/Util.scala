@@ -1,16 +1,16 @@
 package linalg.util
 
-
-import linalg.implicits._
-import linalg.instances._
-
-import linalg._
-//import linalg.kernel._
-import linalg.vector.{SetOfVectors, Vector}
-//import linalg.theory.basis.Dimension
-import linalg.util.Exception.VectorLikeSizeException
-
-import scala.collection.mutable.{ListBuffer, Seq}
+//
+//import linalg.implicits._
+//import linalg.instances._
+//
+//import linalg._
+////import linalg.kernel._
+//import linalg.vector.{SetOfVectors, Vector}
+////import linalg.theory.basis.Dimension
+//import linalg.util.Exception.VectorLikeSizeException
+//
+//import scala.collection.mutable.{ListBuffer, Seq}
 
 /**
   *
@@ -19,7 +19,7 @@ import scala.collection.mutable.{ListBuffer, Seq}
 object Util {
 
 
-     object Gen {
+     /*object Gen {
 
           /**
             * Inserts element at position i, leaving list the same length as before.
@@ -209,7 +209,7 @@ object Util {
           def expressColsAsRows[N:Number](cols: Seq[Vector[N]]): Seq[Vector[N]] = {
                expressRowsAsCols(cols)
           }
-     }
+     }*/
 }
 
 //

@@ -4,6 +4,7 @@ package linalg.theory.space
   *
   */
 //todo Number should extend this
+//todo see spire if extends innerprod space and then make number extend this!
 trait CoordinateSpace[C, F] extends VectorSpace[C, F] {
 
 }
