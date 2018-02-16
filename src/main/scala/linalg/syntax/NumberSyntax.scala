@@ -1,6 +1,8 @@
 package linalg.syntax
 
-import linalg.kernel._
+//import linalg.kernel._
+import linalg._
+import linalg.kernel.{Complex, Real, Rational}
 import linalg.theory._
 
 import linalg.implicits._
@@ -12,11 +14,18 @@ import scala.language.higherKinds
   *
   */
 trait NumberSyntax {
+
      implicit class NumberOps[N: Number](current: N) {
 
           private val number = implicitly[Number[N]]
 
+          def +(other: N): N = number.plus(current, other)
           def -(other: N): N = number.minus(current, other)
+          def *(other: N): N = number.times(current, other)
+          def /(other: N): N = number.divide(current, other)
+          def negate(): N = number.negate(current)
+
+          def inverse(): N = number.inverse(current)
           def isZero: Boolean = number.isZero(current)
           def isNegative: Boolean = number.isNegative(current)
 
@@ -25,9 +34,10 @@ trait NumberSyntax {
      }
 
 
+     //TODO all red
      implicit class RealNumberOps[R: RealNumber](current: R){
           private val root: Root[R] = implicitly[Root[R]]
-          private val ab: Abs[R] = implicitly[Abs[R]]
+          private val ab: Absolute[R] = implicitly[Absolute[R]]
 
           // Root stuff
           def ^(exp: R): R = root.power(current, exp)

@@ -17,7 +17,7 @@ import linalg.theory.basis._
   * (v) k + c)u = ku + cu               --- distributivity, scalars:
   *
   */
-trait VectorSpace[V, F] extends AbelianGroup[V] with Monoid[V] {
+trait VectorSpace[V, F] extends linalg.AbelianGroup[V] with linalg.Monoid[V] {
 
      //todo implicit def vectorSpaceDimension: Dimension[V]
      //implicit val scalar: Field[F]

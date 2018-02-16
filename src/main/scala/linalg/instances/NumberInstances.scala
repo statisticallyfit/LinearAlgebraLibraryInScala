@@ -1,6 +1,8 @@
 package linalg.instances
 
-import linalg.kernel.{Absolute, Complex, NRoot, Number, Rational, Real, RealNumber}
+//import linalg.kernel.{Absolute, Complex, NRoot, Number, Rational, Real, RealNumber}
+import linalg._
+import linalg.kernel.{Complex, Rational, Real}
 import linalg.implicits._
 import linalg.theory.{AbelianGroup, Field, Monoid}
 
@@ -18,8 +20,8 @@ import linalg.theory.{AbelianGroup, Field, Monoid}
 
 trait NumberInstances {
 
-     implicit def ComplexIsNumber[R: RealNumber] = new Number[Complex[R]] with NRoot[Complex[R], R]
-          with Absolute[Complex[R], R] {
+     implicit def ComplexIsNumber[R: RealNumber] = new Number[Complex[R]] with RootLike[Complex[R], R]
+          with AbsoluteLike[Complex[R], R] {
 
           /** Number part */
           val zero: Complex[R] = Complex.ZERO[R]
@@ -39,10 +41,14 @@ trait NumberInstances {
 
 
           /** Root part */
+          //TODO
+          //def power(x: Complex[R], y: Complex[R]): Complex[R] = ???
+
           def power(base: Complex[R], exp: R): Complex[R] =
                Complex(Complex.magnitude(base) ^ exp, Complex.angle(base) * exp)
 
           /** Absolute part */
+          //def absoluteValue(x: Complex[R]): Complex[R] = ???
           def absoluteValue(z: Complex[R]): R = Complex.magnitude(z)
 
           /** Equality part */
@@ -91,8 +97,6 @@ trait NumberInstances {
           def from(x: Int): Real = Real(x)
 
           /** Root part */
-          val rOne: Real = one
-          val rTwo: Real = two
           def power(base: Real, exp: Real): Real = Real(math.pow(base.double, exp.double))
 
           /** Absolute value part */
@@ -141,8 +145,6 @@ trait NumberInstances {
 
 
           /** Root part */
-          val rOne: Rational = one
-          val rTwo: Rational = two
           def power(base: Rational, exp: Rational): Rational = Rational(math.pow(doubleValue(base), doubleValue(exp)))
 
           /** Absolute value part */
@@ -190,8 +192,6 @@ trait NumberInstances {
           def from(x: Int): Int = x
 
           /** Root part */
-          val rOne: Int = 1
-          val rTwo: Int = 2
           def power(base: Int, exp: Int): Int = math.pow(base, exp).toInt //not chopped off
 
           /** Absolute value part */
@@ -238,8 +238,6 @@ trait NumberInstances {
           def from(x: Int): Double = x * 1.0
 
           /** Root part */
-          val rOne: Double = 1.0
-          val rTwo: Double = 2.0
           def power(base: Double, exp: Double): Double = math.pow(base, exp)
 
           /** Absolute value part */

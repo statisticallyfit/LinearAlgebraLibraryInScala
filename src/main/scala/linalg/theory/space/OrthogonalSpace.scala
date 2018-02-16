@@ -4,7 +4,7 @@ package linalg.theory.space
   *
   */
 
-trait OrthogonalSpace[O, F] extends VectorSpace[O, F] {
+trait OrthogonalSpace[O, F] extends linalg.VectorSpace[O, F] {
 
      def isOrthogonal(v: O): Boolean
      def areOrthogonal(v1: O, v2: O): Boolean

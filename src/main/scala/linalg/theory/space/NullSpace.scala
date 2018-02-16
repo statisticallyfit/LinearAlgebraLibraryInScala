@@ -3,7 +3,7 @@ package linalg.theory.space
 /**
   *
   */
-trait NullSpace[N, F] extends VectorSpace[N, F] {
+trait NullSpace[N, F] extends linalg.VectorSpace[N, F] {
      //todo see class to sketch out methods
 }
 

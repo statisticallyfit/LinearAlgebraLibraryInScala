@@ -1,7 +1,7 @@
 package linalg.syntax
 
-import linalg.kernel.Equality
-
+//import linalg.kernel.Equality
+import linalg._
 /**
   *
   */

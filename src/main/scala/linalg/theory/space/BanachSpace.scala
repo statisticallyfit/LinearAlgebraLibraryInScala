@@ -10,7 +10,7 @@ import linalg.theory._
   *
   */
 
-trait BanachSpace[B, F] extends NormedVectorSpace[B, F] {
+trait BanachSpace[B, F] extends linalg.NormedVectorSpace[B, F] {
 
      // |⋅| : B → F
      //norm assigns a strictly positive length or size to all vectors in the vector space, other than the zero vector.

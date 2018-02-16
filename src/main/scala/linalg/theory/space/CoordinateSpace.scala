@@ -4,7 +4,7 @@ package linalg.theory.space
   *
   */
 //todo Number should extend this
-trait CoordinateSpace[C, F] extends VectorSpace[C, F] {
+trait CoordinateSpace[C, F] extends linalg.VectorSpace[C, F] {
 
 }
 

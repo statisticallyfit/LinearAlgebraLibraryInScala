@@ -1,22 +1,17 @@
 package linalg.instances
 
 import linalg.implicits._
-import linalg.instances._
-import linalg.{RealNumber, Number, Monoid}
-import linalg.kernel.{Complex, Imaginary, NRoot}
+//import linalg.instances.RootLikeInstances
+//import linalg.{RealNumber, Number, Monoid}
+import linalg.kernel.{Complex, Imaginary}
+import linalg.{RootLike, RealNumber, NumericConversion}
 /**
   *
   */
 
 trait NumericConversionInstances {
 
-     trait NumericConversion[F, T] {
-          def plus(from: F, to: T): T
-          def minus(from: F, to: T): T
-          def times(from: F, to: T): T
-          def divide(from: F, to: T): T
-          def exponentiate(base: T, exp: F): T
-     }
+
 
      //mechanism: takes something that implements RealNumber and gives it .i accessor, returning Imaginary.
      implicit class ToImaginary[R: RealNumber](private val imaginaryPart: R){
@@ -34,14 +29,15 @@ trait NumericConversionInstances {
 
      // ---------------------------------------------------------------------------------------------
 
-     implicit def GeneralRealToComplex[R: RealNumber](implicit root: NRoot[Complex[R], R]):
+     implicit def GeneralRealToComplex[R: RealNumber](implicit root: RootLike[Complex[R], R]):
      NumericConversion[R, Complex[R]] = new NumericConversion[R, Complex[R]]{
 
           def plus(from: R, to: Complex[R]): Complex[R] = Complex(from + to.re, to.im)
           def minus(from: R, to: Complex[R]): Complex[R] = Complex(from - to.re, to.im)
           def times(from: R, to: Complex[R]): Complex[R] = Complex(from * to.re, from * to.im)
           def divide(from: R, to: Complex[R]): Complex[R] = Complex(to.re / from, to.im / from)
-          def exponentiate(base: Complex[R], exp: R): Complex[R] = base ^ exp
+          def exponentiate(base: Complex[R], exp: R): Complex[R] = root.power(base, exp)
+               //todo why error compile? base ^ exp
      }
 
      implicit class ConvertFrom[F, T](val from: F)(implicit conv: NumericConversion[F, T]){

@@ -7,7 +7,7 @@ import linalg.theory.{AbelianGroup, Field, Monoid, Ring}
   */
 trait CategorySyntax {
 
-     implicit class MonoidOps[M: Monoid](current: M){
+     /*implicit class MonoidOps[M: Monoid](current: M){
           private val monoid = implicitly[Monoid[M]]
 
           def +(other: M): M = monoid.plus(current, other)
@@ -30,5 +30,5 @@ trait CategorySyntax {
 
           def /(other: F): F = field.divide(current, other)
           def inverse(): F = field.inverse(current)
-     }
+     }*/
 }

@@ -1,6 +1,6 @@
 package linalg.syntax
 
-import linalg.kernel.{Absolute, RealNumber}
+import linalg.kernel.{AbsoluteLike, RealNumber}
 
 import scala.language.higherKinds
 /**
@@ -10,7 +10,7 @@ import scala.language.higherKinds
 trait AbsoluteLikeSyntax {
 
      implicit class AbsoluteLikeLAYEROps[N[_], R](current: N[R])
-                                                 (implicit ab: Absolute[N[R], R]){
+                                                 (implicit ab: linalg.AbsoluteLike[N[R], R]){
 
           // Absolute stuff
           def abs(): R = ab.absoluteValue(current)
