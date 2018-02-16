@@ -7,7 +7,7 @@ import cats.Eq
 //import linalg.theory.basis.Dimension
 //import linalg.theory.space._
 import linalg._
-//import linalg.vector.{SetOfVectors}
+import linalg.vector.{SetOfVectors, Vector}
 
 
 import scala.language.implicitConversions
@@ -19,17 +19,20 @@ import scala.language.higherKinds
 //note: finall vec implicits worked in file Vector because I imported linalg.numeric.Number._ in file Vector! (I
 // note think that is because Vector file uses Number and so does the implicit class veclikeops)
 
+
 trait VectorSpaceSyntax {
 
 
-     /*implicit class VectorSpaceOps[V[_], F](current: V[F])(implicit vecSpace: VectorSpace[V[F], F]){
+     implicit class VectorSpaceOps[V[_], F](current: V[F])(implicit vecSpace: VectorSpace[V[F], F]){
           def +(other: V[F]): V[F] = vecSpace.plus(current, other)
           def negate(): V[F] = vecSpace.negate(current)
           def scale(factor: F): V[F] = vecSpace.scale(current, factor)
      }
 
+}
 
 
+trait VectorLikeSyntax extends VectorSpaceSyntax {
 
      implicit class VecLikeOps[V[_], N: Number](current: V[N])(implicit vecLike: VectorLike[V[N], N]){
 
@@ -57,10 +60,11 @@ trait VectorSpaceSyntax {
                vecLike.isNormalized[R](current)
           def distance[R:RealNumber](other: V[N])(implicit r: RootLike[N,R]): N = vecLike.distance[R](current, other)
      }
+}
 
 
 
-
+trait SetVecLikeSyntax {
      implicit class SetVecLikeOps[S[_], N: Number](current: S[N])
                                                   (implicit ev: SetVecLike[S[N], N],
                                                    dim: Dimension[S[N]]){
@@ -71,5 +75,5 @@ trait VectorSpaceSyntax {
 
           def minus(other: S[N]): S[N] = ev.minus(current, other)
           def isZero: Boolean = ev.isZero(current)
-     }*/
+     }
 }

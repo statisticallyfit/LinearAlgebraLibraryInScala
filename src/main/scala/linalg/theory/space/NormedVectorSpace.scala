@@ -8,7 +8,7 @@ import linalg._
   *
   */
 
-trait NormedVectorSpace[V, F] extends linalg.VectorSpace[V, F] {
+trait NormedVectorSpace[V, F] extends VectorSpace[V, F] {
 
      //this: Field[F] =>
 

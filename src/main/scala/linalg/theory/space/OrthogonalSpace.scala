@@ -3,8 +3,8 @@ package linalg.theory.space
 /**
   *
   */
-
-trait OrthogonalSpace[O, F] extends linalg.VectorSpace[O, F] {
+//import spire.algebra.InnerProductSpace
+trait OrthogonalSpace[O, F] extends VectorSpace[O, F] {
 
      def isOrthogonal(v: O): Boolean
      def areOrthogonal(v1: O, v2: O): Boolean

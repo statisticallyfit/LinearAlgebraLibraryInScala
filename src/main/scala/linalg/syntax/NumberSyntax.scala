@@ -49,9 +49,9 @@ trait NumberSyntax {
      }
 
 
-     Complex(1,2).nRoot(2)
+     /*Complex(1,2).nRoot(2)
      Rational(2) + Rational(2)
      Rational(2) ^ Rational(2)
-     Rational(2).nRoot(Rational(2))
+     Rational(2).nRoot(Rational(2))*/
 }
 
