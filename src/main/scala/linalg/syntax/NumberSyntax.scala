@@ -10,6 +10,11 @@ import scala.language.higherKinds
 /**
   *
   */
+//note have extending rootsyntax + absolutesyntax here even though not so in the trait Number
+// note so that it works for realnumber syntax. Will it work for complex root?
+//note, answer YES will  work as long as you put ALL SYNTAXES extending the AllSyntax trait!!
+//(giddy)
+
 trait NumberSyntax extends FieldSyntax with TrigSyntax with EqualitySyntax
      with RootSyntax with AbsoluteSyntax {
 
@@ -26,6 +31,7 @@ trait NumberSyntax extends FieldSyntax with TrigSyntax with EqualitySyntax
      }
 }
 
+//trait RealNumberSyntax
 //TODO need to do realnumber syntax???
 
 //trait RealNumberSyntax extends RootSyntax with AbsoluteSyntax

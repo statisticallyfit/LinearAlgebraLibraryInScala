@@ -9,7 +9,10 @@ import linalg.implicits._
 case class Complex[R:RealNumber](re:R, im:R) {
      //override def toString: String = Complex(re, im).show
 }
-
+//works!
+/*object tester {
+     Complex(1,2).nRoot(2)
+}*/
 object Complex {
 
      def ZERO[R](implicit gen: RealNumber[R]): Complex[R] = new Complex(gen.zero, gen.zero)

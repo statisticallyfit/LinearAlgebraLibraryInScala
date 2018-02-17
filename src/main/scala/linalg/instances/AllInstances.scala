@@ -1,6 +1,7 @@
 package linalg.instances
 
 import linalg.instances.old._
+import linalg.instances.std._
 
 
 /**

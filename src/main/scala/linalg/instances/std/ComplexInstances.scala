@@ -1,5 +1,4 @@
-package linalg.instances
-
+package linalg.instances.std
 
 import linalg.implicits._
 import linalg.kernel._
@@ -38,7 +37,7 @@ class ComplexThings[R:RealNumber] {
           def sin(x: Complex[R]): Complex[R] = ???
           def cos(x: Complex[R]): Complex[R] = ???
           def tan(x: Complex[R]): Complex[R] = ???
-          
+
           def arcsin(x: Complex[R]): Complex[R] = ???
           def arccos(x: Complex[R]): Complex[R] = ???
           def arctan(x: Complex[R]): Complex[R] = ???
