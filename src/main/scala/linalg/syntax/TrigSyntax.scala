@@ -1,7 +1,7 @@
 package linalg.syntax
 
-//import linalg.kernel.Trig
-import linalg._
+import linalg.kernel.Trig
+
 
 /**
   *

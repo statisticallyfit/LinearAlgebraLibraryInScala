@@ -1,18 +1,22 @@
 package linalg.syntax
 
+//import spire.syntax.std.DoubleSyntax
+
 /**
   *
   */
-/*trait AllSyntax
-     extends AbsoluteLikeSyntax
-     with RootLikeSyntax
-     with CategorySyntax
+//note: no need to add IntSyntax etc here because the implicit classes in these below names
+//note - account for taking int as their types - check TODO
+
+trait AllSyntax
+     extends AbsoluteSyntax
+     with RootSyntax
+     with FieldSyntax
      with NumberSyntax
      with TrigSyntax
      with EqualitySyntax
-     with VectorSpaceSyntax
+     //with VectorSpaceSyntax
      with DimensionSyntax
-     with ShowSyntax*/
+     with ShowSyntax
 
-trait AllSyntax
-     extends 
+

@@ -5,7 +5,7 @@ import linalg.theory.Field
 /**
   *
   */
-trait Trig[T] extends Field[T] {
+trait Trig[T] /*extends Field[T]*/ {
 
      val E: T
      val PI: T
@@ -13,19 +13,19 @@ trait Trig[T] extends Field[T] {
      def sin(x: T): T
      def cos(x: T): T
      def tan(x: T): T
-     def csc(x: T): T = divide(one, sin(x))
-     def sec(x: T): T = divide(one, cos(x))
-     def cot(x: T): T = divide(one, tan(x))
+     def csc(x: T)(implicit f: Field[T]): T = f.divide(f.one, sin(x))
+     def sec(x: T)(implicit f: Field[T]): T = f.divide(f.one, cos(x))
+     def cot(x: T)(implicit f: Field[T]): T = f.divide(f.one, tan(x))
 
      def arcsin(x: T): T
      def arccos(x: T): T
      def arctan(x: T): T
-     def arccsc(x: T): T = divide(one, arcsin(x))
-     def arcsec(x: T): T = divide(one, arccos(x))
-     def arccot(x: T): T = divide(one, arctan(x))
+     def arccsc(x: T)(implicit f: Field[T]): T = f.divide(f.one, arcsin(x))
+     def arcsec(x: T)(implicit f: Field[T]): T = f.divide(f.one, arccos(x))
+     def arccot(x: T)(implicit f: Field[T]): T = f.divide(f.one, arctan(x))
 
      //returns the theta component of polar (r, theta) of the x-y coordinate (x: T, y: T)
-     def theta(y: T, x: T): T = tan(divide(y, x))
+     def theta(y: T, x: T)(implicit f: Field[T]): T = tan(f.divide(y, x))
 
      //TODO do the sinh + hyperbolic functions + log + exp
 }

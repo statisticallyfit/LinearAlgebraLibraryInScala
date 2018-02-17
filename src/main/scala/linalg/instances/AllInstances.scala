@@ -9,8 +9,14 @@ import linalg.instances.old._
 //note need to have intinstances etc
 //note: or maybe: RealNumberInstaces extends IntIsRealNumber with DoubleisReal, leaving IntInstances aside
 // and so forth: DimensionInstances extends VectorHasDimension, leaving VectorInstances aside
-/*trait AllInstances
-     extends NumberInstances
+trait AllInstances
+     extends IntInstances
+     with DoubleInstances
+     with RealInstances
+     with RationalInstances
+     with ComplexInstances
+
+/*NumberInstances
      with NumericConversionInstances
      with VectorSpaceInstances
      with DimensionInstances

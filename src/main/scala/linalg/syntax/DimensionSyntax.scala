@@ -1,7 +1,6 @@
 package linalg.syntax
 
-import linalg._
-//import linalg.theory.basis.Dimension
+import linalg.theory.basis.Dimension
 /**
   *
   */

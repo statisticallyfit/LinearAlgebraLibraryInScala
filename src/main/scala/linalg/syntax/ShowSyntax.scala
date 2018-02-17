@@ -1,7 +1,7 @@
 package linalg.syntax
 
-//import linalg.util.Show
-import linalg._
+import linalg.util.Show
+
 
 /**
   *

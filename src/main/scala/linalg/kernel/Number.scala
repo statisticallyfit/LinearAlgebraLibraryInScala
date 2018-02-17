@@ -14,7 +14,7 @@ import scala.language.higherKinds
 ////note cannot have extending AbsoluteLike because of same old problem, so just implement them separately in the
 ////implicit typeclass declaration
 //
-trait Number[N] extends Field[N] with Trig[N] with Equality[N] with Eq[N]
+trait Number[N] extends Field[N] with Trig[N] with Equality[N] /*with Eq[N]*/
      /*with Root[N] with Absolute[N]*/ {
 
      val two: N = plus(one, one)
