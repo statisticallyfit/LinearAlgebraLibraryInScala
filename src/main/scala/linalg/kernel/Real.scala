@@ -6,7 +6,7 @@ import linalg.implicits._
   *
   */
 case class Real(double: Double) {
-     override def toString = Real(double).show
+     //override def toString = Real(double).show
 }
 
 object Real {

@@ -1,11 +1,6 @@
-package linalg.instances
-
-import linalg.implicits._
-
-import linalg.{Number, Dimension}
+package linalg.instances.old
 //import linalg.kernel.Number
 //import linalg.theory.basis.Dimension
-import linalg.vector.{SetOfVectors, Vector, VectorLike}
 
 /**
   *

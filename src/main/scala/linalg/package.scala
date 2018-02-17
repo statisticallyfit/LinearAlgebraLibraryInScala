@@ -12,9 +12,9 @@ package object linalg {
      //kernel stuff
      type Number[N] = linalg.kernel.Number[N]
      //type AbsoluteLike[N, R] = linalg.kernel.AbsoluteLike[N, R]
-     type Absolute[A] = linalg.kernel.Absolute[A]
+     type Absolute[A, B] = linalg.kernel.Absolute[A, B]
      //type RootLike[N,R] = linalg.kernel.RootLike[N,R]
-     type Root[R] = linalg.kernel.Root[R]
+     type Root[N, R] = linalg.kernel.Root[N, R]
      type Equality[E] = linalg.kernel.Equality[E]
      type RealNumber[R] = linalg.kernel.RealNumber[R]
      type Trig[T] = linalg.kernel.Trig[T]

@@ -31,5 +31,5 @@ object NormedVectorSpace extends NormedVectorSpaceBase  {
 
 private[space] trait NormedVectorSpaceBase {
      implicit def InnerProductSpaceIsNormedVectorSpace[V, F](implicit space: InnerProductSpace[V, F], nroot:
-          Root[F]): NormedVectorSpace[V, F] = space.normed
+          Root[F,F]): NormedVectorSpace[V, F] = space.normed
 }

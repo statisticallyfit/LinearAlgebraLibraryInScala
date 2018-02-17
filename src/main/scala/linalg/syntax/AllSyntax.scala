@@ -3,7 +3,7 @@ package linalg.syntax
 /**
   *
   */
-trait AllSyntax
+/*trait AllSyntax
      extends AbsoluteLikeSyntax
      with RootLikeSyntax
      with CategorySyntax
@@ -12,4 +12,4 @@ trait AllSyntax
      with EqualitySyntax
      with VectorSpaceSyntax
      with DimensionSyntax
-     with ShowSyntax
+     with ShowSyntax*/

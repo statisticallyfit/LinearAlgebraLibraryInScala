@@ -1,21 +1,10 @@
-package linalg.instances
-
-import cats.Eq
-import cats.implicits._
+package linalg.instances.old
 //import linalg.kernel._
 //import linalg.{NRoot, Number, RealNumber, Trig}
 
 //import linalg.kernel.{NRoot, Number, RealNumber, Trig}
 //import linalg.theory._
 //import linalg.theory.space._
-import linalg._
-
-import linalg.util.Util
-import linalg.implicits._
-import linalg.vector.{SetOfVectors, Vector}
-
-import scala.collection.mutable.{ListBuffer, Seq}
-import scala.util.control.Breaks.{break, breakable}
 
 /**
   *

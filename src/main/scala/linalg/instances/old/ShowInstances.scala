@@ -1,13 +1,8 @@
-package linalg.instances
+package linalg.instances.old
 
-import linalg.kernel.{Complex, Imaginary, Rational, Real}
 import linalg._
+import linalg.kernel.{Complex, Imaginary, Rational, Real}
 //import linalg.util.Show
-import linalg.vector.{SetOfVectors, Vector}
-
-import org.apache.commons.lang3.StringUtils
-
-import scala.collection.mutable.Seq
 
 /**
   *

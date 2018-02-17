@@ -2,7 +2,6 @@ package linalg.kernel
 
 
 
-
 //1 todo what happens when we just have implicits like def two[implicit field}
 //or 2 todo what happens when implicit def field: Field[R] and we use field.divide(field.plus(...))??
 // 3 todo contrast with FIeld[R] and if implicit error ambigious is given?
@@ -30,10 +29,10 @@ package linalg.kernel
 
 //todo look at spire's Root to see how they have implicit number: Number[N] there!
 
-trait Root[R] {
-     def power(base: R, exp: R): R
-     def nRoot(base: R, n: R)(implicit r: Number[R]): R = power(base, r.divide(r.one, n))
-     def squareRoot(base: R)(implicit r: Number[R]): R = nRoot(base, r.two)
+trait Root[N, R] {
+     def power(base: N, exp: R): N
+     def nRoot(base: N, n: R)(implicit r: Number[R]): N = power(base, r.divide(r.one, n))
+     def squareRoot(base: N)(implicit r: Number[R]): N = nRoot(base, r.two)
 }
 /*
 {
@@ -44,5 +43,5 @@ trait Root[R] {
 */
 
 object Root {
-     @inline final def apply[R](implicit ev: Root[R]): Root[R] = ev
+     @inline final def apply[N,R](implicit ev: Root[N,R]): Root[N,R] = ev
 }

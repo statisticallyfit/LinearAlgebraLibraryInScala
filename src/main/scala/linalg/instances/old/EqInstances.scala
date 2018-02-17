@@ -1,11 +1,4 @@
-package linalg.instances
-
-import cats.Eq
-import cats.implicits._
-
-import linalg._
-import linalg.util.Util
-import linalg.vector.{SetOfVectors, Vector}
+package linalg.instances.old
 /**
   *
   */

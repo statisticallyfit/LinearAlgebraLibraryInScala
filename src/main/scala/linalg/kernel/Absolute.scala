@@ -12,10 +12,10 @@ object AbsoluteLike {
      @inline final def apply[N, R](implicit ev: AbsoluteLike[N, R]): AbsoluteLike[N, R] = ev
 }*/
 
-trait Absolute[A] {
-     def absoluteValue(x: A): A
+trait Absolute[A, B] {
+     def absoluteValue(x: A): B
 }
 
 object Absolute {
-     @inline final def apply[A](implicit ev: Absolute[A]): Absolute[A] = ev
+     @inline final def apply[A,B](implicit ev: Absolute[A,B]): Absolute[A,B] = ev
 }

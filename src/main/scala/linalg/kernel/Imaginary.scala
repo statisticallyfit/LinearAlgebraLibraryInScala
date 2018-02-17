@@ -7,7 +7,7 @@ import linalg.implicits._
 //TODO try to implement Imaginary as Number type and see if you still need NumberConversion operations
 case class Imaginary[R: RealNumber](im: R) {
 
-     implicit def i: Imaginary[R] = this
+     /*implicit def i: Imaginary[R] = this
 
      override def toString: String = im match {
           case _: Rational => im.isNegative match {
@@ -18,7 +18,7 @@ case class Imaginary[R: RealNumber](im: R) {
                case true => " - " + im.negate().toString + "i"
                case false => " + " + im.toString + "i"
           }
-     }
+     }*/
 }
 
 object Imaginary {

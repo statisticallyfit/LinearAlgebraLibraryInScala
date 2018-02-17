@@ -12,7 +12,7 @@ case class Rational(private val n: Int, private val d: Int) {
      val num: Int = reduced.getNumerator
      val den: Int = reduced.getDenominator
 
-     override def toString: String = Rational(num, den).show
+     //override def toString: String = Rational(num, den).show
 }
 
 
