@@ -1,6 +1,7 @@
 package linalg.syntax
 
 import linalg.kernel.Trig
+import linalg.theory.Field
 
 
 /**
@@ -8,7 +9,7 @@ import linalg.kernel.Trig
   */
 trait TrigSyntax {
 
-     implicit class TrigOps[T: Trig](current: T){
+     implicit class TrigOps[T: Trig:Field](current: T){
 
           private val trig: Trig[T] = implicitly[Trig[T]]
 
