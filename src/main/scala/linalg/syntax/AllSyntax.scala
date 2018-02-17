@@ -13,3 +13,6 @@ package linalg.syntax
      with VectorSpaceSyntax
      with DimensionSyntax
      with ShowSyntax*/
+
+trait AllSyntax
+     extends 

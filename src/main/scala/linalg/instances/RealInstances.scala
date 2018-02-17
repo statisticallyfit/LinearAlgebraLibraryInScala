@@ -21,9 +21,12 @@ trait RealHasEquality extends Equality[Real]{
      def eqv(x: Real, y: Real): Boolean = x.double == y.double
      def lessThan(x: Real, y: Real): Boolean = x.double < y.double
 }
+
 //TODO don't know if this is allowed, cyclic reference
-//TODO if not, put trig in the isrealnumber instance trait
-trait RealIsTrigonometric extends Trig[Real] with Field[Real] {
+//TODO if not, put trig in isrealnumber instance trait  OR have implicits per method like ROot currently
+//TODO if it DOES, then make Root extend field the same way to get one and divide
+
+trait RealIsTrig extends Trig[Real] /*with Field[Real]*/ {
      val E: Real = Real(scala.math.E)
      val PI: Real = Real(scala.math.Pi)
 
@@ -61,7 +64,7 @@ trait RealIsField extends Field[Real] with RealIsRing {
 // note use traits to extend additional ones like abeliangroup, no need to repeat them here.
 
 class RealIsRealNumber extends RealIsField
-     with RealIsTrigonometric
+     with RealIsTrig
      with RealIsAbsolute
      with RealIsRoot
      with RealHasEquality
