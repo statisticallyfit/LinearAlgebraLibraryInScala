@@ -15,56 +15,6 @@ import scala.util.control.Breaks._
   */
 //import spire.algebra.InnerProductSpace
 
-trait VectorLikeInstances extends VectorSpaceInstances {
-
-     implicit def VectorIsVectorLike[N: Number] = new VectorLike[Vector[N], N] {
-          /*with Span[Vector[N], N]*/
-
-          def isZero(v: Vector[N]): Boolean = v.getElements().forall(e => e :==: Number[N].zero)
-
-          def projection[R:RealNumber](v: Vector[N], onto: Vector[N])(implicit field: Field[N],
-                                                                      r: Root[N,R]): Vector[N] =
-               scale(onto, field.divide(innerProduct(v, onto), norm[R](onto)) )
-
-          def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = {
-               Util.Gen.ensureSize(v, w)
-
-               val as: Seq[N] = v.getElements()
-               val bs: Seq[N] = w.getElements()
-
-               val result: Seq[Seq[N]] = as.map(a => bs.map(b => a * b))
-
-               SetOfVectors.fromSeqs(result:_*)
-          }
-
-          def innerProduct(v: Vector[N], w: Vector[N]): N = {
-               Util.Gen.ensureSize(v, w)
-               v.getElements().zip(w.getElements()).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
-          }
-
-          def crossProduct(u: Vector[N], v: Vector[N]): Option[Vector[N]] = {
-
-               if(u.dimension() == 3 && v.dimension() == 3){
-                    val w1: N = (u.get(2) * v.get(3)) - (u.get(3) * v.get(2))
-                    val w2: N = (u.get(3) * v.get(1)) - (u.get(1) * v.get(3))
-                    val w3: N = (u.get(1) * v.get(2)) - (u.get(2) * v.get(1))
-
-                    Some(Vector(w1, w2, w3))
-
-               } else None
-          }
-
-          def angle[R:RealNumber](v: Vector[N], w: Vector[N])(implicit t: Trig[N],
-                                                              field: Field[N], r: Root[N,R]): N =
-               field.divide(innerProduct(v, w),  field.times(norm[R](v), norm[R](w)).arccos() )
-
-          def norm[R:RealNumber](v: Vector[N])(implicit field: Field[N], root: Root[N, R]): N =
-               Util.Gen.total[N](Vector(v.getElements().map(e => root.power(e, RealNumber[R].two)):_*))
-          //goal: Util.Gen.total[N](v.map(e => ...))
-          //todo test if this sums well, or if need explicit: .reduceLeft[N]((acc, y) => field.plus(acc,y))
-     }
-}
-
 trait VectorIsVectorSpace
 
 trait VectorSpaceInstances {
