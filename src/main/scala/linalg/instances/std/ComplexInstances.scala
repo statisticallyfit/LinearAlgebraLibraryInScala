@@ -8,13 +8,18 @@ import linalg.theory.{AbelianGroup, Field, Monoid, Ring}
   *
   */
 
-//TODO don't know if this will work
+//note
+//note benefits of using class ComplesIsSomething versus trait
+// note -- 1: can extend multiple classes, not just one (but only if we extend each previous class
+// like in vectorinstances, here we cannot do that!)
+// note -- 2: can say new so we can do many instances in the instances trait at the end
 
 class ComplexThings[R:RealNumber] {
 
      trait ComplexIsAbsolute extends Absolute[Complex[R], R] {
           def absoluteValue(z: Complex[R]): R = Complex.magnitude(z)
      }
+
 
      trait ComplexIsRoot extends Root[Complex[R], R] {
           def power(base: Complex[R], exp: R): Complex[R] =
@@ -86,10 +91,10 @@ class ComplexThings[R:RealNumber] {
           def from(x: Int): Complex[R] = Complex(RealNumber[R].from(x))
      }
 
-     val num = new ComplexIsNumber
+     val number = new ComplexIsNumber
 }
 
 trait ComplexInstances {
 
-     implicit final def complexIsNumber[R: RealNumber] = new ComplexThings[R].num
+     implicit final def complexIsNumber[R: RealNumber] = new ComplexThings[R].number
 }

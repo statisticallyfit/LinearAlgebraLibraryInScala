@@ -11,4 +11,10 @@ trait MonoidSyntax {
 
           def +(other: M): M = monoid.plus(current, other)
      }
+
+     //note: for layer types like vector
+     implicit class MonoidLayerOps[M[_], N](current: M[N])(implicit monoid: Monoid[M[N]]){
+
+          def +(other: M[N]): M[N] = monoid.plus(current, other)
+     }
 }

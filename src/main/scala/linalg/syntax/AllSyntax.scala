@@ -21,6 +21,12 @@ trait AllSyntax
      with FieldSyntax
      with ShowSyntax //breaker between std stuff and vecspace stuff
      with DimensionSyntax
+     with VectorSpaceSyntax
+     with HilbertSpaceSyntax
+     with InnerProductSpaceSyntax
+     with NormedVectorSpaceSyntax
+     with VectorLikeSyntax
+     with SetVecLikeSyntax
 
 
 

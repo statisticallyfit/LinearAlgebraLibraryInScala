@@ -12,4 +12,10 @@ trait RingSyntax extends AbelianGroupSyntax {
 
           def *(other: R): R = ring.times(current, other)
      }
+
+     //note: for layer types like vector
+     /*implicit class RingLayerOps[R[_], N](current: R[N])(implicit ring: Ring[R[N]]){
+
+          def times(other: R[N]): R[N] = ring.times(current, other)
+     }*/
 }

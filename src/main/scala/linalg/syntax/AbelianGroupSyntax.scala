@@ -12,4 +12,10 @@ trait AbelianGroupSyntax extends MonoidSyntax {
 
           def negate(): A = abelian.negate(current)
      }
+
+     //note: for layer types like vector
+     implicit class AbelianGroupLayerOps[A[_], N](current: A[N])(implicit abelian: AbelianGroup[A[N]]){
+
+          def negate(): A[N] = abelian.negate(current)
+     }
 }

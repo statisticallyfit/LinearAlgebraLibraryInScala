@@ -15,26 +15,6 @@ import scala.util.control.Breaks._
   */
 //import spire.algebra.InnerProductSpace
 
-trait VectorIsVectorSpace
-
-trait VectorSpaceInstances {
-
-     implicit def vectorIsVectorSpace[N: Number] = new VectorSpace[Vector[N], N] {
-          val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
-          val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
-
-
-          def plus(v: Vector[N], w: Vector[N]): Vector[N] ={
-               Util.Gen.ensureSize(v, w)
-               Vector(v.getElements().zip(w.getElements()).map(pair => pair._1 + pair._2):_*)
-          }
-
-          def negate(v: Vector[N]): Vector[N] = Vector(v.getElements().map(e => e.negate()):_*)
-
-          def scale(v: Vector[N], factor: N): Vector[N] = Vector(v.getElements().map(e => e * factor):_*)
-
-     }
-}
 
 
 trait temp {
