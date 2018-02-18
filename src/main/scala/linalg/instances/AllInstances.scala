@@ -16,6 +16,7 @@ trait AllInstances
      with RealInstances
      with RationalInstances
      with ComplexInstances
+     with NumericConversionInstances 
 
 /*NumberInstances
      with NumericConversionInstances
