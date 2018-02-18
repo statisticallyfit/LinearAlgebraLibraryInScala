@@ -15,7 +15,7 @@ trait AllSyntax
      with TrigSyntax
      with EqualitySyntax
      with NumberSyntax
-     with NumericConversionSyntax
+     //with NumericConversionSyntax
      //with RealNumberSyntax //note don't really need this? just extends numbersyntax
      with MonoidSyntax
      with AbelianGroupSyntax

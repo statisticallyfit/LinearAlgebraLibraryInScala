@@ -1,4 +1,4 @@
-package linalg.instances.old
+package linalg.instances.std
 
 import linalg.implicits._
 import linalg.kernel.{Complex, NumericConversion, RealNumber, Root}

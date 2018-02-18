@@ -16,7 +16,7 @@ import scala.language.higherKinds
 //(giddy)
 
 trait NumberSyntax extends FieldSyntax with TrigSyntax with EqualitySyntax
-     with RootSyntax with AbsoluteSyntax {
+     with RootSyntax with AbsoluteSyntax with NumericConversionSyntax {
 
 
      implicit class NumberOps[N: Number](current: N) {

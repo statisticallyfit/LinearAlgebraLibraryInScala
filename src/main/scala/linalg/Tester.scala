@@ -6,7 +6,7 @@ import linalg.kernel.{Complex, Rational, Real}
 /**
   */
 
-object Driver extends App {
+object Tester extends App {
 
 
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i + Rational(1)

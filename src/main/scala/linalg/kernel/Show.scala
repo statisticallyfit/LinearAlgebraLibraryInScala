@@ -1,4 +1,4 @@
-package linalg.util
+package linalg.kernel
 
 /**
   *

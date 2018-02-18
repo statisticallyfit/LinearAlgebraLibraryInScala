@@ -1,4 +1,4 @@
-import linalg.util.Show
+import linalg.kernel.Show
 
 /**
   *
@@ -31,7 +31,7 @@ package object linalg {
 
 
      //util stuff
-     type Show[S] = linalg.util.Show[S]
+     type Show[S] = Show[S]
      val Show = linalg.util.Show
 
      //theory stuff

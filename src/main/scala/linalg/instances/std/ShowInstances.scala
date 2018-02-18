@@ -1,19 +1,19 @@
-package linalg.instances.old
+package linalg.instances.std
 
-import linalg._
-import linalg.kernel.{Complex, Imaginary, Rational, Real}
-//import linalg.util.Show
+import linalg.implicits._
+import linalg.kernel.{Complex, Imaginary, Rational, Real, Show, RealNumber}
 
 /**
   *
   */
 trait ShowInstances {
 
-
-
      implicit object IntHasShow extends Show[Int] {def show(x: Int): String = x.toString}
+
      implicit object DoubleHasShow extends Show[Double] {def show(x: Double): String = x.toString}
+
      implicit object RealHasShow extends Show[Real] { def show(x: Real): String = x.double.toString }
+
 
      implicit object RationalHasShow extends Show[Rational] {
           def show(x: Rational): String = x.den match {
@@ -24,6 +24,19 @@ trait ShowInstances {
 
      implicit def ComplexHasShow[R : RealNumber] = new Show[Complex[R]] {
           def show(x: Complex[R]): String = x.re.toString + Imaginary(x.im).toString
+     }
+
+     implicit def ImaginaryHasShow[R:RealNumber] = new Show[Imaginary[R]]{
+          def show(x: Imaginary[R]): String = x.im match {
+               case _: Rational => x.im.isNegative match {
+                    case true => " - (" + x.im.negate().toString + ")" + "i"
+                    case false => " + (" + x.im.toString + ")" + "i"
+               }
+               case _ => x.im.isNegative match {
+                    case true => " - " + x.im.negate().toString + "i"
+                    case false => " + " + x.im.toString + "i"
+               }
+          }
      }
 
 //     implicit def VectorHasShow[N: Number] = new Show[Vector[N]]{

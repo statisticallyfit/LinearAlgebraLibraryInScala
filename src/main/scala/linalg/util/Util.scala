@@ -1,16 +1,12 @@
 package linalg.util
 
-//
-//import linalg.implicits._
-//import linalg.instances._
-//
-//import linalg._
-////import linalg.kernel._
-//import linalg.vector.{SetOfVectors, Vector}
-////import linalg.theory.basis.Dimension
-//import linalg.util.Exception.VectorLikeSizeException
-//
-//import scala.collection.mutable.{ListBuffer, Seq}
+
+import linalg.implicits._
+import linalg.kernel._
+import linalg.theory._
+import linalg.vector._
+
+import scala.collection.mutable.{ListBuffer, Seq}
 
 /**
   *
@@ -19,7 +15,15 @@ package linalg.util
 object Util {
 
 
-     /*object Gen {
+     object Exception {
+
+          /**
+            * Thrown when matrix or vectors are not same size for addition etc.
+            */
+          case class VectorLikeSizeException(message: String) extends Exception(message)
+     }
+
+     object Gen {
 
           /**
             * Inserts element at position i, leaving list the same length as before.
@@ -65,14 +69,14 @@ object Util {
                val caseVectorsAreDifferentThanSpecificSize: Boolean = SIZE != v.dimension() || SIZE != w.dimension()
 
                if(caseVectorsAreDifferentSize || caseVectorsAreDifferentThanSpecificSize){
-                    throw VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
+                    throw Exception.VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
                }
           }
 
           def ensureSize[N:Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Unit = {
 
                if(vset.numRows != wset.numRows || vset.numCols != wset.numCols) {
-                    throw VectorLikeSizeException("SetOfVectors are not same size; cannot continue operation.")
+                    throw Exception.VectorLikeSizeException("SetOfVectors are not same size; cannot continue operation.")
                }
           }
 
@@ -209,7 +213,7 @@ object Util {
           def expressColsAsRows[N:Number](cols: Seq[Vector[N]]): Seq[Vector[N]] = {
                expressRowsAsCols(cols)
           }
-     }*/
+     }
 }
 
 //

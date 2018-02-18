@@ -1,6 +1,5 @@
 package linalg.instances
 
-import linalg.instances.old._
 import linalg.instances.std._
 
 
@@ -11,12 +10,10 @@ import linalg.instances.std._
 //note: or maybe: RealNumberInstaces extends IntIsRealNumber with DoubleisReal, leaving IntInstances aside
 // and so forth: DimensionInstances extends VectorHasDimension, leaving VectorInstances aside
 trait AllInstances
-     extends IntInstances
-     with DoubleInstances
-     with RealInstances
-     with RationalInstances
-     with ComplexInstances
-     with NumericConversionInstances 
+     extends NumberInstances
+     with RealNumberInstances
+     with ShowInstances
+
 
 /*NumberInstances
      with NumericConversionInstances

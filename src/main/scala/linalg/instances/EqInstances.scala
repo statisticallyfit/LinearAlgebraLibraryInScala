@@ -1,4 +1,5 @@
-package linalg.instances.old
+package linalg.instances
+
 /**
   *
   */
