@@ -31,7 +31,7 @@ trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
      def crossProduct(v: V, w: V): Option[V]  //maybe won't work
      def outerProduct(v: V, w: V): SetOfVectors[F]
 
-     def projection[R:RealNumber](v: V, onto: V)(implicit f: Field[F], r: RootLike[F,R]): V
+     def projection[R:RealNumber](v: V, onto: V)(implicit f: Field[F], r: Root[F,R]): V
      /*def get(v: V, i: Int): F
      def set(v: V, i: Int, value: F): Unit
      def toList(v: V): List[F]
@@ -52,8 +52,6 @@ class Vector[N: Number](private val elems: N*) {
      def set(index: Int)(value: N): Unit = elements(index) = value
      def get(index: Int): N = elements(index)
      def getElements(): Seq[N] = Seq(elements:_*)
-     /*def toList: List[N] = elements.toList
-     def toSeq: Seq[N] = Seq(elements:_*)*/
 
      //todo how does cats do it? Have Eq[A] not pink but a different blue color, value?
      override def toString: String = Show[Vector[N]].show(this)

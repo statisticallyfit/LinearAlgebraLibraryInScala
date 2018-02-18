@@ -1,7 +1,10 @@
 package linalg.instances
 
-//import linalg.kernel.Number
-//import linalg.theory.basis.Dimension
+import linalg.implicits._
+import linalg.kernel._
+import linalg.theory._
+import linalg.theory.space._
+import linalg.theory.basis._
 
 /**
   *
