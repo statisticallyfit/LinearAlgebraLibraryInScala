@@ -21,14 +21,10 @@ trait temp {
      /*(implicit vecLike: VectorLike[V[N], N])*/
      implicit def VecSetIsSetVecLike[N: Number] = new SetVecLike[SetOfVectors[N], N] {
 
-          val zero: SetOfVectors[N] = SetOfVectors(Vector.ZERO[N](1))
           val one: SetOfVectors[N] = SetOfVectors(Vector.ONE[N](1))
 
           /** Vector space part */ // ---------------------------------------------------------------------------------
-          def plus(vset: SetOfVectors[N], wset: SetOfVectors[N]): SetOfVectors[N] ={
-               Util.Gen.ensureSize(vset, wset)
-               SetOfVectors(vset.getColumns().zip(wset.getColumns()).map(colPair => colPair._1 + colPair._2):_*)
-          }
+
 
           def negate(vset: SetOfVectors[N]): SetOfVectors[N] = SetOfVectors(vset.getColumns().map(c => c.negate()):_*)
 

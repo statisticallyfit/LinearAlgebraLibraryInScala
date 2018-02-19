@@ -14,7 +14,7 @@ import scala.collection.mutable.Seq
   *
   */
 
-class VectorThings[N: Number]{
+class VectorInstances[N: Number]{
 
      class VectorIsMonoid extends Monoid[Vector[N]]{
 
@@ -98,6 +98,11 @@ class VectorThings[N: Number]{
           }
      }
 
+
+     class VectorHasDimension extends Dimension[Vector[N]] {
+          def dimension(v: Vector[N]): Int = v.getElements().length
+     }
+
      val monoid = new VectorIsMonoid
      val abelian = new VectorIsAbelianGroup
      val vectorSpace = new VectorIsVectorSpace
@@ -105,21 +110,24 @@ class VectorThings[N: Number]{
      val normedSpace = new VectorIsNormedVectorSpace
      val hilbertSpace = new VectorIsHilbertSpace
      val vectorLike = new VectorIsVectorLike
+     val dim = new VectorHasDimension
 }
 
 
+/*
 trait VectorInstances {
 
      //TODO test whether not strictly necessary to have each one like this, can just have
      //the ending trait VectorLike as class and instance below like in ComplexIsNumber ...
 
 
-     implicit def vectorIsMonoid[N: Number] = new VectorThings[N].monoid
-     implicit def vectorIsAbelianGroup[N: Number] = new VectorThings[N].abelian
-     implicit def vectorIsVectorSpace[N: Number] = new VectorThings[N].vectorSpace
-     implicit def vectorIsInnerProductSpace[N: Number] = new VectorThings[N].innerSpace
-     implicit def vectorIsNormedVectorSpace[N: Number] = new VectorThings[N].normedSpace
-     implicit def vectorIsHilbertSpace[N: Number] = new VectorThings[N].hilbertSpace
-     implicit def vectorIsLikeAVector[N: Number] = new VectorThings[N].vectorLike
+     implicit def vectorIsMonoid[N: Number] = new VectorInstances[N].monoid
+     implicit def vectorIsAbelianGroup[N: Number] = new VectorInstances[N].abelian
+     //implicit def vectorIsVectorSpace[N: Number] = new VectorInstances[N].vectorSpace
+     implicit def vectorIsInnerProductSpace[N: Number] = new VectorInstances[N].innerSpace
+     implicit def vectorIsNormedVectorSpace[N: Number] = new VectorInstances[N].normedSpace
+     implicit def vectorIsHilbertSpace[N: Number] = new VectorInstances[N].hilbertSpace
+     implicit def vectorIsLikeAVector[N: Number] = new VectorInstances[N].vectorLike
 }
+*/
 

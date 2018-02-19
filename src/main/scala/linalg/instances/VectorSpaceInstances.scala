@@ -1,6 +1,7 @@
 package linalg.instances
 
 import linalg.implicits._
+import linalg.instances.linear.VectorInstances
 import linalg.kernel._
 import linalg.vector._
 import linalg.theory.space._
@@ -14,5 +15,8 @@ import linalg.util.Util
 
 trait VectorSpaceInstances {
 
-     implicit def vectorIsVectorSpace[N: Number] = new VectorIsVectorSpace[N]
+
+     implicit def vectorIsVectorSpace[N: Number] = new VectorInstances[N].vectorSpace
+
+     implicit def setOfVectorsIsVectorSpace
 }

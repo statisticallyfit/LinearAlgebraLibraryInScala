@@ -13,12 +13,14 @@ trait AllInstances
      extends NumberInstances
      with RealNumberInstances
      with ShowInstances
-
-
-/*NumberInstances
-     with NumericConversionInstances
+     with MonoidInstances
+     with AbelianGroupInstances
+     with InnerProductSpaceInstances
+     with NormedVectorSpaceInstances
      with VectorSpaceInstances
+     with VectorLikeInstances
+     with SetVecLikeInstances
      with DimensionInstances
      with EqInstances
      with EqualityInstances
-     with ShowInstances*/
+
