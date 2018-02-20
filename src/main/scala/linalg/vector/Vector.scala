@@ -53,26 +53,3 @@ object Vector {
      def ZERO[N: Number](len: Int): Vector[N] = Vector(List.fill[N](len)(Number.ZERO[N]))
      def ONE[N: Number](len: Int): Vector[N] = Vector(Seq.fill[N](len)(Number.ONE[N]))
 }
-
-
-
-
-
-
-
-object VectorTester extends App {
-
-
-     val v1: Vector[Int] = Vector(1,2,3)
-     val v2: Vector[Int] = Vector(2,0,4, 5)
-
-     println(v1.negate())
-     println(v1 + v2)
-     println(Vector(2,3,4) + Vector(-2, 3, -6))
-     println(v1.isZero)
-     println(v1.dotProduct(v2))
-     println(v1.norm())
-     println(v1.isNormalized())
-     println(v2.get(3))
-
-}

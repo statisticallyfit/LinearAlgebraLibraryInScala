@@ -13,7 +13,7 @@ import scala.util.control.Breaks.{break, breakable}
 /**
   *
   */
-class SetVecInstances[N: Number] {
+class SetVecThings[N: Number] {
 
      class SetVecIsMonoid extends Monoid[SetOfVectors[N]]{
 
@@ -113,4 +113,13 @@ class SetVecInstances[N: Number] {
      val vectorSpace = new SetVecIsVectorSpace
      val vsetLike = new SetVecIsSetVecLike
      val dim = new SetVecHasDimension
+}
+
+trait SetVecInstances {
+
+     implicit def setVecIsMonoid[N: Number] = new SetVecThings[N].monoid
+     implicit def setVecIsAbelianGroup[N: Number] = new SetVecThings[N].abelian
+     implicit def setVecIsVectorSpace[N: Number] = new SetVecThings[N].vectorSpace
+     implicit def setVecIsSetVecLike[N: Number] = new SetVecThings[N].vsetLike
+     implicit def setVecHasDimension[N: Number] = new SetVecThings[N].dim
 }

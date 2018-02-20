@@ -1,5 +1,6 @@
 package linalg.instances
 
+import linalg.instances.linear.{SetVecInstances, VectorInstances}
 import linalg.instances.std._
 
 
@@ -12,15 +13,18 @@ import linalg.instances.std._
 trait AllInstances
      extends NumberInstances
      with RealNumberInstances
-     with ShowInstances
-     with MonoidInstances
-     with AbelianGroupInstances
-     with InnerProductSpaceInstances
-     with NormedVectorSpaceInstances
-     with VectorSpaceInstances
-     with VectorLikeInstances
-     with SetVecLikeInstances
-     with DimensionInstances
      with EqInstances
      with EqualityInstances
+     with ShowInstances
+     //with MonoidInstances
+     //with AbelianGroupInstances
+     //with InnerProductSpaceInstances
+     //with NormedVectorSpaceInstances
+     //with HilbertSpaceInstances
+     //with VectorSpaceInstances
+     //with VectorLikeInstances
+     //with SetVecLikeInstances
+     //with DimensionInstances
+     with VectorInstances
+     with SetVecInstances
 

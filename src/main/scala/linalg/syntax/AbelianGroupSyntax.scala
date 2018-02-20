@@ -2,6 +2,7 @@ package linalg.syntax
 
 import linalg.theory.AbelianGroup
 
+import scala.language.higherKinds
 /**
   *
   */

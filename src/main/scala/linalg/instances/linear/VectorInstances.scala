@@ -14,7 +14,7 @@ import scala.collection.mutable.Seq
   *
   */
 
-class VectorInstances[N: Number]{
+class VectorThings[N: Number]{
 
      class VectorIsMonoid extends Monoid[Vector[N]]{
 
@@ -114,20 +114,18 @@ class VectorInstances[N: Number]{
 }
 
 
-/*
 trait VectorInstances {
 
      //TODO test whether not strictly necessary to have each one like this, can just have
      //the ending trait VectorLike as class and instance below like in ComplexIsNumber ...
 
 
-     implicit def vectorIsMonoid[N: Number] = new VectorInstances[N].monoid
-     implicit def vectorIsAbelianGroup[N: Number] = new VectorInstances[N].abelian
-     //implicit def vectorIsVectorSpace[N: Number] = new VectorInstances[N].vectorSpace
-     implicit def vectorIsInnerProductSpace[N: Number] = new VectorInstances[N].innerSpace
-     implicit def vectorIsNormedVectorSpace[N: Number] = new VectorInstances[N].normedSpace
-     implicit def vectorIsHilbertSpace[N: Number] = new VectorInstances[N].hilbertSpace
-     implicit def vectorIsLikeAVector[N: Number] = new VectorInstances[N].vectorLike
+     implicit def vectorIsMonoid[N: Number] = new VectorThings[N].monoid
+     implicit def vectorIsAbelianGroup[N: Number] = new VectorThings[N].abelian
+     implicit def vectorIsVectorSpace[N: Number] = new VectorThings[N].vectorSpace
+     implicit def vectorIsInnerProductSpace[N: Number] = new VectorThings[N].innerSpace
+     implicit def vectorIsNormedVectorSpace[N: Number] = new VectorThings[N].normedSpace
+     implicit def vectorIsHilbertSpace[N: Number] = new VectorThings[N].hilbertSpace
+     implicit def vectorIsLikeAVector[N: Number] = new VectorThings[N].vectorLike
 }
-*/
 

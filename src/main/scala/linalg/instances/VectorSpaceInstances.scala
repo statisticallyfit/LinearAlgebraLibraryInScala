@@ -16,6 +16,6 @@ import linalg.util.Util
 trait VectorSpaceInstances {
 
 
-     implicit def vectorIsVectorSpace[N: Number] = new VectorInstances[N].vectorSpace
-     implicit def setVecIsVectorSpace[N: Number] = new SetVecInstances[N].vectorSpace
+     implicit def vectorIsVectorSpace[N: Number] = new VectorThings[N].vectorSpace
+     implicit def setVecIsVectorSpace[N: Number] = new SetVecThings[N].vectorSpace
 }

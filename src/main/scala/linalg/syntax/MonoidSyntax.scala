@@ -2,6 +2,7 @@ package linalg.syntax
 
 import linalg.theory.Monoid
 
+import scala.language.higherKinds
 /**
   *
   */

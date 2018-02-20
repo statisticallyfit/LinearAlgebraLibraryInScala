@@ -81,20 +81,3 @@ object SetOfVectors {
           fromSeqs(seq.grouped(numCols).toList:_*) //.toList.map(_.toList)
 
 }
-
-
-
-
-
-object SetVecTester extends App {
-
-     val s1: SetOfVectors[Double] = SetOfVectors(Vector(1,2,3,4,5), Vector(8,8,1,2,3),
-          Vector(-8,9,-3,0,1))
-     println(s1.get(1,2)) //should be 9
-     s1.getColumn(1).set(1)(333)
-     s1.set(0,0)(111)
-     println(s1)
-     println(s1.get(0,0))
-
-     s1.copy()
-}

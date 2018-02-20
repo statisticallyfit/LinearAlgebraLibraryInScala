@@ -5,6 +5,7 @@ import cats.Eq
 import linalg.kernel._
 import linalg.theory.space.NormedVectorSpace
 
+import scala.language.higherKinds
 /**
   *
   */

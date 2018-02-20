@@ -2,6 +2,7 @@ package linalg
 
 import linalg.implicits._
 import linalg.kernel.{Complex, Rational, Real}
+import linalg.vector.{SetOfVectors, Vector}
 
 /**
   */
@@ -21,11 +22,6 @@ object Tester extends App {
      println("^ test: " + (Complex(1,2) ^ 2))
      println("NROOT TEST: " + (Rational(2) ^ Rational(2)))
      println("ABS TEST: " + Real(-2).abs())
-
-     //import linalg.syntax.AbsoluteSyntax._
-     //import scala.runtime.{RichInt => _, _}
-     //import scala.runtime.{ScalaNumberProxy => _, _}
-     //println("ABS TEST: " + (-24).abs()) //todo this uses RichInt's abs method how to stop this?
      println("ABS TEST: " + Complex[Double](-1, 2).abs())
 
 
@@ -54,6 +50,33 @@ object Tester extends App {
      println(Rational(4, 8) + Rational(5, 15))
      println(Complex(1,2))
      println(Complex(1,2) + Complex(3,4))
+
+
+
+     // Vectors
+     val v1: Vector[Int] = Vector(1,2,3)
+     val v2: Vector[Int] = Vector(2,0,4, 5)
+
+     println(v1.negate())
+     println(v1 + v2)
+     println(Vector(2,3,4) + Vector(-2, 3, -6))
+     println(v1.isZero)
+     println(v1.dotProduct(v2))
+     println(v1.norm())
+     println(v1.isNormalized())
+     println(v2.get(3))
+     println(v1.crossProduct(v2))
+
+     //Set vec
+     val s1: SetOfVectors[Double] = SetOfVectors(Vector(1,2,3,4,5), Vector(8,8,1,2,3),
+          Vector(-8,9,-3,0,1))
+     println(s1.get(1,2)) //should be 9
+     s1.getColumn(1).set(1)(333)
+     s1.set(0,0)(111)
+     println(s1)
+     println(s1.get(0,0))
+
+     s1.copy()
 }
 
 

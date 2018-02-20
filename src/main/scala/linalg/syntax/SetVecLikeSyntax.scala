@@ -2,7 +2,8 @@ package linalg.syntax
 
 import linalg.kernel._
 import linalg.vector._
-import linalg.theory.basis._
+
+import scala.language.higherKinds
 /**
   *
   */

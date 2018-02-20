@@ -4,6 +4,7 @@ import linalg.kernel._
 import linalg.kernel.RealNumber
 import linalg.theory.space.HilbertSpace
 
+import scala.language.higherKinds
 /**
   *
   */

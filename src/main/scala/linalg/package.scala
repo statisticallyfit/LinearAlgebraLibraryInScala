@@ -31,8 +31,8 @@ package object linalg {
 
 
      //util stuff
-     type Show[S] = Show[S]
-     val Show = linalg.util.Show
+     type Show[S] = linalg.kernel.Show[S]
+     val Show = linalg.kernel.Show
 
      //theory stuff
      type Basis[B, F] = linalg.theory.basis.Basis[B, F]
