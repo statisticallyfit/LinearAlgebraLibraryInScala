@@ -1,6 +1,6 @@
 package linalg.instances
 
-import linalg.instances.linear.{SetVecInstances, VectorInstances}
+import linalg.instances.linear._
 import linalg.instances.std._
 
 
@@ -16,15 +16,15 @@ trait AllInstances
      with EqInstances
      with EqualityInstances
      with ShowInstances
-     //with MonoidInstances
-     //with AbelianGroupInstances
-     //with InnerProductSpaceInstances
-     //with NormedVectorSpaceInstances
-     //with HilbertSpaceInstances
-     //with VectorSpaceInstances
-     //with VectorLikeInstances
-     //with SetVecLikeInstances
-     //with DimensionInstances
+     with MonoidInstances
+     with AbelianGroupInstances
+     with InnerProductSpaceInstances
+     with NormedVectorSpaceInstances
+     with HilbertSpaceInstances
+     with VectorSpaceInstances
+     with VectorLikeInstances
+     with SetVecLikeInstances
+     with DimensionInstances
      with VectorInstances
      with SetVecInstances
 

@@ -1,6 +1,6 @@
 package linalg.instances
 
-import linalg.instances.linear.SetVecThings
+import linalg.instances.linear._
 import linalg.kernel.Number
 
 /**
@@ -9,5 +9,5 @@ import linalg.kernel.Number
 trait SetVecLikeInstances {
 
 
-     implicit def setVecIsSetVecLike[N: Number] = new SetVecThings[N].vsetLike
+     //implicit def setVecIsSetVecLike[N: Number] = new SetVecThings[N].vsetLike
 }

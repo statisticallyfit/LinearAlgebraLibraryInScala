@@ -16,7 +16,7 @@ trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
      def minus(v: V, w: V): V = plus(v, negate(w))
      def isZero(v: V): Boolean
      def crossProduct(v: V, w: V)(implicit d: Dimension[V]): Option[V]  //maybe won't work
-     def outerProduct(v: V, w: V): SetOfVectors[F]
+     //def outerProduct(v: V, w: V): SetOfVectors[F]
 
      def projection[R:RealNumber](v: V, onto: V)(implicit f: Field[F], r: Root[F,R]): V
      /*def get(v: V, i: Int): F

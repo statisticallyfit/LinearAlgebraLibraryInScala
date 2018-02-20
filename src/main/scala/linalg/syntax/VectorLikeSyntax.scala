@@ -18,7 +18,7 @@ trait VectorLikeSyntax extends HilbertSpaceSyntax with NormedVectorSpaceSyntax {
 
           def crossProduct(other: V[F]): Option[V[F]] = vecLike.crossProduct(current, other)
 
-          def outerProduct(other: V[F]): SetOfVectors[F]= vecLike.outerProduct(current, other)
+          def outerProduct(other: V[F]) = ??? //: SetOfVectors[F]= vecLike.outerProduct(current, other)
 
           def isZero: Boolean = vecLike.isZero(current)
 

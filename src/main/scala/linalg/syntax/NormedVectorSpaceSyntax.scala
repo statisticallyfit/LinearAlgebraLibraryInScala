@@ -1,8 +1,8 @@
 package linalg.syntax
 
 import cats.Eq
-
 import linalg.kernel._
+import linalg.theory.Field
 import linalg.theory.space.NormedVectorSpace
 
 import scala.language.higherKinds
@@ -11,7 +11,7 @@ import scala.language.higherKinds
   */
 trait NormedVectorSpaceSyntax extends InnerProductSpaceSyntax {
 
-     implicit class NormedVectorSpaceOps[V[_], F](current: V[F])
+     implicit class NormedVectorSpaceOps[V[_], F:Field](current: V[F])
                                                  (implicit normed: NormedVectorSpace[V[F], F]){
 
 

@@ -7,5 +7,5 @@ import linalg.instances.linear._
   */
 trait InnerProductSpaceInstances {
 
-     implicit def vectorIsInnerProductSpace[N: Number] = new VectorThings[N].innerSpace
+     //implicit def vectorIsInnerProductSpace[N: Number] = new VectorThings[N].innerSpace
 }

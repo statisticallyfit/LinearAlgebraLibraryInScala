@@ -43,16 +43,16 @@ trait ShowInstances {
           }
      }
 
-     implicit def VectorHasShow[N: Number] = new Show[Vector[N]]{
+     /*implicit def VectorHasShow[N: Number] = new Show[Vector[N]]{
           def show(v: Vector[N]): String = showVecSet(SetOfVectors(v))
-     }
+     }*/
 
      //todo
      /*implicit def PolynomialHasShow[R: RealNumber] = new Show[Polynomial[R]]{
           def show(poly: Polynomial[R]): String = showVecSet(SetOfVectors(poly))
      }*/
 
-     implicit def SetVecHasShow[N: Number] = new Show[SetOfVectors[N]]{
+     /*implicit def SetVecHasShow[N: Number] = new Show[SetOfVectors[N]]{
           def show(vset: SetOfVectors[N]): String = showVecSet(vset)
      }
 
@@ -78,5 +78,5 @@ trait ShowInstances {
                .map(list => "| " + list.mkString("  ") + " |\n")
 
           firstRow + middleRows.mkString + lastRow
-     }
+     }*/
 }
