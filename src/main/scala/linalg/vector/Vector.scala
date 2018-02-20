@@ -23,25 +23,6 @@ import scala.language.higherKinds
   * -
   */
 
-trait VectorLike[V, F] extends HilbertSpace[V, F] with NormedVectorSpace[V, F] {
-
-
-     // inherited - plus, negate, scale, innerProduct, norm, angle
-     def minus(v: V, w: V): V = plus(v, negate(w))
-     def isZero(v: V): Boolean
-     def crossProduct(v: V, w: V)(implicit d: Dimension[V]): Option[V]  //maybe won't work
-     def outerProduct(v: V, w: V): SetOfVectors[F]
-
-     def projection[R:RealNumber](v: V, onto: V)(implicit f: Field[F], r: Root[F,R]): V
-     /*def get(v: V, i: Int): F
-     def set(v: V, i: Int, value: F): Unit
-     def toList(v: V): List[F]
-     def toBuff(v: V): ListBuffer[F]*/
-}
-object VectorLike
-
-
-
 
 class Vector[N: Number](private val elems: N*) {
 
@@ -71,34 +52,6 @@ object Vector {
 
      def ZERO[N: Number](len: Int): Vector[N] = Vector(List.fill[N](len)(Number.ZERO[N]))
      def ONE[N: Number](len: Int): Vector[N] = Vector(Seq.fill[N](len)(Number.ONE[N]))
-
-
-
-     //todo cannot because in compile time error - do not have implicit N:Number and M:Number, but can't add this to
-     // functor map
-     /*implicit val vectorFunctor = new Functor[Vector] {
-
-          def map[N, M](fa: Vector[N])(f: N => M): Vector[M] ={
-               Vector(fa.getElements().map(f):_*)
-          }
-     }
-
-     implicit def vectorEq[N:Number] = new Eq[Vector[N]]{
-
-          def eqv(v1: Vector[N], v2: Vector[N]): Boolean ={
-               v1.getElements() == v2.getElements()
-          }
-     }
-
-     implicit def vectorMonoid[N:Number](implicit monoidNum: cats.Monoid[N]) = new cats.Monoid[Vector[N]]{
-
-          def empty: Vector[N] = Vector(monoidNum.empty)
-
-          def combine(v: Vector[N], w: Vector[N]): Vector[N] ={
-               Util.Gen.ensureSize(v, w)
-               Vector(v.getElements().zip(w.getElements()).map(pair => pair._1 + pair._2):_*)
-          }
-     }*/
 }
 
 

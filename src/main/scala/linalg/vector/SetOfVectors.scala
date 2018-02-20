@@ -2,11 +2,10 @@ package linalg.vector
 
 
 import linalg.implicits._
-
 import linalg.kernel._
+import linalg.theory.basis.Dimension
 import linalg.util._
 import linalg.theory.space._
-
 
 import scala.collection.mutable.{ListBuffer, Seq}
 import scala.language.higherKinds
@@ -16,19 +15,6 @@ import scala.language.implicitConversions
   *
   */
 
-
-trait SetVecLike[V, F] extends VectorSpace[V, F]{
-
-     def identity(size: Int): V
-     def rowReducedEchelon(m: V): V
-     def rowEchelon(m: V): V
-
-     def minus(v: V, w: V): V = plus(v, negate(w))
-     def isZero(v: V): Boolean
-}
-
-object SetVecLike
-
 //todo question - if you extend Matrix with setvec then is Matrix counted as implementing
 // the setveclike trait? Need to get its methods as well as class setvec methods so as
 //not to implement all over again. Same thing with poly-vector.
@@ -36,10 +22,8 @@ object SetVecLike
 class SetOfVectors[N: Number](private val cols: Vector[N]*) {
 
      private val columns: Seq[Vector[N]] = Seq(cols:_*)
-     val numRows: Int = this.asInstanceOf[SetOfVectors[N]].dimension()
+     val numRows: Int = Dimension[SetOfVectors[N]].dimension(this)
      val numCols: Int = columns.length
-
-     private val s = implicitly[Show[SetOfVectors[N]]]
 
      def copy(): SetOfVectors[N] = SetOfVectors(columns:_*)
      def copy(cols: Seq[Vector[N]]): SetOfVectors[N] = SetOfVectors(cols:_*)
