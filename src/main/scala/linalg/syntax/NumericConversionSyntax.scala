@@ -25,24 +25,18 @@ trait NumericConversionSyntax {
      }
 
 
-     // NEED so that Complex + Rational tests work.
-     implicit class ConvertFrom[F, T[_]](val from: F)(implicit conv: NumericConversion[F, T[F], T[F]]){
+
+     // NEED so that realnum + complex tests work
+     implicit class ConvertLeftRealNum[F, T[_]](val from: F)(implicit conv: NumericConversion[F, T[F], T[F]]){
           def +(to: T[F]): T[F] = conv.plus(from, to)
           def -(to: T[F]): T[F] = conv.minus(from, to)
           def *(to: T[F]): T[F] = conv.times(from, to)
           def /(to: T[F]): T[F] = conv.divide(from, to)
           //def ^(exp: T[F]): T[F] = conv.exponentiate(exp, from)
      }
-     //?? TODO need this thing?
-     /*implicit class ConvertTo[F, T](val to: T)(implicit conv: NumericConversion[F, T]){
-          def +(from: F): T = conv.plus(from, to)
-          def -(from: F): T = conv.minus(from, to)
-          def *(from: F): T = conv.times(from, to)
-          def /(from: F): T = conv.divide(from, to)
-          def ^(exp: F): T = conv.exponentiate(to, exp)
-     }*/
 
-     implicit class ConvertOtherWay[T[_], F](val to: T[F])(implicit conv: NumericConversion[T[F], F, T[F]]){
+     //NEED so that complex + realnum tests work
+     implicit class ConvertRightRealNum[T[_], F](val to: T[F])(implicit conv: NumericConversion[T[F], F, T[F]]){
           def +(from: F): T[F] = conv.plus(to, from)
           def -(from: F): T[F] = conv.minus(to, from)
           def *(from: F): T[F] = conv.times(to, from)
