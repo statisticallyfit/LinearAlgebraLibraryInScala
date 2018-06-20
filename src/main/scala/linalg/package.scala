@@ -1,4 +1,4 @@
-import linalg.kernel.Show
+
 
 /**
   *
@@ -18,7 +18,7 @@ package object linalg {
      type Equality[E] = linalg.kernel.Equality[E]
      type RealNumber[R] = linalg.kernel.RealNumber[R]
      type Trig[T] = linalg.kernel.Trig[T]
-     type NumericConversion[F, T] = linalg.kernel.NumericConversion[F, T]
+     type NumericConversion[A, B, C] = linalg.kernel.NumericConversion[A, B, C]
      val Number = linalg.kernel.Number
      //val AbsoluteLike = linalg.kernel.AbsoluteLike
      val Absolute = linalg.kernel.Absolute
@@ -80,18 +80,20 @@ package object linalg {
      //todo not doing stuff in Category since I might want to use Cats category stuff later!
      type Monoid[M] = linalg.theory.Monoid[M]
      type Field[F] = linalg.theory.Field[F]
+     type Ring[R] = linalg.theory.Ring[R]
      type AbelianGroup[A] = linalg.theory.AbelianGroup[A]
      val Monoid = linalg.theory.Monoid
      val Field = linalg.theory.Field
+     val Ring = linalg.theory.Ring
      val AbelianGroup = linalg.theory.AbelianGroup
 
      //matrix stuff //note - no need to write vec stuff like vectorlike.
-     //type VectorLike[V, F] = linalg.vector.VectorLike[V, F]
-     //type SetVecLike[V, F] = linalg.vector.SetVecLike[V, F]
+     type VectorLike[V, F] = linalg.vector.VectorLike[V, F]
+     type SetVecLike[V, F] = linalg.vector.SetVecLike[V, F]
      //type MatrixLike[M, F] = linalg.matrix.MatrixLike[M, F]
      //type LinearSystem[S, F] = linalg.matrix.LinearSystem[S, F]
-     //val VectorLike = linalg.vector.VectorLike
-     //val SetVecLike = linalg.vector.SetVecLike
+     val VectorLike = linalg.vector.VectorLike
+     val SetVecLike = linalg.vector.SetVecLike
      //val MatrixLike = linalg.matrix.MatrixLike
      //val LinearSystem = linalg.matrix.LinearSystem
 

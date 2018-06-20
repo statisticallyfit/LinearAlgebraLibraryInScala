@@ -11,8 +11,8 @@ import scala.language.higherKinds
   */
 trait VectorLikeSyntax extends HilbertSpaceSyntax with NormedVectorSpaceSyntax {
 
-     implicit class VectorLikeOps[V[_], F](current: V[F])(implicit vecLike: VectorLike[V[F], F],
-                                                          d: Dimension[V[F]]){
+     implicit class VectorLikeOps[V[_], F](current: V[F])(implicit vecLike: VectorLike[V[F], F]/*,
+                                                          d: Dimension[V[F]]*/){
 
           def -(other: V[F]): V[F] = vecLike.minus(current, other)
 
