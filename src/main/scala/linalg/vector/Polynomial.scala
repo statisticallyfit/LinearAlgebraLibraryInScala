@@ -1,9 +1,7 @@
 package linalg.vector
-//
-//import linalg.theory._
-//import linalg.numeric._
-//import linalg.syntax.ShowSyntax._
-//import linalg.show.Show._
+
+//import linalg.implicits._
+//import linalg._
 //
 ///**
 //  *
@@ -14,7 +12,8 @@ package linalg.vector
 ////todo either make it extend vector or make it something that implements veclike
 //case class Polynomial[R: RealNumber](ps: R*) /*extends Vector[R](ps:_*)*/ {
 //
-//     override def toString: String = this.asInstanceOf[Polynomial[R]].show
+//     override def toString: String = Show[Polynomial[R]].show(this)
+//     //this.asInstanceOf[Polynomial[R]].show
 //}
 //
 //
@@ -31,9 +30,6 @@ package linalg.vector
 //     // ------------
 //
 //     implicit def PolynomialIsRing[R: RealNumber] = new Ring[Polynomial[R]]{
-//
-//          import linalg.syntax.VectorLikeSyntax._
-//          import Vector._
 //
 //          val gen = implicitly[RealNumber[R]]
 //          val zero: Polynomial[R] = Polynomial(gen.zero) // just simple constant 0

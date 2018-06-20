@@ -19,9 +19,7 @@ import scala.language.implicitConversions
 class SetOfVectors[N: Number](private val cols: Vector[N]*) {
 
      private val columns: Seq[Vector[N]] = Seq(cols:_*)
-     val numRows: Int = cols.head.getElements().length //TODO hacky - how to use dimension??
-     //implicitly[SetOfVectors[N]].dimension()
-     //Dimension[SetOfVectors[N]].dimension(this)
+     val numRows: Int = Dimension[SetOfVectors[N]].dimension(this)
      val numCols: Int = columns.length
 
      def copy(): SetOfVectors[N] = SetOfVectors(columns:_*)
