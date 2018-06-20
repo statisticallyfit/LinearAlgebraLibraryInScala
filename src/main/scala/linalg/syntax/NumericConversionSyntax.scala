@@ -29,7 +29,7 @@ trait NumericConversionSyntax {
           def -(to: T[F]): T[F] = conv.minus(from, to)
           def *(to: T[F]): T[F] = conv.times(from, to)
           def /(to: T[F]): T[F] = conv.divide(from, to)
-          def ^(exp: T[F]): T[F] = conv.exponentiate(exp, from)
+          //def ^(exp: T[F]): T[F] = conv.exponentiate(exp, from)
      }
      //?? TODO need this thing?
      /*implicit class ConvertTo[F, T](val to: T)(implicit conv: NumericConversion[F, T]){

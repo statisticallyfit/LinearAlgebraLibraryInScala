@@ -16,7 +16,7 @@ trait NumericConversionInstances {
           def minus(from: R, to: Complex[R]): Complex[R] = Complex(from - to.re, to.im)
           def times(from: R, to: Complex[R]): Complex[R] = Complex(from * to.re, from * to.im)
           def divide(from: R, to: Complex[R]): Complex[R] = Complex(to.re / from, to.im / from)
-          def exponentiate(base: Complex[R], exp: R): Complex[R] = root.power(base, exp)
+          //def exponentiate(base: Complex[R], exp: R): Complex[R] = root.power(base, exp)
                //todo why error compile? base ^ exp
      }
 
@@ -27,7 +27,7 @@ trait NumericConversionInstances {
           def minus(upper: Complex[R], from: R): Complex[R] = Complex(from - upper.re, upper.im)
           def times(upper: Complex[R], from: R): Complex[R] = Complex(from * upper.re, from * upper.im)
           def divide(upper: Complex[R], from: R): Complex[R] = Complex(upper.re / from, upper.im / from)
-          def exponentiate(base: Complex[R], exp: R): Complex[R] = root.power(base, exp)
+          //def exponentiate(base: Complex[R], exp: R): Complex[R] = root.power(base, exp)
      }
 }
 
