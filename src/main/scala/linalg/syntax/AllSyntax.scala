@@ -15,6 +15,7 @@ trait AllSyntax
      with TrigSyntax
      with EqualitySyntax
      with NumberSyntax
+     with NumericConversionSyntax
      with MonoidSyntax
      with AbelianGroupSyntax
      with RingSyntax

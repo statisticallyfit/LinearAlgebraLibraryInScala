@@ -11,4 +11,13 @@ trait NumericConversion[F, T] {
      def exponentiate(base: T, exp: F): T
 }
 
+trait NumericConversion2[T, F] {
+     def plus(upper: T, from:F): T
+     def minus(upper: T, from: F): T
+     def times(upper: T, from: F): T
+     def divide(upper: T, from: F): T
+     //def exponentiate(base: T, exp: F): T
+
+}
+
 object NumericConversion
