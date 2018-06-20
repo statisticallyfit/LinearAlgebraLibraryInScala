@@ -11,7 +11,7 @@ import scala.language.higherKinds
   *
   */
 
-trait Number[N] extends Field[N] with Trig[N] with Equality[N] /*with Eq[N]*/
+trait Number[N] extends Field[N] /*with Trig[N]*/ with Equality[N] /*with Eq[N]*/
      /*with Root[N] with Absolute[N]*/ {
 
      val two: N = plus(one, one)

@@ -7,7 +7,7 @@ import linalg.theory.Field
   */
 trait Trig[T] /*extends Field[T]*/ {
 
-     val E: T
+     //val E: T
      val PI: T
 
      def sin(x: T): T

@@ -21,6 +21,8 @@ object Tester extends App {
 
      println("NROOT TEST: " + Complex(1.0, 2.0).nRoot(2))
      println("^ test: " + (Complex(1,2) ^ 2))
+     println("^ test and + after: " + ((Complex(1,3) ^ 2) + 4))
+     println("^ test and ^ after: " + ((Complex(1,3) ^ 2) ^ 4))
      println("NROOT TEST: " + (Rational(2) ^ Rational(2)))
      println("ABS TEST: " + Real(-2).abs())
      println("ABS TEST: " + Complex[Double](-1, 2).abs())

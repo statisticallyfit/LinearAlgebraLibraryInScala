@@ -4,7 +4,7 @@ package linalg.kernel
   *
   */
 
-trait RealNumber[R] extends Number[R] with Root[R,R] with Absolute[R,R]
+trait RealNumber[R] extends Number[R] with Trig[R] with Root[R,R] with Absolute[R,R]
 
 
 object RealNumber {
