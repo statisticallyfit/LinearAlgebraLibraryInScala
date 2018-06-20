@@ -85,10 +85,11 @@ class VectorThings[N: Number]{
                SetOfVectors.fromSeqs(result:_*)
           }
 
-          def crossProduct(u: Vector[N], v: Vector[N])(implicit d: Dimension[Vector[N]]):
+          def crossProduct(u: Vector[N], v: Vector[N])/*(implicit d: Dimension[Vector[N]])*/:
           Option[Vector[N]] = {
 
-               if(u.dimension() == 3 && v.dimension() == 3){
+               //TODO hacky way to get dimension/length but with Dimension doesn't work...
+               if(u.getElements().length == 3 && v.getElements().length == 3){
                     val w1: N = (u.get(2) * v.get(3)) - (u.get(3) * v.get(2))
                     val w2: N = (u.get(3) * v.get(1)) - (u.get(1) * v.get(3))
                     val w3: N = (u.get(1) * v.get(2)) - (u.get(2) * v.get(1))

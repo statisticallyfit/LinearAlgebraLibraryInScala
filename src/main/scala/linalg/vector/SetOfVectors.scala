@@ -19,7 +19,9 @@ import scala.language.implicitConversions
 class SetOfVectors[N: Number](private val cols: Vector[N]*) {
 
      private val columns: Seq[Vector[N]] = Seq(cols:_*)
-     val numRows: Int = Dimension[SetOfVectors[N]].dimension(this)
+     val numRows: Int = cols.head.getElements().length //TODO hacky - how to use dimension??
+     //implicitly[SetOfVectors[N]].dimension()
+     //Dimension[SetOfVectors[N]].dimension(this)
      val numCols: Int = columns.length
 
      def copy(): SetOfVectors[N] = SetOfVectors(columns:_*)
@@ -48,6 +50,8 @@ class SetOfVectors[N: Number](private val cols: Vector[N]*) {
 
 
      override def toString: String = Show[SetOfVectors[N]].show(this)
+     //TODO why 'could not find implicit value for param ev in linalg.kernel.Show??
+          //Show[SetOfVectors[N]].show(this)
 }
 
 

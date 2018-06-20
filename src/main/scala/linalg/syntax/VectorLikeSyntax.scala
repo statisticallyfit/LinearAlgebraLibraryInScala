@@ -1,11 +1,11 @@
 package linalg.syntax
 
-import linalg.theory._
-import linalg.kernel._
-import linalg.theory.basis.Dimension
-import linalg.vector._
+import linalg.implicits._
+import linalg._
+import linalg.vector.{Vector, SetOfVectors}
 
 import scala.language.higherKinds
+import scala.language.implicitConversions
 /**
   *
   */

@@ -122,7 +122,7 @@ class SetVecThings[N: Number] {
      val abelian = new SetVecIsAbelianGroup
      val vectorSpace = new SetVecIsVectorSpace
      val vsetLike = new SetVecIsSetVecLike
-     val dim = new SetVecHasDimension
+     val dim: SetVecHasDimension = new SetVecHasDimension
 }
 
 trait SetVecInstances {

@@ -2,10 +2,7 @@ package linalg.vector
 
 
 import linalg.implicits._
-import linalg.kernel._
-import linalg.theory.space._
-import linalg.theory._
-import linalg.theory.basis.Dimension
+import linalg._
 
 import scala.collection.mutable.{ListBuffer, Seq}
 import scala.language.implicitConversions
@@ -35,7 +32,7 @@ class Vector[N: Number](private val elems: N*) {
      def get(index: Int): N = elements(index)
      def getElements(): Seq[N] = Seq(elements:_*)
 
-     //todo how does cats do it? Have Eq[A] not pink but a different blue color, value?
+
      override def toString: String = Show[Vector[N]].show(this)
 }
 
