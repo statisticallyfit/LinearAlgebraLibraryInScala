@@ -1,7 +1,7 @@
 package linalg.syntax
 
 import linalg.implicits._
-import linalg.kernel.{Complex, Imaginary, NumericConversion, NumericConversion2, RealNumber}
+import linalg.kernel.{Complex, Imaginary, NumericConversion,  RealNumber}
 
 import scala.language.higherKinds
 /**
@@ -24,7 +24,9 @@ trait NumericConversionSyntax {
           def -(that: Imaginary[R]) = Complex(realPart, that.im.negate()) //compLike.imag(that).negate())
      }
 
-     implicit class ConvertFrom[F, T[_]](val from: F)(implicit conv: NumericConversion[F, T[F]]){
+
+     // NEED so that Complex + Rational tests work.
+     implicit class ConvertFrom[F, T[_]](val from: F)(implicit conv: NumericConversion[F, T[F], T[F]]){
           def +(to: T[F]): T[F] = conv.plus(from, to)
           def -(to: T[F]): T[F] = conv.minus(from, to)
           def *(to: T[F]): T[F] = conv.times(from, to)
@@ -40,7 +42,7 @@ trait NumericConversionSyntax {
           def ^(exp: F): T = conv.exponentiate(to, exp)
      }*/
 
-     implicit class ConvertTo2[T[_], F](val to: T[F])(implicit conv: NumericConversion2[T[F], F]){
+     implicit class ConvertOtherWay[T[_], F](val to: T[F])(implicit conv: NumericConversion[T[F], F, T[F]]){
           def +(from: F): T[F] = conv.plus(to, from)
           def -(from: F): T[F] = conv.minus(to, from)
           def *(from: F): T[F] = conv.times(to, from)
