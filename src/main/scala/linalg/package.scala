@@ -90,10 +90,14 @@ package object linalg {
      //matrix stuff //note - no need to write vec stuff like vectorlike.
      type VectorLike[V, F] = linalg.vector.VectorLike[V, F]
      type SetVecLike[V, F] = linalg.vector.SetVecLike[V, F]
+     type MatrixLike[M, F] = linalg.matrix.MatrixLike[M, F]
+     type LinearSystem[S, F] = linalg.matrix.LinearSystem[S, F]
      //type MatrixLike[M, F] = linalg.matrix.MatrixLike[M, F]
      //type LinearSystem[S, F] = linalg.matrix.LinearSystem[S, F]
      val VectorLike = linalg.vector.VectorLike
      val SetVecLike = linalg.vector.SetVecLike
+     val MatrixLike = linalg.matrix.MatrixLike
+     val LinearSystem = linalg.matrix.LinearSystem
      //val MatrixLike = linalg.matrix.MatrixLike
      //val LinearSystem = linalg.matrix.LinearSystem
 

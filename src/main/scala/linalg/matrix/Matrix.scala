@@ -1,12 +1,5 @@
 package linalg.matrix
 
-
-import linalg.util._
-//import linalg.util.Implicits._
-
-import linalg.vector._
-//import linalg.temp_factorization._
-
 import org.apache.commons.lang3.StringUtils
 import scala.collection.IndexedSeq
 import scala.collection.mutable.ListBuffer
@@ -14,37 +7,6 @@ import scala.reflect.runtime.universe._
 import scala.util.control.Breaks._
 
 
-
-
-import cats.Eq
-
-import linalg.vector._
-import linalg.kernel._
-import linalg.theory._
-import linalg.theory.space._
-
-
-//todo - decide overall if should use extension to specify type of the 'smaller' parameters.
-
-//trait MatrixLike[M, F] extends SetVecLike[M, F] {
-//
-//     val identity: M
-//
-//     def power(m: M, exp: F): M //use linear algebra formula for matrix powers
-//     def inverse(m: M): M
-//     def transpose(m: M): M
-//     def conjugateTranspose(m: M): M
-//     def adjoint(m: M): M
-//     def cofactor(m: M): M
-//     def minor(m: M): M
-//     def minor(m: M, rowIndex: Int, colIndex: Int): F
-//     def determinant(m: M): M
-//     def trace(m: M): F
-//}
-//
-//object MatrixLike {
-//     @inline final def apply[M,F](implicit ev: MatrixLike[M,F]): MatrixLike[M,F] = ev
-//}
 ////todo have object methods: isIdentity() and isSquare() and so forth
 ////note: matrix types:
 ////Square, Hessenberg, LowerTri, UpperTri, Unitary,
@@ -54,23 +16,7 @@ import linalg.theory.space._
 //
 ////todo ok to pass no param? instead of passing non-used N?
 //
-//trait LinearSystem[S, F] extends MatrixLike[S, F] {
 //
-//     //this: Number[N] =>
-//
-//     def isInconsistent(s: S): Boolean
-//     def isConsistent(s: S): Boolean  = ! isInconsistent(s)
-//
-//     def hasNoSolution(s: S): Boolean = isInconsistent(s)
-//     def hasUniqueSolution(s: S)(implicit eqSys: Eq[S]): Boolean = eqSys.eqv(rowReducedEchelon(s), identity)
-//
-//     def infiniteSolutionSolver(s: S): S
-//     def solve(s: S): Option[S]
-//}
-//
-//object LinearSystem {
-//     @inline final def apply[S,F](implicit ev: LinearSystem[S,F]): LinearSystem[S,F] = ev
-//}
 //
 //
 ////todo move in another file? follow veclikepattern
