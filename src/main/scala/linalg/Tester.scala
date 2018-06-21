@@ -67,7 +67,7 @@ object Tester extends App {
      println(v1.isZero)
      println(v1.dotProduct(v2))
      println(v1.norm())
-     println(v1.isNormalized())
+     println(v1.isNormalized()) 
      println(v2.get(3))
      println(v1.crossProduct(v2))
 
