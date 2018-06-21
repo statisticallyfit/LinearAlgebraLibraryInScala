@@ -1,12 +1,10 @@
 package linalg.instances.linear
 
+
+import spire.algebra.Eq
+
 import linalg.implicits._
 import linalg._
-import spire.algebra.Eq
-//import linalg.kernel.{Number, RealNumber, Root, Trig}
-//import linalg.theory.basis.Dimension
-//import linalg.theory.{AbelianGroup, Field, Monoid}
-//import linalg.theory.space.{HilbertSpace, InnerProductSpace, NormedVectorSpace, VectorSpace}
 import linalg.util._
 import linalg.vector.{SetOfVectors, Vector}
 
@@ -18,12 +16,6 @@ import scala.collection.mutable.Seq
 
 class VectorThings[N: Number]{
 
-     class VectorHasEq extends Eq[Vector[N]] {
-          def eqv(v: Vector[N], w: Vector[N]): Boolean ={
-               v.getElements().zip(w.getElements())
-                    .forall(vwElemPair => Eq[N].eqv(vwElemPair._1, vwElemPair._2))
-          }
-     }
 
      class VectorIsMonoid extends Monoid[Vector[N]]{
 
@@ -115,8 +107,24 @@ class VectorThings[N: Number]{
           def dimension(v: Vector[N]): Int = v.getElements().length
      }
 
+     class VectorHasEq extends Eq[Vector[N]] {
+          def eqv(v: Vector[N], w: Vector[N]): Boolean ={
+               v.getElements().zip(w.getElements())
+                    .forall(vwElemPair => Eq[N].eqv(vwElemPair._1, vwElemPair._2))
+          }
+     }
 
-     val eq = new VectorHasEq
+     class VectorCanHaveLinearIndependence extends LinearIndependence[Vector[N]] {
+
+          def linearlyIndependent(v: Vector[N], w: Vector[N]): Boolean ={
+               val rref: SetOfVectors[N] = Util.Gen.rowReducedEchelon[N](SetOfVectors(v, w))
+               val rrefSquare: SetOfVectors[N] = SetOfVectors(Util.Gen.expressRowsAsCols[N](rref.getRowsAt(0, 1)):_*)
+               rref == SetOfVectors.IDENTITY[N](2)
+          }
+
+          def isLinearlyIndependent(v: Vector[N]): Boolean = true //yes a single vector is lin indep.
+     }
+
      val monoid = new VectorIsMonoid
      val abelian = new VectorIsAbelianGroup
      val vectorSpace = new VectorIsVectorSpace
@@ -125,6 +133,8 @@ class VectorThings[N: Number]{
      val hilbertSpace = new VectorIsHilbertSpace
      val vectorLike = new VectorIsVectorLike
      val dim = new VectorHasDimension
+     val eq = new VectorHasEq
+     val linearIndep = new VectorCanHaveLinearIndependence
 }
 
 
@@ -133,7 +143,6 @@ trait VectorInstances {
      //TODO test whether not strictly necessary to have each one like this, can just have
      //the ending trait VectorLike as class and instance below like in ComplexIsNumber ...
 
-     implicit final def vectorHasEq[N: Number] = new VectorThings[N].eq
      implicit final def vectorIsMonoid[N: Number] = new VectorThings[N].monoid
      implicit final def vectorIsAbelianGroup[N: Number] = new VectorThings[N].abelian
      implicit final def vectorIsVectorSpace[N: Number] = new VectorThings[N].vectorSpace
@@ -142,5 +151,7 @@ trait VectorInstances {
      implicit final def vectorIsHilbertSpace[N: Number] = new VectorThings[N].hilbertSpace
      implicit final def vectorIsLikeAVector[N: Number] = new VectorThings[N].vectorLike
      implicit final def vectorHasDimension[N: Number] = new VectorThings[N].dim
+     implicit final def vectorHasEq[N: Number] = new VectorThings[N].eq
+     implicit final def vectorCanBeLinearlyIndependent[N: Number] = new VectorThings[N].linearIndep
 }
 

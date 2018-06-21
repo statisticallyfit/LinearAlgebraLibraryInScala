@@ -37,7 +37,7 @@ package object linalg {
      //theory stuff
      type Basis[B, F] = linalg.theory.basis.Basis[B, F]
      type Dimension[V] = linalg.theory.basis.Dimension[V]
-     type LinearIndependence[V, F] = linalg.theory.basis.LinearIndependence[V, F]
+     type LinearIndependence[V] = linalg.theory.basis.LinearIndependence[V]
      type Rank[V, F] = linalg.theory.basis.Rank[V, F]
      type Span[V, F] = linalg.theory.basis.Span[V, F]
      type Transformation[V, W] = linalg.theory.basis.Transformation[V, W]

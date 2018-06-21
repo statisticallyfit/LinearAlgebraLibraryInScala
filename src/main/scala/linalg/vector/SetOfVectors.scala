@@ -35,11 +35,24 @@ class SetOfVectors[N: Number](private val cols: Vector[N]*) {
           val rows = this.getRows()
           rows(rowIndex)
      }
+
+     /**
+       * Returns all rows
+       */
      def getRows(): Seq[Vector[N]] = {
           //val rows: Seq[Vector[N]] = Seq()
           //for(r <- 0 until this.numRows) rows(r) = Vector(columns.map(colVec => colVec.get(r)):_*)
           //rows
           Util.Gen.expressColsAsRows(columns)
+     }
+
+     /**
+       * Gets Rows at particular indices and returns them expressed as rows.
+       */
+     def getRowsAt(indices: Int*): Seq[Vector[N]] ={
+          val allRows = this.getRows()
+          val someRows = for(i <- indices) yield allRows(i)
+          Seq(someRows:_*)
      }
 
      def setColumn(colIndex: Int, col: Vector[N]): Unit = columns(colIndex) = col

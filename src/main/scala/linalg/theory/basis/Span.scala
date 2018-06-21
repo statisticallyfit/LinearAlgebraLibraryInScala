@@ -34,12 +34,16 @@ trait Span[W, F] /*extends VectorSpace[W, F]*/ {
 
      //todo choice - let V implement VectorLike OR let V <: Vector[F] -- which one? in case Poly exteds Vector
      // implements vlike doesn't work
-     def isSpanned[V](vset: W, v: V)(implicit vecLike: VectorLike[V, F]): Boolean
-     def isInSpanOf[V](v: V, vset: W)(implicit vecLike: VectorLike[V, F]): Boolean = isSpanned(vset, v)
+     //def isSpanned[V](vset: W, v: V)(implicit vecLike: VectorLike[V, F]): Boolean
+     def isSpanned(vset: W, v: W): Boolean
+     //def isInSpanOf[V](v: V, vset: W)(implicit vecLike: VectorLike[V, F]): Boolean = isSpanned(vset, v)
+     def isInSpanOf(v: W, vset: W): Boolean = isSpanned(vset, v)
 
      //gets the coefficients the relate the vset to the vector v in the linear combination. They are:
      // k1v1 + k2v2 + k3v3 + ... = v, where vset = {v1,v2,v3...} and v = v.
-     def getSpanningCoefficients[V](vset: W, v: V)(implicit vecLike: VectorLike[V, F]): Option[W] //if isspanned is false, then NOne
+     //def getSpanningCoefficients[V](vset: W, v: V)(implicit vecLike: VectorLike[V, F]): Option[W] //if isspanned is
+     // false, then NOne
+     def getSpanningCoefficients(vset: W, v: W): Option[W]
      // else Some(...)
 }
 
