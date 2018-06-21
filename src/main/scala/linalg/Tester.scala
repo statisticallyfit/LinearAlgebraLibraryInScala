@@ -2,7 +2,7 @@ package linalg
 
 import linalg.implicits._
 import linalg.kernel.{Complex, Rational, Real}
-//import linalg.vector._
+import linalg.vector.{Vector, SetOfVectors}
 
 
 /**
@@ -57,8 +57,8 @@ object Tester extends App {
 
 
 
-     // Vectors
-     /*val v1: Vector[Int] = Vector(1,2,3)
+     // Vectors ---------------------------------------------------------------------------
+     val v1: Vector[Int] = Vector(1,2,3)
      val v2: Vector[Int] = Vector(2,0,4, 5)
 
      println(v1.negate())
@@ -80,7 +80,7 @@ object Tester extends App {
      println(s1)
      println(s1.get(0,0))
 
-     s1.copy()*/
+     s1.copy()
 }
 
 
