@@ -1,7 +1,6 @@
 package linalg.instances.std
 
-import linalg.kernel._
-import linalg.theory.{AbelianGroup, Field, Monoid, Ring}
+import linalg._
 
 /**
   *

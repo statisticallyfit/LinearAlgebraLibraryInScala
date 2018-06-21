@@ -2,22 +2,12 @@ package linalg.instances.linear
 
 import linalg.implicits._
 import linalg._
-/*import linalg.kernel._
-import linalg.theory._
-import linalg.theory.space._
-import linalg.theory.basis._*/
+import linalg.vector.{SetOfVectors, Vector}
+import linalg.util._
+import spire.algebra.Eq
 
 import scala.language.higherKinds
 import scala.language.implicitConversions
-//import linalg.kernel._ //{Number, RealNumber, Root, Trig}
-/*import linalg.theory.basis.Dimension
-import linalg.theory.{AbelianGroup, Field, Monoid}
-import linalg.theory.space.{HilbertSpace, InnerProductSpace, NormedVectorSpace, VectorSpace}*/
-//import linalg.util.Util
-import linalg.vector.{SetOfVectors, Vector}
-//import linalg.vector.SetVecLike
-import linalg.util._
-
 import scala.collection.mutable.{ListBuffer, Seq}
 import scala.util.control.Breaks.{break, breakable}
 /**
@@ -117,19 +107,30 @@ class SetVecThings[N: Number] {
           def dimension(vset: SetOfVectors[N]): Int = vset.getColumns().head.dimension()
      }
 
+     class SetVecHasEq extends Eq[SetOfVectors[N]]{
+          def eqv(vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean = {
+               Util.Gen.ensureSize(vset, wset)
 
+               vset.getColumns()
+                    .zip(wset.getColumns())
+                    .forall(colPair => Eq[Vector[N]].eqv(colPair._1, colPair._2))
+          }
+     }
+
+     val eq = new SetVecHasEq
      val monoid = new SetVecIsMonoid
      val abelian = new SetVecIsAbelianGroup
      val vectorSpace = new SetVecIsVectorSpace
      val vsetLike = new SetVecIsSetVecLike
-     val dim: SetVecHasDimension = new SetVecHasDimension
+     val dim = new SetVecHasDimension
 }
 
 trait SetVecInstances {
 
-     implicit def setVecIsMonoid[N: Number] = new SetVecThings[N].monoid
-     implicit def setVecIsAbelianGroup[N: Number] = new SetVecThings[N].abelian
-     implicit def setVecIsVectorSpace[N: Number] = new SetVecThings[N].vectorSpace
-     implicit def setVecIsSetVecLike[N: Number] = new SetVecThings[N].vsetLike
-     implicit def setVecHasDimension[N: Number] = new SetVecThings[N].dim
+     implicit final def setVecHasEq[N: Number] = new SetVecThings[N].eq
+     implicit final def setVecIsMonoid[N: Number] = new SetVecThings[N].monoid
+     implicit final def setVecIsAbelianGroup[N: Number] = new SetVecThings[N].abelian
+     implicit final def setVecIsVectorSpace[N: Number] = new SetVecThings[N].vectorSpace
+     implicit final def setVecIsSetVecLike[N: Number] = new SetVecThings[N].vsetLike
+     implicit final def setVecHasDimension[N: Number] = new SetVecThings[N].dim
 }

@@ -1,7 +1,9 @@
 package linalg.syntax
 
-import linalg.kernel.Trig
-import linalg.theory.Field
+import linalg._
+
+import scala.language.higherKinds
+import scala.language.implicitConversions
 
 
 /**

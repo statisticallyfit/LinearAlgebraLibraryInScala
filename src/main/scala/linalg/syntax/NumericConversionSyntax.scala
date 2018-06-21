@@ -1,9 +1,12 @@
 package linalg.syntax
 
 import linalg.implicits._
-import linalg.kernel.{Complex, Imaginary, NumericConversion,  RealNumber}
+import linalg.kernel.{Complex, Imaginary}
+import linalg._
 
 import scala.language.higherKinds
+import scala.language.implicitConversions
+
 /**
   *
   */

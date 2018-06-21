@@ -1,11 +1,12 @@
 package linalg.syntax
 
-import cats.Eq
-import linalg.kernel._
-import linalg.theory.Field
-import linalg.theory.space.NormedVectorSpace
+import spire.algebra.Eq
+
+import linalg.implicits._
+import linalg._
 
 import scala.language.higherKinds
+import scala.language.implicitConversions
 /**
   *
   */

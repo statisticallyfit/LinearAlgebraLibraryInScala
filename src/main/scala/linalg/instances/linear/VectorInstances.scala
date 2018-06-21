@@ -2,6 +2,7 @@ package linalg.instances.linear
 
 import linalg.implicits._
 import linalg._
+import spire.algebra.Eq
 //import linalg.kernel.{Number, RealNumber, Root, Trig}
 //import linalg.theory.basis.Dimension
 //import linalg.theory.{AbelianGroup, Field, Monoid}
@@ -16,6 +17,13 @@ import scala.collection.mutable.Seq
   */
 
 class VectorThings[N: Number]{
+
+     class VectorHasEq extends Eq[Vector[N]] {
+          def eqv(v: Vector[N], w: Vector[N]): Boolean ={
+               v.getElements().zip(w.getElements())
+                    .forall(vwElemPair => Eq[N].eqv(vwElemPair._1, vwElemPair._2))
+          }
+     }
 
      class VectorIsMonoid extends Monoid[Vector[N]]{
 
@@ -105,6 +113,8 @@ class VectorThings[N: Number]{
           def dimension(v: Vector[N]): Int = v.getElements().length
      }
 
+
+     val eq = new VectorHasEq
      val monoid = new VectorIsMonoid
      val abelian = new VectorIsAbelianGroup
      val vectorSpace = new VectorIsVectorSpace
@@ -121,14 +131,14 @@ trait VectorInstances {
      //TODO test whether not strictly necessary to have each one like this, can just have
      //the ending trait VectorLike as class and instance below like in ComplexIsNumber ...
 
-
-     implicit def vectorIsMonoid[N: Number] = new VectorThings[N].monoid
-     implicit def vectorIsAbelianGroup[N: Number] = new VectorThings[N].abelian
-     implicit def vectorIsVectorSpace[N: Number] = new VectorThings[N].vectorSpace
-     implicit def vectorIsInnerProductSpace[N: Number] = new VectorThings[N].innerSpace
-     implicit def vectorIsNormedVectorSpace[N: Number] = new VectorThings[N].normedSpace
-     implicit def vectorIsHilbertSpace[N: Number] = new VectorThings[N].hilbertSpace
-     implicit def vectorIsLikeAVector[N: Number] = new VectorThings[N].vectorLike
-     implicit def vectorHasDimension[N: Number] = new VectorThings[N].dim
+     implicit final def vectorHasEq[N: Number] = new VectorThings[N].eq
+     implicit final def vectorIsMonoid[N: Number] = new VectorThings[N].monoid
+     implicit final def vectorIsAbelianGroup[N: Number] = new VectorThings[N].abelian
+     implicit final def vectorIsVectorSpace[N: Number] = new VectorThings[N].vectorSpace
+     implicit final def vectorIsInnerProductSpace[N: Number] = new VectorThings[N].innerSpace
+     implicit final def vectorIsNormedVectorSpace[N: Number] = new VectorThings[N].normedSpace
+     implicit final def vectorIsHilbertSpace[N: Number] = new VectorThings[N].hilbertSpace
+     implicit final def vectorIsLikeAVector[N: Number] = new VectorThings[N].vectorLike
+     implicit final def vectorHasDimension[N: Number] = new VectorThings[N].dim
 }
 

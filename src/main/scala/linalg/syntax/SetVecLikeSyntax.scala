@@ -1,8 +1,6 @@
 package linalg.syntax
 
-import linalg.implicits._
 import linalg._
-import linalg.vector.{Vector, SetOfVectors}
 
 import scala.language.higherKinds
 import scala.language.implicitConversions

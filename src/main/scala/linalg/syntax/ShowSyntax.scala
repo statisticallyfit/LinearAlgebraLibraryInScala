@@ -1,6 +1,9 @@
 package linalg.syntax
 
-import linalg.kernel.Show
+import linalg._
+
+import scala.language.higherKinds
+import scala.language.implicitConversions
 
 
 /**

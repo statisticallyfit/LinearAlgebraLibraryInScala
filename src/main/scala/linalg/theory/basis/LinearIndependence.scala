@@ -1,7 +1,5 @@
 package linalg.theory.basis
 
-
-
 /**
   *
   */

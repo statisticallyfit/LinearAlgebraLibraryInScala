@@ -1,7 +1,6 @@
 package linalg.theory.space
 
-import linalg.theory._
-import linalg.theory.basis._
+import linalg._
 
 /**
   * A vector space is a set V together with two binary operations that combine

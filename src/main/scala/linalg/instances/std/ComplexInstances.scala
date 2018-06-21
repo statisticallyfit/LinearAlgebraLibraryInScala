@@ -1,8 +1,8 @@
 package linalg.instances.std
 
 import linalg.implicits._
-import linalg.kernel.{Complex}
 import linalg._
+import linalg.kernel.{Complex}
 //import linalg.theory.{AbelianGroup, Field, Monoid, Ring}
 
 /**

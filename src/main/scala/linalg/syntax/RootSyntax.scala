@@ -1,11 +1,10 @@
 package linalg.syntax
 
-import linalg.kernel.{RealNumber, Root}
 import linalg.implicits._
-import linalg.kernel.Complex
-import linalg.theory.Field
+import linalg._
 
 import scala.language.higherKinds
+import scala.language.implicitConversions
 /**
   *
   */

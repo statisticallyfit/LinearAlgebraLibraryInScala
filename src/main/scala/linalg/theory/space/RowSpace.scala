@@ -3,7 +3,7 @@ package linalg.theory.space
 /**
   *
   */
-trait RowSpace[R, F] extends linalg.VectorSpace[R, F] {
+trait RowSpace[R, F] extends VectorSpace[R, F] {
 //todo see class to sketch out methods
 }
 

@@ -39,13 +39,13 @@ package object linalg {
      type Dimension[V] = linalg.theory.basis.Dimension[V]
      type LinearIndependence[V, F] = linalg.theory.basis.LinearIndependence[V, F]
      type Rank[V, F] = linalg.theory.basis.Rank[V, F]
-     //type Span[V, F] = linalg.theory.basis.Span[V, F]
+     type Span[V, F] = linalg.theory.basis.Span[V, F]
      type Transformation[V, W] = linalg.theory.basis.Transformation[V, W]
      val Basis = linalg.theory.basis.Basis
      val Dimension = linalg.theory.basis.Dimension
      val LinearIndependence = linalg.theory.basis.LinearIndependence
      val Rank = linalg.theory.basis.Rank
-     //val Span = linalg.theory.basis.Span
+     val Span = linalg.theory.basis.Span
      val Transformation = linalg.theory.basis.Transformation
 
      type VectorSpace[V, F] = linalg.theory.space.VectorSpace[V, F]

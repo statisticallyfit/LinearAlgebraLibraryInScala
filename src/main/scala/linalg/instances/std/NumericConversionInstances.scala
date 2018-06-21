@@ -1,7 +1,8 @@
 package linalg.instances.std
 
 import linalg.implicits._
-import linalg.kernel._
+import linalg._
+import linalg.kernel.{Complex}
 
 /**
   *

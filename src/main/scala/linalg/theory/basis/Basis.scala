@@ -1,8 +1,5 @@
 package linalg.theory.basis
 
-import linalg.theory.space._
-import linalg.theory._
-
 /**
   *
   */

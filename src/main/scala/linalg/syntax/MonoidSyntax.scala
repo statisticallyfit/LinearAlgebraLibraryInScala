@@ -1,8 +1,10 @@
 package linalg.syntax
 
-import linalg.theory.Monoid
+import linalg.implicits._
+import linalg._
 
 import scala.language.higherKinds
+import scala.language.implicitConversions
 /**
   *
   */

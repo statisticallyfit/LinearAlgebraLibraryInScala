@@ -1,13 +1,12 @@
 package linalg.theory.basis
 
 
-import linalg.theory.space._
+import linalg._
 
 /**
   *
   *
   */
-
 trait Rank[V, F] extends VectorSpace[V, F] {
 
      def rank(vectorSpace: V): Int

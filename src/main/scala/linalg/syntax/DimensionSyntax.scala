@@ -1,6 +1,10 @@
 package linalg.syntax
 
-import linalg.theory.basis.Dimension
+import linalg.implicits._
+import linalg._
+
+import scala.language.higherKinds
+import scala.language.implicitConversions
 /**
   *
   */

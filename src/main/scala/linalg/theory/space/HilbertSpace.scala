@@ -2,7 +2,6 @@ package linalg.theory.space
 
 //import linalg.kernel.{RealNumber, NRoot, Trig}
 import linalg._
-import linalg.theory.Field
 
 
 /**

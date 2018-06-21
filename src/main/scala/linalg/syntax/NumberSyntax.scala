@@ -1,11 +1,10 @@
 package linalg.syntax
 
+import linalg.implicits._
+import linalg._
 
-
-import linalg.kernel.Number
-
-import scala.language.implicitConversions
 import scala.language.higherKinds
+import scala.language.implicitConversions
 
 /**
   *

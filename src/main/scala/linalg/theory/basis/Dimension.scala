@@ -1,12 +1,9 @@
 package linalg.theory.basis
 
 
-import linalg.theory.space._
-
 /**
   *
   */
-
 trait Dimension[V]{
 
      def dimension(v: V): Int

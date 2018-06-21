@@ -1,10 +1,11 @@
 package linalg.theory.space
 
 
-//import linalg.theory._
+import linalg.implicits._
 import linalg._
 
-
+import scala.language.higherKinds
+import scala.language.implicitConversions
 
 
 

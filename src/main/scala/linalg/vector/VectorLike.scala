@@ -1,9 +1,7 @@
 package linalg.vector
 
-import linalg.kernel.{RealNumber, Root}
-import linalg.theory.Field
-import linalg.theory.basis.Dimension
-import linalg.theory.space.{HilbertSpace, NormedVectorSpace}
+import linalg._
+
 
 /**
   *

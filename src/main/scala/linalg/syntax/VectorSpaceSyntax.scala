@@ -1,14 +1,12 @@
 package linalg.syntax
 
-import linalg.theory.space.VectorSpace
+import linalg._
 
 import scala.language.higherKinds
 
 /**
   *
   */
-
-
 trait VectorSpaceSyntax extends AbelianGroupSyntax with MonoidSyntax {
 
      implicit class VectorSpaceOps[V[_], F](current: V[F])(implicit vecSpace: VectorSpace[V[F], F]){

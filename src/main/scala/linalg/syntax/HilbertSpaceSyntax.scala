@@ -1,10 +1,10 @@
 package linalg.syntax
 
-import linalg.kernel._
-import linalg.theory.Field
-import linalg.theory.space.HilbertSpace
+import linalg.implicits._
+import linalg._
 
 import scala.language.higherKinds
+import scala.language.implicitConversions
 /**
   *
   */

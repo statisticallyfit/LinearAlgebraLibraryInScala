@@ -2,8 +2,7 @@ package linalg.theory.space
 
 import cats.Eq
 
-import linalg.kernel._
-import linalg.theory._
+import linalg._
 
 /**
   *
