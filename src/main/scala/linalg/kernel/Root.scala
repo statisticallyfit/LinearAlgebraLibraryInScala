@@ -11,7 +11,7 @@ import linalg.theory.Field
 //todo look at spire's Root to see how they have implicit number: Number[N] there!
 
 trait Root[N, R] {
-     private def two(implicit f: Field[R]): R = f.plus(f.one, f.one)
+     def two(implicit f: Field[R]): R = f.plus(f.one, f.one)
 
      def power(base: N, exp: R): N
      def nRoot(base: N, n: R)(implicit f: Field[R]): N = power(base, f.divide(f.one, n))

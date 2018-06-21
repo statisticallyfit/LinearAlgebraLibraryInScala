@@ -62,7 +62,7 @@ class VectorThings[N: Number]{
      class VectorIsNormedVectorSpace extends VectorIsInnerProductSpace with NormedVectorSpace[Vector[N], N]{
 
           def norm[R:RealNumber](v: Vector[N])(implicit field: Field[N], root: Root[N, R]): N =
-               Util.Gen.total[N](Vector(v.getElements().map(e => root.power(e, RealNumber[R].two)):_*))
+               Util.Gen.total[N](Vector(v.getElements().map(e => root.power(e, root.two)):_*))
      }
 
 
