@@ -60,8 +60,8 @@ object Tester extends App {
      // Vectors ---------------------------------------------------------------------------
      //TODO fix int so that we can declare vectors using int nums but operations are in double and are returned as
      // TODO ... double.
-     var v1: Vector[Double] = Vector(1,2,3)
-     val v2: Vector[Double] = Vector(2,0,4, 5)
+     var v1: Vector[Rational] = Vector(1,2,3)
+     val v2: Vector[Rational] = Vector(2,0,4, 5)
 
      println("NEgate: " + v1.negate())
      println("Show v2: " + v2)
@@ -76,10 +76,14 @@ object Tester extends App {
 
      //Set vec
      //TODO implicit from int to rational and from double to real
-     val s1: SetOfVectors[Double] = SetOfVectors(
-          Vector(1,2,3,4,5),
-          Vector(8,8,7,2,3),
-          Vector(-8,9,-3,0,1))
+     /*val s1: SetOfVectors[Real] = SetOfVectors(
+          Vector(1.0, 2.0, 3.0, 4.0, 5.0),
+          Vector(8.0, 8.0, 7.0, 2.0, 3.0),
+          Vector(-8.0, 9.0, -3.0, 0.0, 1.0))*/
+     val s1: SetOfVectors[Rational] = SetOfVectors(
+          Vector(1, 2, 3, 4, 5),
+          Vector(8, 8, 7, 2, 3),
+          Vector(-8, 9, -3, 0, 1))
      println("Rows: " + s1.getRows())
      println("Cols: " + s1.getColumns())
      println(s1)
