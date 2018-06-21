@@ -16,14 +16,14 @@ trait NormedVectorSpaceSyntax extends InnerProductSpaceSyntax {
                                                  (implicit normed: NormedVectorSpace[V[F], F]){
 
 
-          def norm[R:RealNumber]()(implicit r: Root[F,R]): F = normed.norm[R](current)
+          def norm()(implicit r: Root[F,F]): F = normed.norm(current)
 
-          def normalize[R:RealNumber]()(implicit r: Root[F,R]): V[F] = normed.normalize[R](current)
+          def normalize()(implicit r: Root[F,F]): V[F] = normed.normalize(current)
 
-          def isNormalized[R:RealNumber]()(implicit eqVec: Eq[V[F]],  r: Root[F,R]): Boolean =
-               normed.isNormalized[R](current)
+          def isNormalized()(implicit eqVec: Eq[V[F]],  r: Root[F,F]): Boolean =
+               normed.isNormalized(current)
 
-          def distance[R:RealNumber](other: V[F])(implicit r: Root[F,R]): F =
-               normed.distance[R](current, other)
+          def distance(other: V[F])(implicit r: Root[F,F]): F =
+               normed.distance(current, other)
      }
 }

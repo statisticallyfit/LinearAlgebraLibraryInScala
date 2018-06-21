@@ -13,14 +13,14 @@ trait NormedVectorSpace[V, F] extends VectorSpace[V, F] {
      //this: Field[F] =>
 
      //note defining norm() just in normedinnerprodspace only - normedvecspace doesn't know about innerprod.
-     def norm[R:RealNumber](v: V)(implicit f: Field[F], r: Root[F, R]): F
+     def norm(v: V)(implicit f: Field[F], r: Root[F, F]): F
 
-     def normalize[R:RealNumber](v: V)(implicit field: Field[F], r: Root[F, R]): V = scale(v, field.inverse(norm(v)))
+     def normalize(v: V)(implicit field: Field[F], r: Root[F, F]): V = scale(v, field.inverse(norm(v)))
 
-     def isNormalized[R:RealNumber](v: V)(implicit eq: Eq[V], f: Field[F], r: Root[F, R]): Boolean =
+     def isNormalized(v: V)(implicit eq: Eq[V], f: Field[F], r: Root[F, F]): Boolean =
           eq.eqv(v, normalize(v))
 
-     def distance[R:RealNumber](v: V, w: V)(implicit f: Field[F], r: Root[F, R]): F = norm(plus(v, negate(w)))
+     def distance(v: V, w: V)(implicit f: Field[F], r: Root[F, F]): F = norm(plus(v, negate(w)))
 }
 
 

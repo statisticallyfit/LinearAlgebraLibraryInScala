@@ -61,16 +61,18 @@ class VectorThings[N: Number]{
 
      class VectorIsNormedVectorSpace extends VectorIsInnerProductSpace with NormedVectorSpace[Vector[N], N]{
 
-          def norm[R:RealNumber](v: Vector[N])(implicit field: Field[N], root: Root[N, R]): N =
-               Util.Gen.total[N](Vector(v.getElements().map(e => root.power(e, root.two)):_*))
+          def norm(v: Vector[N])(implicit field: Field[N], root: Root[N, N]): N = {
+
+               val two: N = field.one + field.one
+               Util.Gen.total[N](Vector(v.getElements().map(e => root.power(e, two)):_*))
+          }
      }
 
 
      class VectorIsHilbertSpace extends VectorIsNormedVectorSpace with HilbertSpace[Vector[N], N]{
 
-          def angle[R:RealNumber](v: Vector[N], w: Vector[N])(implicit t: Trig[N],
-                                                              field: Field[N], r: Root[N,R]): N =
-               field.divide(innerProduct(v, w),  field.times(norm[R](v), norm[R](w)).arccos() )
+          def angle(v: Vector[N], w: Vector[N])(implicit t: Trig[N], field: Field[N], r: Root[N,N]): N =
+               field.divide(innerProduct(v, w),  field.times(norm(v), norm(w)).arccos() )
      }
 
 
@@ -78,9 +80,8 @@ class VectorThings[N: Number]{
 
           def isZero(v: Vector[N]): Boolean = v.getElements().forall(e => e :==: Number[N].zero)
 
-          def projection[R:RealNumber](v: Vector[N], onto: Vector[N])(implicit field: Field[N],
-                                                                      r: Root[N,R]): Vector[N] =
-               scale(onto, field.divide(innerProduct(v, onto), norm[R](onto)) )
+          def projection(v: Vector[N], onto: Vector[N])(implicit field: Field[N], r: Root[N,N]): Vector[N] =
+               scale(onto, field.divide(innerProduct(v, onto), norm(onto)) )
 
           def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = {
                Util.Gen.ensureSize(v, w)

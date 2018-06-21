@@ -2,6 +2,7 @@ package linalg.kernel
 
 
 import linalg.implicits._
+
 /**
   *
   */

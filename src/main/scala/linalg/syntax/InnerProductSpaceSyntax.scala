@@ -1,6 +1,6 @@
 package linalg.syntax
 
-import linalg.implicits._
+
 import linalg._
 
 import scala.language.higherKinds

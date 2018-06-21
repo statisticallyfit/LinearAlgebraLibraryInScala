@@ -21,7 +21,7 @@ trait VectorLikeSyntax extends HilbertSpaceSyntax with NormedVectorSpaceSyntax {
 
           def isZero: Boolean = vecLike.isZero(current)
 
-          def projection[R:RealNumber](onto: V[F])(implicit f: Field[F], r: Root[F, R]): V[F] = vecLike
-               .projection[R](current, onto)
+          def projection(onto: V[F])(implicit f: Field[F], r: Root[F, F]): V[F] = vecLike
+               .projection(current, onto)
      }
 }
