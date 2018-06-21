@@ -64,7 +64,8 @@ class VectorThings[N: Number]{
           def norm(v: Vector[N])(implicit field: Field[N], root: Root[N, N]): N = {
 
                val two: N = field.one + field.one
-               Util.Gen.total[N](Vector(v.getElements().map(e => root.power(e, two)):_*))
+               val sum: N = Util.Gen.sumElements[N](Vector(v.getElements().map(e => root.power(e, two)):_*))
+               sum.sqrt()
           }
      }
 

@@ -61,16 +61,26 @@ object Util {
                                    wset: SetOfVectors[N]): SetOfVectors[N] =
                SetOfVectors((vset.getColumns() ++ wset.getColumns()):_*)
 
-          def total[N:Number](v: Vector[N]): N = v.getElements().reduceLeft[N](_ + _)
+          def sumElements[N:Number](v: Vector[N]): N = v.getElements().reduceLeft[N](_ + _)
 
-          def ensureSize[N:Number](v: Vector[N], w: Vector[N],
-                                   SIZE: Int = 0): Unit = {
 
-               val caseVectorsAreDifferentSize: Boolean = (SIZE == 0 || SIZE < 0) && (v.dimension() != w.dimension())
-               val caseVectorsAreDifferentThanSpecificSize: Boolean = SIZE != v.dimension() || SIZE != w.dimension()
+          def ensureSize[N:Number](v: Vector[N], w: Vector[N], SIZE: Int = 0): Unit = {
 
-               if(caseVectorsAreDifferentSize || caseVectorsAreDifferentThanSpecificSize){
-                    throw Exception.VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
+               SIZE match {
+                    case 0 => if(v.dimension() != w.dimension()) {
+                         throw Exception.VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
+                    }
+                    case _ => {
+                         val len = v.dimension()
+
+                         if (v.dimension() == w.dimension() && SIZE != len){
+                              throw Exception.VectorLikeSizeException("Vectors do not have same size as given size; cannot " +
+                                   "continue operation.")
+
+                         } else if (v.dimension() != w.dimension()){
+                              throw Exception.VectorLikeSizeException("Vectors do not have same size; cannot continue operation.")
+                         }
+                    }
                }
           }
 

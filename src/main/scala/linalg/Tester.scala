@@ -58,18 +58,21 @@ object Tester extends App {
 
 
      // Vectors ---------------------------------------------------------------------------
-     val v1: Vector[Int] = Vector(1,2,3)
-     val v2: Vector[Int] = Vector(2,0,4, 5)
+     //TODO fix int so that we can declare vectors using int nums but operations are in double and are returned as
+     // TODO ... double.
+     var v1: Vector[Double] = Vector(1,2,3)
+     val v2: Vector[Double] = Vector(2,0,4, 5)
 
-     println(v1.negate())
-     println(v1 + v2)
-     println(Vector(2,3,4) + Vector(-2, 3, -6))
-     println(v1.isZero)
-     println(v1.dotProduct(v2))
-     println(v1.norm())
-     println(v1.isNormalized()) 
-     println(v2.get(3))
-     println(v1.crossProduct(v2))
+     println("NEgate: " + v1.negate())
+     println("Show v2: " + v2)
+     println("Plus: " + (Vector(2,3,4) + Vector(-2, 3, -6)))
+     println("is zero?: " + v1.isZero)
+     v1 = Vector(3,8,-1,5)
+     println("Dot product: " + v1.dotProduct(v2))
+     println("v1 norm: " + v1.norm()) //TODO fix
+     println("is normalized: " + v1.isNormalized())
+     println("get: " + v2.get(3) + "\n\n")
+     //println(v1.crossProduct(v2))
 
      //Set vec
      val s1: SetOfVectors[Double] = SetOfVectors(Vector(1,2,3,4,5), Vector(8,8,1,2,3),

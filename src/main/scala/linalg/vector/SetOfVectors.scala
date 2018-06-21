@@ -19,7 +19,8 @@ import scala.collection.mutable.{ListBuffer, Seq}
 class SetOfVectors[N: Number](private val cols: Vector[N]*) {
 
      private val columns: Seq[Vector[N]] = Seq(cols:_*)
-     val numRows: Int = Dimension[SetOfVectors[N]].dimension(this)
+     val numRows: Int = columns.head.dimension()
+     //note is recursive here since goes back to instances file: Dimension[SetOfVectors[N]].dimension(this)
      val numCols: Int = columns.length
 
      def copy(): SetOfVectors[N] = SetOfVectors(columns:_*)
