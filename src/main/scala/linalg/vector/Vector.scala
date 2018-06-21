@@ -29,7 +29,7 @@ class Vector[N: Number](private val elems: N*) {
      def copy(es: Seq[N]): Vector[N] = Vector(es:_*)
 
      def set(index: Int)(value: N): Unit = elements(index) = value
-     def get(index: Int): N = elems(index) //elements(index)
+     def get(index: Int): N = elements(index) //elements(index)
      def getElements(): Seq[N] = Seq(elements:_*)
 
 

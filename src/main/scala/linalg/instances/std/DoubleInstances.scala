@@ -11,7 +11,7 @@ trait DoubleIsAbsolute extends Absolute[Double,Double]{
 }
 
 trait DoubleIsRoot extends Root[Double, Double] {
-     def power(base: Double, exp: Double): Double = math.pow(base, exp).toInt
+     def power(base: Double, exp: Double): Double = math.pow(base, exp)
 }
 
 trait DoubleHasEquality extends Equality[Double]{

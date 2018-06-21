@@ -8,22 +8,6 @@ import linalg._
 //inspiration for structure:
 //https://github.com/non/spire/blob/8eb8ab1ac5c27e660fcf7abd24b44b3cd3bac960/core/shared/src/main/scala/spire/std/long.scala
 
-/*
-trait RealIsAbsolute extends Absolute[Real, Real]{
-
-     def absoluteValue(x: Real): Real = Real(math.abs(x.double))
-}
-
-trait RationalIsAbsolute extends Absolute[Rational, Rational]{
-
-     def absoluteValue(x: Rational): Rational = Rational(math.abs(x.num), math.abs(x.den))
-}
-
-class ComplexIsAbsolute[R:RealNumber] extends Absolute[Complex[R], R]{
-
-     def absoluteValue(z: Complex[R]): R = Complex.magnitude(z)
-}*/
-
 
 trait IntIsAbsolute extends Absolute[Int,Int]{
 
@@ -40,7 +24,6 @@ trait IntHasEquality extends Equality[Int]{
 }
 
 trait IntIsTrigonometric extends Trig[Int] {
-     val E: Int = 2
      val PI: Int = 3 //just approximations! - note: int is not good for calculations
 
      def sin(x: Int): Int = math.sin(x).toInt

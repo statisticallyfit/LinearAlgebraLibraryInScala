@@ -3,6 +3,7 @@ package linalg.vector
 
 import linalg.implicits._
 import linalg._
+import linalg.util._
 
 import scala.language.higherKinds
 import scala.language.implicitConversions
@@ -30,11 +31,15 @@ class SetOfVectors[N: Number](private val cols: Vector[N]*) {
      def getColumns(): Seq[Vector[N]] = Seq(columns:_*)
      def getColumn(colIndex: Int): Vector[N] = columns(colIndex)
 
-     def getRow(rowIndex: Int): Vector[N] = this.getRows()(rowIndex)
+     def getRow(rowIndex: Int): Vector[N] = {
+          val rows = this.getRows()
+          rows(rowIndex)
+     }
      def getRows(): Seq[Vector[N]] = {
-          val rows: Seq[Vector[N]] = Seq()
-          for(r <- 0 until this.numRows) rows(r) = Vector(columns.map(colVec => colVec.get(r)):_*)
-          rows
+          //val rows: Seq[Vector[N]] = Seq()
+          //for(r <- 0 until this.numRows) rows(r) = Vector(columns.map(colVec => colVec.get(r)):_*)
+          //rows
+          Util.Gen.expressColsAsRows(columns)
      }
 
      def setColumn(colIndex: Int, col: Vector[N]): Unit = columns(colIndex) = col

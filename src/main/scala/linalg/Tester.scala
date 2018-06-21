@@ -75,15 +75,23 @@ object Tester extends App {
      //println(v1.crossProduct(v2))
 
      //Set vec
-     val s1: SetOfVectors[Double] = SetOfVectors(Vector(1,2,3,4,5), Vector(8,8,1,2,3),
+     //TODO implicit from int to rational and from double to real
+     val s1: SetOfVectors[Double] = SetOfVectors(
+          Vector(1,2,3,4,5),
+          Vector(8,8,7,2,3),
           Vector(-8,9,-3,0,1))
+     println("Rows: " + s1.getRows())
+     println("Cols: " + s1.getColumns())
+     println(s1)
      println(s1.get(1,2)) //should be 9
      s1.getColumn(1).set(1)(333)
+     println("After (1,1) == 333: " + s1)
      s1.set(0,0)(111)
-     println(s1)
+     println("After (0,0) == 111: " + s1)
      println(s1.get(0,0))
+     println(s1.getRow(0))
 
-     s1.copy()
+     println("copy: " + s1.copy())
 }
 
 
