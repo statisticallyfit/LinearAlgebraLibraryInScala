@@ -71,7 +71,7 @@ class VectorThings[N: Number]{
 
      class VectorIsVectorLike extends VectorIsHilbertSpace with VectorLike[Vector[N], N]{
 
-          def isZero(v: Vector[N]): Boolean = v.getElements().forall(e => e :==: Number[N].zero)
+          def isZero(v: Vector[N]): Boolean = v.getElements().forall(e => e.isZero)
 
           def projection(v: Vector[N], onto: Vector[N])(implicit field: Field[N], r: Root[N,N]): Vector[N] =
                scale(onto, field.divide(innerProduct(v, onto), norm(onto)) )
@@ -108,9 +108,10 @@ class VectorThings[N: Number]{
      }
 
      class VectorHasEq extends Eq[Vector[N]] {
+
           def eqv(v: Vector[N], w: Vector[N]): Boolean ={
                v.getElements().zip(w.getElements())
-                    .forall(vwElemPair => Eq[N].eqv(vwElemPair._1, vwElemPair._2))
+                    .forall(vwElemPair => vwElemPair._1 :==: vwElemPair._2)
           }
      }
 

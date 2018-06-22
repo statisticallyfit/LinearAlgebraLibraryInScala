@@ -292,20 +292,22 @@ object Util {
           object Id {
 
                def isSymmetric[N: Number](smat: SquareMatrix[N]): Boolean={
-                    smat == smat.transpose()
+                    ??? //smat == smat.transpose()
                }
 
                def isHermitian[N: Number](smat: SquareMatrix[N]): Boolean={
-                    smat == smat.conjugateTranspose()
+                    ??? //smat == smat.conjugateTranspose()
                }
 
                //TODO need shapeless to automatically derive typeclass instances for squaremat??
                def isUnitary[N: Number](smat: SquareMatrix[N]): Boolean ={
-                    SquareMatrix.IDENTITY[N](smat.dimension()) == (smat * smat.conjugateTranspose())
+                    ???
+                    ///SquareMatrix.IDENTITY[N](smat.dimension()) == (smat * smat.conjugateTranspose())
                }
 
                def isOrthogonal[N: Number](smat: SquareMatrix[N]): Boolean ={
-                    SquareMatrix.IDENTITY[N](smat.dimension()) == (smat * smat.transpose())
+                    ???
+                    //SquareMatrix.IDENTITY[N](smat.dimension()) == (smat * smat.transpose())
                }
 
                def isLowerTriangular[N: Number](mat: Matrix[N]): Boolean ={
@@ -337,7 +339,7 @@ object Util {
                       * based on Gauss-Jordan elimination
                       */
                     def makeHessenberg[N: Number](smat: SquareMatrix[N])
-                                                 (implicit a: Absolute[N, N]): SquareMatrix[N] = {
+                                                 /*(implicit a: Absolute[N, N])*/: SquareMatrix[N] = {
 
                          var squareHessenMat: SetOfVectors[N] = smat.asInstanceOf[SetOfVectors[N]].copy()
 
@@ -350,6 +352,7 @@ object Util {
                                    //TODO test here if the .abs() still works when at runtime
                                    // TODO when using Complex class -- need to differentiate
                                    // TODO between layerops and regular?
+                                   //todo - now this works because Number inherits Absolute[N,N]
                                    if(squareHessenMat.get(i, r).abs().toDouble > largest){
                                         largest = squareHessenMat.get(i, r).abs().toDouble
                                         largestRow = i

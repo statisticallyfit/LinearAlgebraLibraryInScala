@@ -69,6 +69,7 @@ class DoubleIsRealNumber extends DoubleIsField
      with DoubleHasEquality
      with RealNumber[Double] {
 
+     def isZero(x: Double): Boolean = x == 0
      def isNegative(x: Double): Boolean = x < 0
      def doubleValue(x: Double): Double = x * 1.0
      def from(x: Int): Double = x

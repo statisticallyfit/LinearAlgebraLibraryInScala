@@ -72,6 +72,7 @@ class RationalIsRealNumber extends RationalIsField
      with RationalHasEquality
      with RealNumber[Rational] {
 
+     def isZero(x: Rational): Boolean = x.num == 0
      def isNegative(x: Rational): Boolean = x.num < 0
      def doubleValue(x: Rational): Double = x.num * 1.0 / x.den
      def from(x: Int): Rational = Rational(x)

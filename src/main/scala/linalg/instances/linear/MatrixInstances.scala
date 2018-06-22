@@ -26,7 +26,7 @@ import scala.util.control.Breaks._
 class MatrixThings[N: Number] {
 
      class MatrixIsMatrixLike extends MatrixLike[Matrix[N], N]{
-          val identity = _
+          val identity = ???
 
           def power(m: Matrix[N], exp: N) = ???
 
@@ -56,8 +56,8 @@ class MatrixThings[N: Number] {
 
           def isZero(v: Matrix[N]) = ???
 
-          val zero = _
-          val one = _
+          val zero = ???
+          val one = ???
 
           def plus(v: Matrix[N], w: Matrix[N]) = ???
 

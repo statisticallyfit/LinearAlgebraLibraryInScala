@@ -88,6 +88,7 @@ class ComplexThings[R:RealNumber] {
           with ComplexHasEquality
           with Number[Complex[R]]  {
 
+          def isZero(x: Complex[R]): Boolean = x.re.isZero && x.im.isZero
           def isNegative(x: Complex[R]): Boolean = x.re.isNegative && x.im.isNegative
           def doubleValue(x: Complex[R]): Double = Complex.magnitude(x).toDouble
           def from(x: Int): Complex[R] = Complex(RealNumber[R].from(x))

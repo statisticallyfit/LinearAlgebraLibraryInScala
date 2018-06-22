@@ -72,10 +72,24 @@ class SetVecThings[N: Number] {
      }
 
 
-     class SetVecSpan extends Span[Vector[N], SetOfVectors[N], N]{
+     class SetVecSpan extends SetVecIsSetVecLike with Span[Vector[N], SetOfVectors[N], N]{
+
+          //TODO why doesn't implicit syntax work , why have to call rref with vv. ??
+          //private val vv: SetVecLike[SetOfVectors[N], N] = implicitly[SetVecLike[SetOfVectors[N], N]]
+
+
+          def span(vset: SetOfVectors[N]): SetOfVectors[N] = ??? //vv.rowReducedEchelon(vset)
+
+          def doesSetSpanTheSpace(vset: SetOfVectors[N]): Boolean ={
+               ???
+          }
 
           def doesSetSpanTheVector(vset: SetOfVectors[N], v: Vector[N]): Boolean ={
+               ???
+          }
 
+          def getSpanningCoefficients(vset: SetOfVectors[N], v: Vector[N]): Option[List[N]] ={
+               ???
           }
      }
 

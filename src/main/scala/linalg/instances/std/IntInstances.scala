@@ -72,6 +72,7 @@ class IntIsRealNumber extends IntIsField
      with IntHasEquality
      with RealNumber[Int] {
 
+     def isZero(x: Int): Boolean = x == 0
      def isNegative(x: Int): Boolean = x < 0
      def doubleValue(x: Int): Double = x * 1.0
      def from(x: Int): Int = x

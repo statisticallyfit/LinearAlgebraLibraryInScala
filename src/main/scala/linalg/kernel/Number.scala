@@ -11,14 +11,13 @@ import scala.language.higherKinds
   *
   */
 
-trait Number[N] extends Field[N] /*with Trig[N]*/ with Equality[N] /*with Eq[N]*/
-     /*with Root[N] with Absolute[N]*/ {
+trait Number[N] extends Field[N] with Absolute[N, N] with Equality[N] {
 
      val two: N = plus(one, one)
 
      def minus(x: N, y: N): N = plus(x, negate(y))
 
-     def isZero(x: N): Boolean = eqv(zero, x)
+     def isZero(x: N): Boolean //= eqv(zero, x)
      def isNegative(x: N): Boolean
 
      def doubleValue(x: N): Double

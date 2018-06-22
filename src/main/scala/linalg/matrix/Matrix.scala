@@ -17,7 +17,7 @@ import scala.util.control.Breaks._
 //// Similar, UpperHessenberg, Jacobian.
 //
 
-
+//TODO get rid of 'extends' by using Hlist shapeless
 class Matrix[N: Number](private val cols: Vector[N]*) extends SetOfVectors[N](cols:_*)
 
 /*object Testing {

@@ -71,6 +71,7 @@ class RealIsRealNumber extends RealIsField
      with RealHasEquality
      with RealNumber[Real] {
 
+     def isZero(x: Real): Boolean = x.double == 0
      def isNegative(x: Real): Boolean = x.double < 0
      def doubleValue(x: Real): Double = x.double
      def from(x: Int): Real = Real(x)

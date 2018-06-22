@@ -9,9 +9,7 @@ import scala.language.implicitConversions
   */
 trait MatrixLikeSyntax extends SetVecLikeSyntax {
 
-     implicit class MatrixLikeOps[M[_], N: Number](current: M[N]){
-
-          private val mat: MatrixLike[M[N], N] = implicitly[MatrixLike[M[N], N]]
+     implicit class MatrixLikeOps[M[_], N: Number](current: M[N])(implicit mat: MatrixLike[M[N], N]){
 
           def power(exp: N): M[N] = mat.power(current, exp)
           def inverse(): M[N] = mat.inverse(current)

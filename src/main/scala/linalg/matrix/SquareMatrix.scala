@@ -31,7 +31,7 @@ object SquareMatrix {
           for(r <- 0 until diag.dimension()){
                for(c <- 0 until diag.dimension()){
                     if(r == c) mat(r)(c) = diag.get(r)
-                    else mat(r)(c) = Number.ZERO.asInstanceOf[N]
+                    else mat(r)(c) = Number[N].zero
                }
           }
           new SquareMatrix(Matrix.fromBuffers(mat:_*))
