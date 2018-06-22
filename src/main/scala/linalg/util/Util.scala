@@ -299,6 +299,7 @@ object Util {
                     smat == smat.conjugateTranspose()
                }
 
+               //TODO need shapeless to automatically derive typeclass instances for squaremat??
                def isUnitary[N: Number](smat: SquareMatrix[N]): Boolean ={
                     SquareMatrix.IDENTITY[N](smat.dimension()) == (smat * smat.conjugateTranspose())
                }
