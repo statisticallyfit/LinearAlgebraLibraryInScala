@@ -71,6 +71,14 @@ class SetVecThings[N: Number] {
           }
      }
 
+
+     class SetVecSpan extends Span[Vector[N], SetOfVectors[N], N]{
+
+          def doesSetSpanTheVector(vset: SetOfVectors[N], v: Vector[N]): Boolean ={
+
+          }
+     }
+
      val eq = new SetVecHasEq
      val monoid = new SetVecIsMonoid
      val abelian = new SetVecIsAbelianGroup

@@ -39,7 +39,7 @@ package object linalg {
      type Dimension[V] = linalg.theory.basis.Dimension[V]
      type LinearIndependence[V] = linalg.theory.basis.LinearIndependence[V]
      type Rank[V, F] = linalg.theory.basis.Rank[V, F]
-     type Span[V, F] = linalg.theory.basis.Span[V, F]
+     type Span[V, W, F] = linalg.theory.basis.Span[V, W, F]
      type Transformation[V, W] = linalg.theory.basis.Transformation[V, W]
      val Basis = linalg.theory.basis.Basis
      val Dimension = linalg.theory.basis.Dimension
@@ -92,13 +92,9 @@ package object linalg {
      type SetVecLike[V, F] = linalg.vector.SetVecLike[V, F]
      type MatrixLike[M, F] = linalg.matrix.MatrixLike[M, F]
      type LinearSystem[S, F] = linalg.matrix.LinearSystem[S, F]
-     //type MatrixLike[M, F] = linalg.matrix.MatrixLike[M, F]
-     //type LinearSystem[S, F] = linalg.matrix.LinearSystem[S, F]
      val VectorLike = linalg.vector.VectorLike
      val SetVecLike = linalg.vector.SetVecLike
      val MatrixLike = linalg.matrix.MatrixLike
      val LinearSystem = linalg.matrix.LinearSystem
-     //val MatrixLike = linalg.matrix.MatrixLike
-     //val LinearSystem = linalg.matrix.LinearSystem
 
 }

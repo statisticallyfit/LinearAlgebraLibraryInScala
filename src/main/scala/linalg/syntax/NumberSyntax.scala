@@ -21,6 +21,7 @@ trait NumberSyntax extends FieldSyntax with TrigSyntax with EqualitySyntax
      implicit class NumberOps[N: Number](current: N) {
 
           private val number = implicitly[Number[N]]
+          //number.ab
 
           def -(other: N): N = number.minus(current, other)
           def isZero: Boolean = number.isZero(current)

@@ -3,6 +3,7 @@ package linalg.util
 
 import linalg.implicits._
 import linalg._
+import linalg.matrix.{Matrix, SquareMatrix}
 import linalg.vector.{SetOfVectors, Vector}
 
 import scala.collection.mutable.{ListBuffer, Seq}
@@ -278,95 +279,103 @@ object Util {
                echelonMatrix
           }
      }
+
+
+
+
+     // ------------------------------------------------------------------------------
+
+     object MatrixOps {
+
+          //TODO - where to put this? in each class or should I use typeclasses?
+          //TODO but then would have to make squarematlike typeclass -- too grainy.
+          object Id {
+
+               def isSymmetric[N: Number](smat: SquareMatrix[N]): Boolean={
+                    smat == smat.transpose()
+               }
+
+               def isHermitian[N: Number](smat: SquareMatrix[N]): Boolean={
+                    smat == smat.conjugateTranspose()
+               }
+
+               def isUnitary[N: Number](smat: SquareMatrix[N]): Boolean ={
+                    SquareMatrix.IDENTITY[N](smat.dimension()) == (smat * smat.conjugateTranspose())
+               }
+
+               def isOrthogonal[N: Number](smat: SquareMatrix[N]): Boolean ={
+                    SquareMatrix.IDENTITY[N](smat.dimension()) == (smat * smat.transpose())
+               }
+
+               def isLowerTriangular[N: Number](mat: Matrix[N]): Boolean ={
+                    for(r <- 0 until mat.numRows){
+                         for(c <- 0 until mat.numCols){
+                              if(c > r && mat.get(r, c) != 0)
+                                   false
+                         }
+                    }
+                    true
+               }
+
+               def isUpperTriangular[N: Number](mat: Matrix[N]): Boolean ={
+                    for(r <- 0 until mat.numRows){
+                         for(c <- 0 until mat.numCols){
+                              if(c < r && mat.get(r, c) != 0)
+                                   false
+                         }
+                    }
+                    true
+               }
+          }
+
+          object Trans {
+               object HessenbergTransformer {
+                    import linalg.implicits._
+                    /**
+                      * Computes the upper Hessenberg form of the matrix via similarity transforms
+                      * based on Gauss-Jordan elimination
+                      */
+                    def makeHessenberg[N: Number](smat: SquareMatrix[N])
+                                                 (implicit a: Absolute[N, N]): SquareMatrix[N] = {
+
+                         var squareHessenMat: SetOfVectors[N] = smat.asInstanceOf[SetOfVectors[N]].copy()
+
+                         for(r <- 0 until squareHessenMat.numRows){
+                              //find max magnitude in the rth col below diagonal
+                              var largest: Double = 0
+                              var largestRow:Int = 0
+
+                              for(i <- (r+1) until squareHessenMat.numRows){
+                                   //TODO test here if the .abs() still works when at runtime
+                                   // TODO when using Complex class -- need to differentiate
+                                   // TODO between layerops and regular?
+                                   if(squareHessenMat.get(i, r).abs().toDouble > largest){
+                                        largest = squareHessenMat.get(i, r).abs().toDouble
+                                        largestRow = i
+                                   }
+                              }
+
+                              if(largest != 0){
+                                   //interchange rows largestRow and r+1
+                                   squareHessenMat = Util.Gen.swapRows(largestRow, r+1, squareHessenMat)
+                                   //interchange cols largestRow and r+1 to make it a similarity transform
+                                   squareHessenMat = Util.Gen.swapCols(largestRow, r+1, squareHessenMat)
+
+                                   for(i <- (r+2) until squareHessenMat.numRows){
+                                        val mult: N = squareHessenMat.get(i, r) / squareHessenMat.get(r+1, r)
+
+                                        //subtract mult * row r+1 from row i
+                                        squareHessenMat = Util.Gen.sumRows(i, r+1, mult, squareHessenMat)
+                                        //add mult * col i to col r+1 to preserve similarity
+                                        squareHessenMat = Util.Gen.sumCols(r+1, i, mult, squareHessenMat)
+                                   }
+                              }
+                         }
+                         squareHessenMat.asInstanceOf[SquareMatrix[N]]
+                    }
+               }
+          }
+     }
 }
 
-//
-//
-//     // ------------------------------------------------------------------------------
-//
-//     object MatrixOps {
-//
-//          object Id {
-//
-//               def isSymmetric[N <: Number[N]: TypeTag](smat: SquareMatrix[N]): Boolean={
-//                    smat == smat.transpose()
-//               }
-//
-//               def isHermitian[N <: Number[N]: TypeTag](smat: SquareMatrix[N]): Boolean={
-//                    smat == smat.conjugateTranspose()
-//               }
-//
-//               def isUnitary[N <: Number[N]: TypeTag](smat: SquareMatrix[N]): Boolean ={
-//                    SquareMatrix.IDENTITY[N](smat) == (smat * smat.conjugateTranspose())
-//               }
-//
-//               def isOrthogonal[N <: Number[N]: TypeTag](smat: SquareMatrix[N]): Boolean ={
-//                    SquareMatrix.IDENTITY[N](smat) == (smat * smat.transpose())
-//               }
-//
-//               def isLowerTriangular[N <: Number[N]: TypeTag](mat: Matrix[N]): Boolean ={
-//                    for(r <- 0 until mat.numRows){
-//                         for(c <- 0 until mat.numCols){
-//                              if(c > r && mat.get(r, c) != 0)
-//                                   false
-//                         }
-//                    }
-//                    true
-//               }
-//
-//               def isUpperTriangular[N <: Number[N]: TypeTag](mat: Matrix[N]): Boolean ={
-//                    for(r <- 0 until mat.numRows){
-//                         for(c <- 0 until mat.numCols){
-//                              if(c < r && mat.get(r, c) != 0)
-//                                   false
-//                         }
-//                    }
-//                    true
-//               }
-//          }
-//
-//          object Trans {
-//               object HessenbergTransformer {
-//                    /**
-//                      * Computes the upper Hessenberg form of the matrix via similarity transforms
-//                      * based on Gauss-Jordan elimination
-//                      */
-//                    def makeHessenberg[N <: Number[N]: TypeTag](smat: SquareMatrix[N]): SquareMatrix[N] = {
-//
-//                         var squareHessenMat: VectorSet[N] = smat.asInstanceOf[VectorSet[N]].copy()
-//
-//                         for(r <- 0 until squareHessenMat.numRows){
-//                              //find max magnitude in the rth col below diagonal
-//                              var largest: Double = 0
-//                              var largestRow:Int = 0
-//                              for(i <- (r+1) until squareHessenMat.numRows){
-//                                   if(squareHessenMat.get(i, r).abs().toDouble > largest){
-//                                        largest = squareHessenMat.get(i, r).abs().toDouble
-//                                        largestRow = i
-//                                   }
-//                              }
-//
-//                              if(largest != 0){
-//                                   //interchange rows largestRow and r+1
-//                                   squareHessenMat = Util.GenOps.swapRows(largestRow, r+1, squareHessenMat)
-//                                   //interchange cols largestRow and r+1 to make it a similarity transform
-//                                   squareHessenMat = Util.GenOps.swapCols(largestRow, r+1, squareHessenMat)
-//
-//                                   for(i <- (r+2) until squareHessenMat.numRows){
-//                                        val mult: N = squareHessenMat.get(i, r) / squareHessenMat.get(r+1, r)
-//
-//                                        //subtract mult * row r+1 from row i
-//                                        squareHessenMat = Util.GenOps.sumRows(i, r+1, mult, squareHessenMat)
-//                                        //add mult * col i to col r+1 to preserve similarity
-//                                        squareHessenMat = Util.GenOps.sumCols(r+1, i, mult, squareHessenMat)
-//                                   }
-//                              }
-//                         }
-//                         squareHessenMat.asInstanceOf[SquareMatrix[N]]
-//                    }
-//               }
-//          }
-//     }
-//}
-//
-//
+
