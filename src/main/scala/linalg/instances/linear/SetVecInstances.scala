@@ -40,7 +40,7 @@ class SetVecThings[N: Number] {
           def isZero(v: SetOfVectors[N]): Boolean = v.getColumns().forall(col => col.isZero)
 
           def identity(size: Int): SetOfVectors[N] ={
-               val list = ListBuffer.fill[N](size, size)(Number.ZERO[N])
+               val list = ListBuffer.fill[N](size, size)(Number[N].zero)
 
                for(r <- 0 until size) {
                     for(c <- 0 until size)

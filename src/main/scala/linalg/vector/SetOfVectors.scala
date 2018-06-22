@@ -78,13 +78,13 @@ object SetOfVectors {
      def apply[N: Number](cols: Vector[N]*): SetOfVectors[N] = new SetOfVectors(cols:_*)
 
      def apply[N: Number](nr:Int, nc:Int): SetOfVectors[N] =
-          new SetOfVectors(Vector(Seq.fill[N](nr * nc)(Number.ZERO[N]):_*))
+          new SetOfVectors(Vector(Seq.fill[N](nr * nc)(Number[N].zero):_*))
 
      def ZERO[N: Number](numCols: Int, numRows: Int): SetOfVectors[N] =
-          SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number.ZERO[N]):_*)
+          SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number[N].zero):_*)
 
      def ONE[N: Number](numCols: Int, numRows: Int): SetOfVectors[N] =
-          SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number.ONE[N]):_*)
+          SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number[N].one):_*)
 
      def IDENTITY[N: Number](size: Int)(implicit ev: SetVecLike[SetOfVectors[N], N]):SetOfVectors[N] =
           ev.identity(size)

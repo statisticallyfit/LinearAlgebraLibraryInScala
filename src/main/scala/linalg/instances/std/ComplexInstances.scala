@@ -33,30 +33,11 @@ class ComplexThings[R:RealNumber] {
           def lessThan(x: Complex[R], y: Complex[R]): Boolean = x.re < y.re || (x.re :==: y.re && x.im < y.im)
      }
 
-     //TODO ok to extend Number ? or cyclic reference?
-
-     /*trait ComplexIsTrig extends Trig[Complex[R]] {
-          //val E: Complex[R] = ??? //Complex(scala.math.E).asInstanceOf[Complex[R]] //todo more graceful way?
-          //val PI: Complex[R] = ??? //Complex(scala.math.Pi).asInstanceOf[Complex[R]]
-
-          //todo major todo
-          def sin(x: Complex[R]): Complex[R] = Complex(scala.math.sin(x.re.toDouble),
-               scala.math.sin(x.im.toDouble))
-          def cos(x: Complex[R]): Complex[R] = ???
-          def tan(x: Complex[R]): Complex[R] = ???
-
-          def arcsin(x: Complex[R]): Complex[R] = ???
-          def arccos(x: Complex[R]): Complex[R] = ???
-          def arctan(x: Complex[R]): Complex[R] = ???
-     }*/
-
      trait ComplexIsMonoid extends Monoid[Complex[R]] {
           val zero: Complex[R] = Complex.ZERO[R]
 
           def plus(x: Complex[R], y: Complex[R]): Complex[R] = Complex(x.re + y.re, x.im + y.im)
      }
-
-     //todo what to do here since class must be first , can't have more than one class
 
      trait ComplexIsAbelianGroup extends ComplexIsMonoid with AbelianGroup[Complex[R]] {
           def negate(x: Complex[R]): Complex[R] = Complex(x.re.negate(), x.im.negate())
@@ -82,7 +63,6 @@ class ComplexThings[R:RealNumber] {
      // note use traits to extend additional ones like abeliangroup, no need to repeat them here.
 
      class ComplexIsNumber extends ComplexIsField
-          //with ComplexIsTrig
           with ComplexIsAbsolute
           with ComplexIsRoot
           with ComplexHasEquality
@@ -94,10 +74,24 @@ class ComplexThings[R:RealNumber] {
           def from(x: Int): Complex[R] = Complex(RealNumber[R].from(x))
      }
 
+//     val ab = new ComplexIsAbsolute
+//     val eq = new ComplexHasEquality
+//     val root = new ComplexIsRoot
+//     val monoid = new ComplexIsMonoid
+//     val field = new ComplexIsField
+//     val abelian = new ComplexIsAbelianGroup
+//     val ring = new ComplexIsRing
      val number = new ComplexIsNumber
 }
 
 trait ComplexInstances {
 
+//     implicit final def complexIsAbsolute[R: RealNumber] = new ComplexThings[R].ab
+//     implicit final def complexHasEquality[R: RealNumber] = new ComplexThings[R].eq
+//     implicit final def complexIsRoot[R: RealNumber] = new ComplexThings[R].root
+//     implicit final def complexIsMonoid[R: RealNumber] = new ComplexThings[R].monoid
+//     implicit final def complexIsField[R: RealNumber] = new ComplexThings[R].field
+//     implicit final def complexIsAbelianGroup[R: RealNumber] = new ComplexThings[R].abelian
+//     implicit final def complexIsRing[R: RealNumber] = new ComplexThings[R].ring
      implicit final def complexIsNumber[R: RealNumber] = new ComplexThings[R].number
 }

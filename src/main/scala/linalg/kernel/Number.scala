@@ -11,7 +11,11 @@ import scala.language.higherKinds
   *
   */
 
-trait Number[N] extends Field[N] with Absolute[N, N] with Equality[N] {
+//note: cannot inherit Absolute here since Complex won't work as desired. Can do this with
+// Equality though because just one parameter N. So now Number - Is - Equality but need
+// to give separate absolute implicit in methods using absolute... whereas can use equality
+//things directly when calling numbe     r.
+trait Number[N] extends Field[N] /*with Absolute[N, N]*/ with Equality[N] {
 
      val two: N = plus(one, one)
 

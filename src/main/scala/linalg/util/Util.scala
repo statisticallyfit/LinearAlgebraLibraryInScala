@@ -215,7 +215,7 @@ object Util {
                //converting from row to col representation
                val ncol: Int = rows.head.dimension()
                val nrow: Int = rows.length
-               val colBuff: Seq[Seq[N]] = Seq.fill[N](ncol, nrow)(Number.ZERO[N])
+               val colBuff: Seq[Seq[N]] = Seq.fill[N](ncol, nrow)(Number[N].zero)
 
                for (c <- 0 until ncol) {
                     colBuff(c) = rows.map(row => row.get(c))
@@ -341,20 +341,23 @@ object Util {
                     def makeHessenberg[N: Number](smat: SquareMatrix[N])
                                                  /*(implicit a: Absolute[N, N])*/: SquareMatrix[N] = {
 
-                         var squareHessenMat: SetOfVectors[N] = smat.asInstanceOf[SetOfVectors[N]].copy()
+                         /*var squareHessenMat: SetOfVectors[N] = smat.asInstanceOf[SetOfVectors[N]].copy()
 
                          for(r <- 0 until squareHessenMat.numRows){
                               //find max magnitude in the rth col below diagonal
-                              var largest: Double = 0
+                              var largest: N = Number[N].zero
                               var largestRow:Int = 0
 
                               for(i <- (r+1) until squareHessenMat.numRows){
                                    //TODO test here if the .abs() still works when at runtime
                                    // TODO when using Complex class -- need to differentiate
                                    // TODO between layerops and regular?
-                                   //todo - now this works because Number inherits Absolute[N,N]
-                                   if(squareHessenMat.get(i, r).abs().toDouble > largest){
-                                        largest = squareHessenMat.get(i, r).abs().toDouble
+
+                                   //todo abs doesn't work on number just on real since only
+                                   // real inherits from Absolute[R, R] but number cannot.
+
+                                   if(squareHessenMat.get(i, r).abs() > largest){
+                                        largest = squareHessenMat.get(i, r).abs()
                                         largestRow = i
                                    }
                               }
@@ -375,7 +378,12 @@ object Util {
                                    }
                               }
                          }
-                         squareHessenMat.asInstanceOf[SquareMatrix[N]]
+                         squareHessenMat.asInstanceOf[SquareMatrix[N]]*/
+                         ???
+
+                         //TODO why doesn't abs value work? -- because Number doesn't inherit
+                         // Absolute trait
+                         //TODO hoping this will work when implementing asbolute for SquareMat
                     }
                }
           }
