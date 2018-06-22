@@ -59,7 +59,7 @@ libraryDependencies ++= Seq(
      "org.typelevel"   %% "cats-free"           % "1.0.1",
      "org.typelevel"   %% "cats-testkit"           % "1.0.1",
      //Shapeless
-     "com.chuusai"     %% "shapeless"      % "2.3.3",
+     "org.typelevel" %% "shapeless-scalaz" % "0.4",
      //Kind projector plugin
      "org.spire-math" %% "kind-projector" % "0.9.4"
 )

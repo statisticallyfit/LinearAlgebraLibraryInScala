@@ -3,10 +3,55 @@ package linalg
 import linalg.implicits._
 import linalg.kernel.{Complex, Rational, Real}
 import linalg.vector.{Vector, SetOfVectors}
-
+import linalg.util._
 
 /**
   */
+
+
+import shapeless._
+
+/**
+  *
+  */
+
+object SetVecLike {
+
+     implicit def vsetLikeForSetOfVectorsHList[N: Number]: SetVecLike[SetOfVectors[N] :: HNil, N] = new
+               SetVecLike[SetOfVectors[N] :: HNil, N]{
+
+          override def rowReducedEchelon(vset: SetOfVectors[N] :: HNil): SetOfVectors[N] :: HNil =
+               Util.Gen.rowReducedEchelon[N](vset.head) :: HNil
+
+          override def minus(v: ::[SetOfVectors[N], HNil], w: ::[SetOfVectors[N], HNil]) = ???
+
+          def identity(size: Int) = ???
+
+          def rowEchelon(m: ::[SetOfVectors[N], HNil]) = ???
+
+          def isZero(v: ::[SetOfVectors[N], HNil]) = ???
+
+          val zero = _
+          val one = _
+
+          def plus(v: ::[SetOfVectors[N], HNil], w: ::[SetOfVectors[N], HNil]) = ???
+
+          def negate(v: ::[SetOfVectors[N], HNil]) = ???
+
+          def scale(v: ::[SetOfVectors[N], HNil], constant: N) = ???
+     }
+}
+
+trait VectorDSL {
+
+}
+
+
+
+
+
+
+
 
 object Tester extends App {
 

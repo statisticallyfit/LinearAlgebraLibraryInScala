@@ -15,6 +15,8 @@ import scala.util.control.Breaks.{break, breakable}
   */
 class SetVecThings[N: Number] {
 
+     //TODO make absolute and Root instances.
+
      class SetVecIsMonoid extends Monoid[SetOfVectors[N]]{
 
           val zero: SetOfVectors[N] = SetOfVectors(Vector.ZERO[N](1))
