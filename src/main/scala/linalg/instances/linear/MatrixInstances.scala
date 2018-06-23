@@ -2,6 +2,7 @@ package linalg.instances.linear
 
 
 import spire.algebra.Eq
+
 import linalg.implicits._
 import linalg._
 import linalg.matrix.Matrix
@@ -18,15 +19,14 @@ import scala.reflect.runtime.universe._
 import scala.util.control.Breaks._
 
 
-/**
-  *
-  */
 
 
 class MatrixThings[N: Number] {
 
+     //TODO GOAL: implement matrixlike things without re-implementing them again, since similar implementations for
+     // TODO for setveclike and matrix things.
+
      class MatrixIsMatrixLike extends MatrixLike[Matrix[N], N]{
-          val identity = ???
 
           def power(m: Matrix[N], exp: N) = ???
 
@@ -65,11 +65,15 @@ class MatrixThings[N: Number] {
 
           def scale(v: Matrix[N], constant: N) = ???
      }
+
+
+     val matrixLike = new MatrixIsMatrixLike
 }
 
 
 trait MatrixInstances {
 
+     implicit final def matrixIsMatrixLike[N: Number] = new MatrixThings[N].matrixLike
 
 
 }

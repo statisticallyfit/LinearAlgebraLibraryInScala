@@ -27,4 +27,5 @@ trait AllInstances
      with DimensionInstances*/
      with VectorInstances
      with SetVecInstances
+     with MatrixInstances
 

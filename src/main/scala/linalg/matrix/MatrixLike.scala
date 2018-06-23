@@ -11,7 +11,7 @@ import linalg._
 
 trait MatrixLike[M, F] extends SetVecLike[M, F] {
 
-     val identity: M //rule: identity is dim-by-dim wide (so numrows by numrows wide)
+     //val identity: M //rule: identity is dim-by-dim wide (so numrows by numrows wide)
      // so that we can test if set spans a space
 
      def power(m: M, exp: F): M //use linear algebra formula for matrix powers

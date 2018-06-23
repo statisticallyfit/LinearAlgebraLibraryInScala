@@ -2,52 +2,17 @@ package linalg
 
 import linalg.implicits._
 import linalg.kernel.{Complex, Rational, Real}
-import linalg.vector.{Vector, SetOfVectors}
+import linalg.matrix.{JacobianMatrix, Matrix}
+import linalg.vector.{SetOfVectors, Vector}
 import linalg.util._
+
+import scala.collection.mutable.ListBuffer
 
 /**
   */
 
 
 import shapeless._
-
-/**
-  *
-  */
-
-object SetVecLike {
-
-     implicit def vsetLikeForSetOfVectorsHList[N: Number]: SetVecLike[SetOfVectors[N] :: HNil, N] = new
-               SetVecLike[SetOfVectors[N] :: HNil, N]{
-
-          override def rowReducedEchelon(vset: SetOfVectors[N] :: HNil): SetOfVectors[N] :: HNil =
-               Util.Gen.rowReducedEchelon[N](vset.head) :: HNil
-
-          override def minus(v: ::[SetOfVectors[N], HNil], w: ::[SetOfVectors[N], HNil]) = ???
-
-          def identity(size: Int) = ???
-
-          def rowEchelon(m: ::[SetOfVectors[N], HNil]) = ???
-
-          def isZero(v: ::[SetOfVectors[N], HNil]) = ???
-
-          val zero = _
-          val one = _
-
-          def plus(v: ::[SetOfVectors[N], HNil], w: ::[SetOfVectors[N], HNil]) = ???
-
-          def negate(v: ::[SetOfVectors[N], HNil]) = ???
-
-          def scale(v: ::[SetOfVectors[N], HNil], constant: N) = ???
-     }
-}
-
-trait VectorDSL {
-
-}
-
-
-
 
 
 
@@ -56,6 +21,22 @@ trait VectorDSL {
 object Tester extends App {
 
 
+     //class Matrix implements matrixlike which extends from setveclike - does matrix have access to setveclike methods?
+     val m: SetOfVectors[Int] = SetOfVectors(Vector(1,2,3), Vector(-8, 4, 2))
+     m.rowReducedEchelon()
+
+     val mat: Matrix[Int] = Matrix(Vector(3,5,7), Vector(9, 8, 5))
+     mat.rowReducedEchelon()
+     mat.adjoint()
+
+     val m1: JacobianMatrix[Int] = new JacobianMatrix[Int](Vector[Int](1,2,3), Vector[Int](3,4,2))
+     m1.rowReducedEchelon()
+     m1.adjoint()
+
+     mat + mat
+
+
+     // -----------------------------------------------------------------------------------------------
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i + Rational(1)
      val b: Complex[Int] = 3 + 5.i + 3
      val c: Complex[Int] = 1 - 2.i
