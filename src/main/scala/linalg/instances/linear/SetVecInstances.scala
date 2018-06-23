@@ -14,106 +14,7 @@ import scala.util.control.Breaks.{break, breakable}
   *
   */
 
-
-
 import shapeless._
-/**
-  *
-  */
-
-object SetVecLikeComp {
-
-     implicit def setVecForMonoidHList[N: Number]: Monoid[SetOfVectors[N] :: HNil] =
-          new Monoid[SetOfVectors[N] :: HNil] {
-
-     }
-     implicit def setVecForSetVecLikeHList[N: Number]: SetVecLike[SetOfVectors[N] :: HNil, N] = new
-               SetVecLike[SetOfVectors[N] :: HNil, N] {
-
-
-          def isZero(v: SetOfVectors[N] :: HNil): Boolean = v.head.getColumns().forall(col => col.isZero)
-
-          def identity(size: Int): SetOfVectors[N] :: HNil ={
-               val list = ListBuffer.fill[N](size, size)(Number[N].zero)
-
-               for(r <- 0 until size) {
-                    for(c <- 0 until size)
-                         if(r == c)
-                              list(r)(c) = Number.ONE[N]
-               }
-               SetOfVectors.fromSeqs(list:_*) :: HNil
-          }
-
-
-          def rowEchelon(vset: SetOfVectors[N] :: HNil): SetOfVectors[N] :: HNil = Util.Gen.rowEchelon[N](vset.head):: HNil
-
-          def rowReducedEchelon(vset: SetOfVectors[N] :: HNil): SetOfVectors[N] :: HNil =
-               Util.Gen.rowReducedEchelon[N](vset.head) :: HNil
-
-          //vec space
-          val zero: SetOfVectors[N] :: HNil = SetOfVectors(Vector.ZERO[N](1)) :: HNil
-          val one: SetOfVectors[N] :: HNil = SetOfVectors(Vector.ONE[N](1)) :: HNil
-
-          def scale(v: SetOfVectors[N] :: HNil, factor: N): SetOfVectors[N] :: HNil =
-               SetOfVectors(v.head.getColumns().map(col => col.scale(factor)):_*) :: HNil
-
-          def plus(vset: SetOfVectors[N] :: HNil, wset: SetOfVectors[N] :: HNil): SetOfVectors[N] :: HNil ={
-               Util.Gen.ensureSize(vset.head, wset.head)
-               SetOfVectors(vset.head.getColumns().zip(wset.head.getColumns())
-                    .map(colPair => colPair._1 + colPair._2):_*) :: HNil
-          }
-          def negate(vset: SetOfVectors[N] :: HNil): SetOfVectors[N] :: HNil =
-               SetOfVectors(vset.head.getColumns().map(c => c.negate()):_*) :: HNil
-     }
-
-
-     implicit def genericSetVecLike[V, R, N: Number](implicit gen: Generic.Aux[V, R],
-                                                     slike: SetVecLike[R, N]): SetVecLike[V, N] = new SetVecLike[V, N] {
-
-          override def minus(vset1: V, vset2: V): V = gen.from(slike.minus(gen.to(vset1), gen.to(vset2)))
-          override def rowEchelon(vset: V): V = gen.from(slike.rowEchelon(gen.to(vset)))
-          override def rowReducedEchelon(vset: V) = gen.from(slike.rowReducedEchelon(gen.to(vset)))
-
-          override def isZero(vset: V): Boolean = slike.isZero(gen.to(vset))
-          override def identity(size: Int): V = gen.from(slike.identity(size))
-
-          // ---- vec space things
-          override val zero: V = gen.from(slike.zero)
-          override val one: V = gen.from(slike.one)
-
-          override def plus(vset1: V, vset2: V): V = gen.from(slike.plus(gen.to(vset1), gen.to(vset2)))
-          override def scale(vset: V, constant: N ): V = gen.from(slike.scale(gen.to(vset), constant))
-          override def negate(vset: V): V = gen.from(slike.negate(gen.to(vset)))
-     }
-
-     //The way to generate an Amount type class instance for HLists so that the resulting typeclass
-     // can be plugged into genericAmount[A, R] where R is the HList.
-     implicit def setVecLikeForHList[H, T <: HList, N: Number](
-                                                                   implicit slike: Lazy[SetVecLike[H, N]], defaultTail: DefaultInstance[T]
-                                                              ): SetVecLike[H :: T, N] = new SetVecLike[H :: T, N] {
-
-          override def minus(vset1: H :: T, vset2: H :: T): H :: T =
-               slike.value.minus(vset1.head, vset2.head) :: defaultTail.instance
-
-          override def rowEchelon(vset: H :: T): H :: T = slike.value.rowEchelon(vset.head) :: defaultTail.instance
-          override def rowReducedEchelon(vset: H :: T): H :: T = slike.value.rowReducedEchelon(vset.head) :: defaultTail
-               .instance
-          override def isZero(vset: H :: T): Boolean = slike.value.isZero(vset.head)
-          override def identity(size: Int): H :: T = slike.value.identity(size) :: defaultTail.instance
-
-
-          // --- vec space
-          override val zero: H :: T = slike.value.zero  :: defaultTail.instance
-          override val one: H :: T = slike.value.one :: defaultTail.instance
-
-          override def plus(vset1: H :: T, vset2: H :: T): H :: T =
-               slike.value.plus(vset1.head, vset2.head) :: defaultTail.instance
-          override def scale(vset: H :: T, constant: N): H :: T = slike.value.scale(vset.head, constant) :: defaultTail.instance
-          override def negate(vset: H :: T): H :: T = slike.value.negate(vset.head) :: defaultTail.instance
-     }
-
-}
-
 
 
 trait DefaultInstance[T] {
@@ -140,7 +41,247 @@ object DefaultInstance {
 
 
 
+
+
+//trait SetVecInstances {
 class SetVecThings[N: Number] {
+
+
+     // ---------
+
+     class GenericMonoid[M, R](implicit gen: Generic.Aux[M, R], monoid: Monoid[R]) {
+
+          val zero: M = gen.from(monoid.zero)
+          def plus(vset1: M, vset2: M): M = gen.from(monoid.plus(gen.to(vset1), gen.to(vset2)))
+     }
+
+     class GenericAbelianGroup[A, R](implicit gen: Generic.Aux[A, R], abelian: AbelianGroup[R])
+          extends GenericMonoid {
+
+          def negate(vset: A): A = gen.from(abelian.negate(gen.to(vset)))
+     }
+
+     class GenericVectorSpace[V, R, F: Field](implicit gen: Generic.Aux[V, R], vs: VectorSpace[R, F])
+          extends GenericAbelianGroup {
+          /*implicit def genericVectorSpace[V, R, F: Field](implicit gen: Generic.Aux[V, R],
+                                                          vs: VectorSpace[R, F]): VectorSpace[V, F] = new VectorSpace[V, F] {*/
+          val one: V = gen.from(vs.one)
+          def scale(vset: V, constant: F): V = gen.from(vs.scale(gen.to(vset), constant))
+     }
+
+
+     class GenericSetVecLike[V, R](implicit gen: Generic.Aux[V, R],
+                                              slike: SetVecLike[R, N]) extends GenericVectorSpace {
+          /*implicit def genericSetVecLike[V, R, N: Number](implicit gen: Generic.Aux[V, R],
+                                                          slike: SetVecLike[R, N]): SetVecLike[V, N] = new SetVecLike[V, N] {*/
+
+          //override def minus(vset1: V, vset2: V): V = gen.from(slike.minus(gen.to(vset1), gen.to(vset2)))
+          def rowEchelon(vset: V): V = gen.from(slike.rowEchelon(gen.to(vset)))
+          def rowReducedEchelon(vset: V) = gen.from(slike.rowReducedEchelon(gen.to(vset)))
+
+          def isZero(vset: V): Boolean = slike.isZero(gen.to(vset))
+          def identity(size: Int): V = gen.from(slike.identity(size))
+     }
+
+
+     class GenericEq[E, R](implicit gen: Generic.Aux[E, R], eq: Eq[R]) {
+          def eqv(a: E, b: E): Boolean = eq.eqv(gen.to(a), gen.to(b))
+     }
+
+
+     // -------------------
+     class MonoidForHList[H, T <: HList](implicit monoid: Lazy[Monoid[H]], defaultTail: DefaultInstance[T]){
+
+          val zero: H :: T = monoid.value.zero  :: defaultTail.instance
+
+          def plus(vset1: H :: T, vset2: H :: T): H :: T =
+               monoid.value.plus(vset1.head, vset2.head) :: defaultTail.instance
+     }
+
+     class AbelianGroupForHList[H, T <: HList](implicit abelian: Lazy[AbelianGroup[H]],
+                                               defaultTail: DefaultInstance[T]) extends MonoidForHList {
+
+          def negate(vset: H :: T): H :: T = abelian.value.negate(vset.head) :: defaultTail.instance
+     }
+
+     class VectorSpaceForHList[H, T <: HList, F: Field](implicit vs: Lazy[VectorSpace[H, F]],
+                                                        defaultTail: DefaultInstance[T]) extends AbelianGroupForHList {
+
+          val one: H :: T = vs.value.one :: defaultTail.instance
+          def scale(vset: H :: T, constant: F): H :: T = vs.value.scale(vset.head, constant) :: defaultTail.instance
+     }
+
+     //The way to generate an Amount type class instance for HLists so that the resulting typeclass
+     // can be plugged into genericAmount[A, R] where R is the HList.
+     class SetVecLikeForHList[H, T <: HList](implicit slike: Lazy[SetVecLike[H, N]],
+                                                        defaultTail: DefaultInstance[T]) extends VectorSpaceForHList {
+          /*implicit def setVecLikeForHList[H, T <: HList, N: Number](
+                                                                        implicit slike: Lazy[SetVecLike[H, N]], defaultTail: DefaultInstance[T]
+                                                                   ): SetVecLike[H :: T, N] = new SetVecLike[H :: T, N] {*/
+
+          def minus(vset1: H :: T, vset2: H :: T): H :: T =
+               slike.value.minus(vset1.head, vset2.head) :: defaultTail.instance
+
+          def rowEchelon(vset: H :: T): H :: T = slike.value.rowEchelon(vset.head) :: defaultTail.instance
+          def rowReducedEchelon(vset: H :: T): H :: T = slike.value.rowReducedEchelon(vset.head) :: defaultTail
+               .instance
+          def isZero(vset: H :: T): Boolean = slike.value.isZero(vset.head)
+          def identity(size: Int): H :: T = slike.value.identity(size) :: defaultTail.instance
+     }
+
+
+     class EqForHList[H, T <: HList](implicit eq: Lazy[Eq[H]], defaultTail: DefaultInstance[T]) {
+          def eqv(a: H :: T, b: H :: T): Boolean = eq.value.eqv(a.head, b.head)
+     }
+
+
+     // -----------
+
+
+
+     trait SetVecIsMonoidHList extends Monoid[SetOfVectors[N] :: HNil] {
+          val zero: SetOfVectors[N] :: HNil = SetOfVectors(Vector.ZERO[N](1)) :: HNil
+
+          def plus(vset: SetOfVectors[N] :: HNil, wset: SetOfVectors[N] :: HNil): SetOfVectors[N] :: HNil ={
+               Util.Gen.ensureSize(vset.head, wset.head)
+               SetOfVectors(vset.head.getColumns().zip(wset.head.getColumns())
+                    .map(colPair => colPair._1 + colPair._2):_*) :: HNil
+          }
+     }
+     ////
+
+     //TODO what happens if I uncomment the abelian of setvecs :: Hnil ???
+     trait SetVecIsAbelianGroupHList extends SetVecIsMonoidHList with AbelianGroup[SetOfVectors[N] ::HNil]{
+
+          def negate(vset: SetOfVectors[N] :: HNil): SetOfVectors[N] :: HNil =
+               SetOfVectors(vset.head.getColumns().map(c => c.negate()):_*) :: HNil
+     }
+
+
+     trait SetVecIsVectorSpaceHList extends SetVecIsAbelianGroupHList with SetVecIsMonoidHList with VectorSpace[SetOfVectors[N] ::
+          HNil, N] {
+
+          val one: SetOfVectors[N] :: HNil = SetOfVectors(Vector.ONE[N](1)) :: HNil
+
+          def scale(v: SetOfVectors[N] :: HNil, factor: N): SetOfVectors[N] :: HNil =
+               SetOfVectors(v.head.getColumns().map(col => col.scale(factor)):_*) :: HNil
+
+     }
+
+
+     trait SetVecHasEqHList extends Eq[SetOfVectors[N] ::HNil] {
+          def eqv(vset: SetOfVectors[N] :: HNil, wset: SetOfVectors[N] :: HNil): Boolean = {
+               Util.Gen.ensureSize(vset.head, wset.head)
+
+               vset.head.getColumns()
+                    .zip(wset.head.getColumns())
+                    .forall(colPair => Eq[Vector[N]].eqv(colPair._1, colPair._2))
+          }
+     }
+
+
+     class SetVecIsSetVecLikeHList extends SetVecIsMonoidHList
+          with SetVecIsAbelianGroupHList
+          with SetVecIsVectorSpaceHList
+          //with SetVecHasDimensionHList
+          with SetVecHasEqHList
+          with SetVecLike[SetOfVectors[N] ::HNil, N] {
+          //implicit def setVecForSetVecLikeHList[N: Number]: SetVecLike[SetOfVectors[N] :: HNil, N] = new
+          //SetVecLike[SetOfVectors[N] :: HNil, N] {
+
+
+          def isZero(v: SetOfVectors[N] :: HNil): Boolean = v.head.getColumns().forall(col => col.isZero)
+
+          def identity(size: Int): SetOfVectors[N] :: HNil ={
+               val list = ListBuffer.fill[N](size, size)(Number[N].zero)
+
+               for(r <- 0 until size) {
+                    for(c <- 0 until size)
+                         if(r == c)
+                              list(r)(c) = Number.ONE[N]
+               }
+               SetOfVectors.fromSeqs(list:_*) :: HNil
+          }
+
+
+          def rowEchelon(vset: SetOfVectors[N] :: HNil): SetOfVectors[N] :: HNil = Util.Gen.rowEchelon[N](vset.head):: HNil
+
+          def rowReducedEchelon(vset: SetOfVectors[N] :: HNil): SetOfVectors[N] :: HNil =
+               Util.Gen.rowReducedEchelon[N](vset.head) :: HNil
+
+     }
+
+
+     //implicit val monoid = new SetVecIsMonoidHList
+     //implicit val abelian = new SetVecIsAbelianGroupHList
+     //implicit val vectorSpace = new SetVecIsVectorSpaceHList
+     implicit val vsetLike = new SetVecIsSetVecLikeHList
+     //implicit val dim = new SetVecHasDimensionHList
+     //implicit val eq = new SetVecHasEqHList
+}
+
+trait SetVecInstances {
+
+     implicit def genericDimension[V, R](implicit gen: Generic.Aux[V, R], d: Dimension[R]): Dimension[V] = new
+               Dimension[V] {
+          //class GenericDimension[V, R](implicit gen: Generic.Aux[V, R], d: Dimension[R]) {
+          def dimension(v: V): Int = d.dimension(gen.to(v))
+     }
+
+     implicit def dimensionForHList[H, T <: HList](implicit d: Lazy[Dimension[H]], defaultTail: DefaultInstance[T]):
+     Dimension[H :: T] = new Dimension[H :: T] {
+          //class DimensionForHList[H, T <: HList](implicit d: Lazy[Dimension[H]], defaultTail: DefaultInstance[T]) {
+          def dimension(v: H :: T): Int = d.value.dimension(v.head)
+     }
+
+     implicit def setVecHasDimensionHList[N:Number]: Dimension[SetOfVectors[N] :: HNil] = new
+               Dimension[SetOfVectors[N]::HNil] {
+          //trait SetVecHasDimensionHList extends Dimension[SetOfVectors[N] ::HNil] {
+          def dimension(vset: SetOfVectors[N] :: HNil): Int = vset.head.getColumns().head.dimension()
+     }
+
+     /*implicit final def setVecHasEq[N: Number] = new SetVecThings[N].eq
+     implicit final def setVecIsMonoid[N: Number] = new SetVecThings[N].monoid
+     implicit final def setVecIsAbelianGroup[N: Number] = new SetVecThings[N].abelian
+     implicit final def setVecIsVectorSpace[N: Number] = new SetVecThings[N].vectorSpace
+     implicit final def setVecHasDimension[N: Number] = new SetVecThings[N].dim*/
+     //implicit final def setVecIsSetVecLike[N: Number] = new SetVecThings[N].vsetLike
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*class SetVecThings[N: Number] {
 
      //TODO make absolute and Root instances.
 
@@ -238,4 +379,4 @@ trait SetVecInstances {
      implicit final def setVecIsVectorSpace[N: Number] = new SetVecThings[N].vectorSpace
      implicit final def setVecIsSetVecLike[N: Number] = new SetVecThings[N].vsetLike
      implicit final def setVecHasDimension[N: Number] = new SetVecThings[N].dim
-}
+}*/

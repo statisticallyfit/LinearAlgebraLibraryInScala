@@ -77,10 +77,10 @@ package object linalg {
      val BanachSpace = linalg.theory.space.BanachSpace
      val HilbertSpace = linalg.theory.space.HilbertSpace
 
-     //todo not doing stuff in Category since I might want to use Cats category stuff later!
-     type Monoid[M] = linalg.theory.Monoid[M]
+     //todo not doing stuff in Category since I might want to use Cats category stuff later!id[M]
      type Field[F] = linalg.theory.Field[F]
      type Ring[R] = linalg.theory.Ring[R]
+     type Monoid[M] = linalg.theory.Monoid[M]
      type AbelianGroup[A] = linalg.theory.AbelianGroup[A]
      val Monoid = linalg.theory.Monoid
      val Field = linalg.theory.Field

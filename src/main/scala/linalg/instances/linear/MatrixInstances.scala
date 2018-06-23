@@ -73,7 +73,7 @@ class MatrixThings[N: Number] {
 
 trait MatrixInstances {
 
-     implicit final def matrixIsMatrixLike[N: Number] = new MatrixThings[N].matrixLike
+     //implicit final def matrixIsMatrixLike[N: Number] = new MatrixThings[N].matrixLike
 
 
 }

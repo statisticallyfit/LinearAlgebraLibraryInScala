@@ -24,6 +24,9 @@ object Tester extends App {
      //class Matrix implements matrixlike which extends from setveclike - does matrix have access to setveclike methods?
      val m: SetOfVectors[Int] = SetOfVectors(Vector(1,2,3), Vector(-8, 4, 2))
      m.rowReducedEchelon()
+     m.dimension()
+
+     Vector(1,2,3).dimension()
 
      val mat: Matrix[Int] = Matrix(Vector(3,5,7), Vector(9, 8, 5))
      mat.rowReducedEchelon()
