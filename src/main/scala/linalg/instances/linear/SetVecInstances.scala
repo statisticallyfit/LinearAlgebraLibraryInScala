@@ -70,8 +70,8 @@ class SetVecThings[N: Number] {
      }
 
 
-     class GenericSetVecLike[V, R](implicit gen: Generic.Aux[V, R],
-                                              slike: SetVecLike[R, N]) extends GenericVectorSpace {
+     class GenericSetVecLike[V, R, F:Field](implicit gen: Generic.Aux[V, R],
+                                              slike: SetVecLike[R, N]) extends GenericVectorSpace[V, R, F] {
           /*implicit def genericSetVecLike[V, R, N: Number](implicit gen: Generic.Aux[V, R],
                                                           slike: SetVecLike[R, N]): SetVecLike[V, N] = new SetVecLike[V, N] {*/
 
@@ -83,6 +83,10 @@ class SetVecThings[N: Number] {
           def identity(size: Int): V = gen.from(slike.identity(size))
      }
 
+     class GenericDimension[V, R](implicit gen: Generic.Aux[V, R], d: Dimension[R]) {
+          //class GenericDimension[V, R](implicit gen: Generic.Aux[V, R], d: Dimension[R]) {
+          def dimension(v: V): Int = d.dimension(gen.to(v))
+     }
 
      class GenericEq[E, R](implicit gen: Generic.Aux[E, R], eq: Eq[R]) {
           def eqv(a: E, b: E): Boolean = eq.eqv(gen.to(a), gen.to(b))
@@ -113,8 +117,9 @@ class SetVecThings[N: Number] {
 
      //The way to generate an Amount type class instance for HLists so that the resulting typeclass
      // can be plugged into genericAmount[A, R] where R is the HList.
-     class SetVecLikeForHList[H, T <: HList](implicit slike: Lazy[SetVecLike[H, N]],
-                                                        defaultTail: DefaultInstance[T]) extends VectorSpaceForHList {
+     class SetVecLikeForHList[H, T <: HList, F:Field](implicit slike: Lazy[SetVecLike[H, N]],
+                                                        defaultTail: DefaultInstance[T]) extends
+          VectorSpaceForHList[H, T, F] {
           /*implicit def setVecLikeForHList[H, T <: HList, N: Number](
                                                                         implicit slike: Lazy[SetVecLike[H, N]], defaultTail: DefaultInstance[T]
                                                                    ): SetVecLike[H :: T, N] = new SetVecLike[H :: T, N] {*/
@@ -127,6 +132,12 @@ class SetVecThings[N: Number] {
                .instance
           def isZero(vset: H :: T): Boolean = slike.value.isZero(vset.head)
           def identity(size: Int): H :: T = slike.value.identity(size) :: defaultTail.instance
+     }
+
+
+     class DimensionForHList[H, T <: HList](implicit d: Lazy[Dimension[H]], defaultTail: DefaultInstance[T]){
+          //class DimensionForHList[H, T <: HList](implicit d: Lazy[Dimension[H]], defaultTail: DefaultInstance[T]) {
+          def dimension(v: H :: T): Int = d.value.dimension(v.head)
      }
 
 
@@ -179,11 +190,16 @@ class SetVecThings[N: Number] {
           }
      }
 
+     trait SetVecHasDimensionHList extends Dimension[SetOfVectors[N]::HNil] {
+          //trait SetVecHasDimensionHList extends Dimension[SetOfVectors[N] ::HNil] {
+          def dimension(vset: SetOfVectors[N] :: HNil): Int = vset.head.getColumns().head.dimension()
+     }
+
 
      class SetVecIsSetVecLikeHList extends SetVecIsMonoidHList
           with SetVecIsAbelianGroupHList
           with SetVecIsVectorSpaceHList
-          //with SetVecHasDimensionHList
+          with SetVecHasDimensionHList
           with SetVecHasEqHList
           with SetVecLike[SetOfVectors[N] ::HNil, N] {
           //implicit def setVecForSetVecLikeHList[N: Number]: SetVecLike[SetOfVectors[N] :: HNil, N] = new
@@ -222,7 +238,7 @@ class SetVecThings[N: Number] {
 
 trait SetVecInstances {
 
-     implicit def genericDimension[V, R](implicit gen: Generic.Aux[V, R], d: Dimension[R]): Dimension[V] = new
+     /*implicit def genericDimension[V, R](implicit gen: Generic.Aux[V, R], d: Dimension[R]): Dimension[V] = new
                Dimension[V] {
           //class GenericDimension[V, R](implicit gen: Generic.Aux[V, R], d: Dimension[R]) {
           def dimension(v: V): Int = d.dimension(gen.to(v))
@@ -240,12 +256,17 @@ trait SetVecInstances {
           def dimension(vset: SetOfVectors[N] :: HNil): Int = vset.head.getColumns().head.dimension()
      }
 
+
+
+     val m: SetOfVectors[Int] = SetOfVectors(Vector(1,2,3), Vector(-8, 4, 2))
+     m.dimension()*/
      /*implicit final def setVecHasEq[N: Number] = new SetVecThings[N].eq
      implicit final def setVecIsMonoid[N: Number] = new SetVecThings[N].monoid
      implicit final def setVecIsAbelianGroup[N: Number] = new SetVecThings[N].abelian
      implicit final def setVecIsVectorSpace[N: Number] = new SetVecThings[N].vectorSpace
      implicit final def setVecHasDimension[N: Number] = new SetVecThings[N].dim*/
-     //implicit final def setVecIsSetVecLike[N: Number] = new SetVecThings[N].vsetLike
+
+     implicit final def setVecIsSetVecLike[N: Number] = new SetVecThings[N].vsetLike
 }
 
 

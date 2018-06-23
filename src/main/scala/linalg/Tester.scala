@@ -23,12 +23,13 @@ object Tester extends App {
 
      //class Matrix implements matrixlike which extends from setveclike - does matrix have access to setveclike methods?
      val m: SetOfVectors[Int] = SetOfVectors(Vector(1,2,3), Vector(-8, 4, 2))
-     m.rowReducedEchelon()
-     m.dimension()
+     println("rref(m) = " + m.rowReducedEchelon())
+     println("dimension = " + m.dimension())
 
      Vector(1,2,3).dimension()
+     Vector(1,2,3).isLinearlyIndependent()
 
-     val mat: Matrix[Int] = Matrix(Vector(3,5,7), Vector(9, 8, 5))
+     /*val mat: Matrix[Int] = Matrix(Vector(3,5,7), Vector(9, 8, 5))
      mat.rowReducedEchelon()
      mat.adjoint()
 
@@ -36,7 +37,7 @@ object Tester extends App {
      m1.rowReducedEchelon()
      m1.adjoint()
 
-     mat + mat
+     mat + mat*/
 
 
      // -----------------------------------------------------------------------------------------------

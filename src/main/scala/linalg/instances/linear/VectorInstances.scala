@@ -120,7 +120,8 @@ class VectorThings[N: Number]{
           def linearlyIndependent(v: Vector[N], w: Vector[N]): Boolean ={
                val rref: SetOfVectors[N] = Util.Gen.rowReducedEchelon[N](SetOfVectors(v, w))
                val rrefSquare: SetOfVectors[N] = SetOfVectors(Util.Gen.expressRowsAsCols[N](rref.getRowsAt(0, 1)):_*)
-               rref == SetOfVectors.IDENTITY[N](2)
+               //rref :==: SetOfVectors.IDENTITY[N](2)
+               ???
           }
 
           def isLinearlyIndependent(v: Vector[N]): Boolean = true //yes a single vector is lin indep.
