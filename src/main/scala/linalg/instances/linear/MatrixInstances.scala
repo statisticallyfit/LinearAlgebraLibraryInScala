@@ -13,6 +13,7 @@ import scala.language.implicitConversions
 import scala.util.control.Breaks.{break, breakable}
 import org.apache.commons.lang3.StringUtils
 
+import scala.collection.mutable
 import scala.collection.mutable.Seq
 import scala.collection.mutable.ListBuffer
 import scala.reflect.runtime.universe._
@@ -100,18 +101,38 @@ class MatrixThings[N: Number] {
           def transpose(mat: Matrix[N]): Matrix[N] = Matrix(mat.getRows(): _*)
 
           def conjugateTranspose(mat: Matrix[N]): Matrix[N] =
-               Matrix.fromSeqs(mat.getColumns()
-                    .map(vecCol => vecCol.getElements()
-                         .map(elem => elem.conjugate()))).transpose()
+               transpose(Matrix.fromSeqs(mat.getColumns().map(col => col.getElements()
+                    .map(e => e.conjugate())):_*))
 
+          def adjoint(mat: Matrix[N]): Matrix[N] = {
+               //definition 6.19: adjoint = transpose(cofactor) if matrix is square
+               //can apply this definition only if matrix is square, not checking this here.
+               val newMat: ListBuffer[Vector[N]] = ListBuffer() //ListBuffer.fill[N](numRows, numCols)(Number.ZERO[N])
 
+               for(r <- 0 until mat.numRows){
+                    val row: Vector[N] = Vector.ZERO[N](mat.numCols)
+
+                    for(c <- 0 until mat.numCols){
+                         val cof = ((r + c) % 2 == 0) match {
+                              case true => minor(mat, r, c)
+                              case false => minor(mat, r, c).negate()
+                         }
+                         row.set(c)(cof)
+                    }
+                    newMat += row
+               }
+               //implicit transpose (we could have done (matrix (rowtocol(mat)).transpose
+               Matrix(newMat:_*)
+          }
+
+          def cofactor(mat: Matrix[N]): Matrix[N] ={
+
+               val indexes: IndexedSeq[(Int, Int)] = for(r <- 0 until numRows; c <- 0 until numCols) yield (r, c)
+               val cofactors: List[N] = indexes.map(indexPair => cofactor(indexPair._1, indexPair._2)).toList
+               Matrix.fromList(numRows, numCols, cofactors).transpose()
+          }
 
           /*
-          def power(m: M, exp: F): M //use linear algebra formula for matrix powers
-     def inverse(m: M): M
-     def transpose(m: M): M
-     def conjugateTranspose(m: M): M
-     def adjoint(m: M): M
      def cofactor(m: M): M
      def minor(m: M): M
      def minor(m: M, rowIndex: Int, colIndex: Int): F
