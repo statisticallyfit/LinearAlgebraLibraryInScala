@@ -17,7 +17,7 @@ import scala.util.control.Breaks.{break, breakable}
   */
 
 
-class SetVecThings[N: Number] { 
+class SetVecThings[N: Number] {
 
      class SetVecHasAbsoluteValue extends Absolute[SetOfVectors[N], SetOfVectors[N]] {
 
