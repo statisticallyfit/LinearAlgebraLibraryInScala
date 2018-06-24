@@ -27,80 +27,108 @@ class MatrixThings[N: Number] {
      // TODO for setveclike and matrix things.
 
 
-     /*class SetVecHasAbsoluteValue extends Absolute[SetOfVectors[N], SetOfVectors[N]] {
+     class MatrixHasAbsoluteValue extends Absolute[Matrix[N], Matrix[N]] {
 
-          def absoluteValue(vset: SetOfVectors[N]): SetOfVectors[N] =
-               SetOfVectors(vset.getColumns().map(vec => vec.abs()):_*)
+          def absoluteValue(mat: Matrix[N]): Matrix[N] =
+               Matrix(mat.getColumns().map(vec => vec.abs()):_*)
      }
 
-     class SetVecIsMonoid extends Monoid[SetOfVectors[N]]{
+     class MatrixHasDimension extends Dimension[Matrix[N]]{
+          def dimension(mat: Matrix[N]): Int = mat.getColumns().head.dimension()
+     }
 
-          val zero: SetOfVectors[N] = SetOfVectors(Vector.ZERO[N](1))
+     class MatrixHasEq extends Eq[Matrix[N]]{
+          def eqv(mat1: Matrix[N], mat2: Matrix[N]): Boolean = {
+               Util.Gen.ensureSize(mat1, mat2)
 
-          def plus(vset: SetOfVectors[N], wset: SetOfVectors[N]): SetOfVectors[N] ={
-               Util.Gen.ensureSize(vset, wset)
-               SetOfVectors(vset.getColumns().zip(wset.getColumns())
+               mat1.getColumns()
+                    .zip(mat2.getColumns())
+                    .forall(colPair => Eq[Vector[N]].eqv(colPair._1, colPair._2))
+          }
+     }
+
+     class MatrixIsMonoid extends Monoid[Matrix[N]]{
+
+          val zero: Matrix[N] = Matrix(Vector.ZERO[N](1))
+
+          def plus(mat1: Matrix[N], mat2: Matrix[N]): Matrix[N] ={
+               Util.Gen.ensureSize(mat1, mat2)
+               Matrix(mat1.getColumns().zip(mat2.getColumns())
                     .map(colPair => colPair._1 + colPair._2):_*)
           }
      }
 
-     class SetVecIsAbelianGroup extends SetVecIsMonoid with AbelianGroup[SetOfVectors[N]]{
-          def negate(vset: SetOfVectors[N]): SetOfVectors[N] = SetOfVectors(vset.getColumns().map(c => c.negate()):_*)
+     class MatrixIsAbelianGroup extends MatrixIsMonoid with AbelianGroup[Matrix[N]]{
+          def negate(mat: Matrix[N]): Matrix[N] = Matrix(mat.getColumns().map(c => c.negate()):_*)
      }
 
-     class SetVecIsVectorSpace extends SetVecIsAbelianGroup with VectorSpace[SetOfVectors[N], N]{
-          val one: SetOfVectors[N] = SetOfVectors(Vector.ONE[N](1))
-          def scale(v: SetOfVectors[N], factor: N): SetOfVectors[N] =
-               SetOfVectors(v.getColumns().map(col => col.scale(factor)):_*)
+     class MatrixIsVectorSpace extends MatrixIsAbelianGroup with VectorSpace[Matrix[N], N]{
+          val one: Matrix[N] = Matrix(Vector.ONE[N](1))
+
+          def scale(v: Matrix[N], factor: N): Matrix[N] =
+               Matrix(v.getColumns().map(col => col.scale(factor)):_*)
      }
 
-     class SetVecIsSetVecLike extends SetVecIsVectorSpace with SetVecLike[SetOfVectors[N], N]{
-          def isZero(v: SetOfVectors[N]): Boolean = v.getColumns().forall(col => col.isZero)
+     class MatrixIsSetVecLike extends MatrixIsVectorSpace with SetVecLike[Matrix[N], N]{
+          def isZero(mat: Matrix[N]): Boolean = mat.getColumns().forall(col => col.isZero)
 
-          def identity(size: Int): SetOfVectors[N] ={
-               val list = ListBuffer.fill[N](size, size)(Number[N].zero)
+          def rowEchelon(mat: Matrix[N]): Matrix[N] =
+               Matrix(Util.Gen.rowEchelon[N](mat).getColumns():_*)
 
-               for(r <- 0 until size) {
-                    for(c <- 0 until size)
-                         if(r == c)
-                              list(r)(c) = Number.ONE[N]
-               }
-               SetOfVectors.fromSeqs(list:_*)
-          }
-
-
-          def rowEchelon(vset: SetOfVectors[N]): SetOfVectors[N] = Util.Gen.rowEchelon[N](vset)
-
-          def rowReducedEchelon(vset: SetOfVectors[N]): SetOfVectors[N] = Util.Gen.rowReducedEchelon[N](vset)
+          def rowReducedEchelon(mat: Matrix[N]): Matrix[N] =
+               Matrix(Util.Gen.rowReducedEchelon[N](mat).getColumns():_*)
 
      }
 
-     class SetVecHasDimension extends Dimension[SetOfVectors[N]]{
-          def dimension(vset: SetOfVectors[N]): Int = vset.getColumns().head.dimension()
+     class MatrixIsMatrixLike extends MatrixIsSetVecLike with MatrixLike[Matrix[N], N] {
+
+          def power(mat1: Matrix[N], exp: N): Matrix[N] = ???
+
+          def inverse(mat: Matrix[N]): Matrix[N] = ??? // TODO - solve using augmented?
+
+          def transpose(mat: Matrix[N]): Matrix[N] = Matrix(mat.getRows():_*)
+
+          def conjugateTranspose(mat: Matrix[N]): Matrix[N] =
+          /*
+          def power(m: M, exp: F): M //use linear algebra formula for matrix powers
+     def inverse(m: M): M
+     def transpose(m: M): M
+     def conjugateTranspose(m: M): M
+     def adjoint(m: M): M
+     def cofactor(m: M): M
+     def minor(m: M): M
+     def minor(m: M, rowIndex: Int, colIndex: Int): F
+     def determinant(m: M): M
+     def trace(m: M): F
+           */
      }
-
-     class SetVecHasEq extends Eq[SetOfVectors[N]]{
-          def eqv(vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean = {
-               Util.Gen.ensureSize(vset, wset)
-
-               vset.getColumns()
-                    .zip(wset.getColumns())
-                    .forall(colPair => Eq[Vector[N]].eqv(colPair._1, colPair._2))
-          }
-     }*/
 
 
 
      //span, basis ... etc
 
 
+     val absolute = new MatrixHasAbsoluteValue
+     val eq = new MatrixHasEq
+     val dim = new MatrixHasDimension
+     val monoid = new MatrixIsMonoid
+     val abelian = new MatrixIsAbelianGroup
+     val vectorSpace = new MatrixIsVectorSpace
+     val vsetLike = new MatrixIsSetVecLike
      val matrixLike = new MatrixIsMatrixLike
 }
 
 
 trait MatrixInstances {
 
-     //implicit final def matrixIsMatrixLike[N: Number] = new MatrixThings[N].matrixLike
+     implicit final def matrixHasAbsoluteValue[N: Number] = new MatrixThings[N].absolute
+     implicit final def matrixIsMonoid[N: Number] = new MatrixThings[N].monoid
+     implicit final def matrixIsAbelianGroup[N: Number] = new MatrixThings[N].abelian
+     implicit final def matrixIsVectorSpace[N: Number] = new MatrixThings[N].vectorSpace
+     implicit final def matrixIsSetVecLike[N: Number] = new MatrixThings[N].vsetLike
+     implicit final def matrixHasEq[N: Number] = new MatrixThings[N].eq
+     implicit final def matrixHasDimension[N: Number] = new MatrixThings[N].dim
+     implicit final def matrixIsMatrixLike[N: Number] = new MatrixThings[N].matrixLike
 
 
 }

@@ -8,7 +8,7 @@ import linalg.theory.space.VectorSpace
 
 trait SetVecLike[V, F] extends VectorSpace[V, F]{
 
-     def identity(size: Int): V
+     //def identity(size: Int): V
      def rowReducedEchelon(m: V): V
      def rowEchelon(m: V): V
 
