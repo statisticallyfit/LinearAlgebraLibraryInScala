@@ -16,10 +16,13 @@ import scala.collection.mutable.Seq
 
 class VectorThings[N: Number]{
 
-     class VectorHasAbsoluteValue extends Absolute[Vector[N], Vector[N]]{
+     //Problem no implicit value since Number does not inherit from Absolute[N,N] only
+     //RealNumber does that, same with Root
+
+     /*class VectorHasAbsoluteValue extends Absolute[Vector[N], Vector[N]]{
           def absoluteValue(v: Vector[N]): Vector[N] =
                Vector(v.getElements().map(e => Absolute[N, N].absoluteValue(e)):_*)
-     }
+     }*/
 
      class VectorIsMonoid extends Monoid[Vector[N]]{
 
@@ -131,7 +134,7 @@ class VectorThings[N: Number]{
           def isLinearlyIndependent(v: Vector[N]): Boolean = true //yes a single vector is lin indep.
      }
 
-     val absolute = new VectorHasAbsoluteValue
+     //val absolute = new VectorHasAbsoluteValue
      val monoid = new VectorIsMonoid
      val abelian = new VectorIsAbelianGroup
      val vectorSpace = new VectorIsVectorSpace
@@ -150,7 +153,7 @@ trait VectorInstances {
      //TODO test whether not strictly necessary to have each one like this, can just have
      //the ending trait VectorLike as class and instance below like in ComplexIsNumber ...
 
-     implicit final def vectorHasAbsoluteValue[N: Number] = new VectorThings[N].absolute
+     //implicit final def vectorHasAbsoluteValue[N: Number] = new VectorThings[N].absolute
      implicit final def vectorIsMonoid[N: Number] = new VectorThings[N].monoid
      implicit final def vectorIsAbelianGroup[N: Number] = new VectorThings[N].abelian
      implicit final def vectorIsVectorSpace[N: Number] = new VectorThings[N].vectorSpace

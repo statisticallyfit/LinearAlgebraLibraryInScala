@@ -73,6 +73,7 @@ class RationalIsRealNumber extends RationalIsField
      with RealNumber[Rational] {
 
      def isZero(x: Rational): Boolean = x.num == 0
+     def conjugate(x: Rational): Rational = x
      def isNegative(x: Rational): Boolean = x.num < 0
      def doubleValue(x: Rational): Double = x.num * 1.0 / x.den
      def from(x: Int): Rational = Rational(x)

@@ -25,6 +25,7 @@ trait NumberSyntax extends FieldSyntax with TrigSyntax with EqualitySyntax
 
           def -(other: N): N = number.minus(current, other)
           def isZero: Boolean = number.isZero(current)
+          def conjugate(): N = number.conjugate(current)
           def isNegative: Boolean = number.isNegative(current)
           def toDouble: Double = number.doubleValue(current)
           def toInt: Int = number.doubleValue(current).toInt // todo check this can be chopped off!

@@ -19,11 +19,12 @@ import scala.util.control.Breaks.{break, breakable}
 
 class SetVecThings[N: Number] {
 
-     class SetVecHasAbsoluteValue extends Absolute[SetOfVectors[N], SetOfVectors[N]] {
+     //TODO
+     /*class SetVecHasAbsoluteValue extends Absolute[SetOfVectors[N], SetOfVectors[N]] {
 
           def absoluteValue(vset: SetOfVectors[N]): SetOfVectors[N] =
                SetOfVectors(vset.getColumns().map(vec => vec.abs()):_*)
-     }
+     }*/
 
      class SetVecIsMonoid extends Monoid[SetOfVectors[N]]{
 
@@ -103,7 +104,7 @@ class SetVecThings[N: Number] {
           }
      }
 
-     val absolute = new SetVecHasAbsoluteValue
+     //val absolute = new SetVecHasAbsoluteValue
      val monoid = new SetVecIsMonoid
      val abelian = new SetVecIsAbelianGroup
      val vectorSpace = new SetVecIsVectorSpace
@@ -114,7 +115,7 @@ class SetVecThings[N: Number] {
 
 trait SetVecInstances {
 
-     implicit final def setVecHasAbsoluteValue[N: Number] = new SetVecThings[N].absolute
+     //implicit final def setVecHasAbsoluteValue[N: Number] = new SetVecThings[N].absolute
      implicit final def setVecIsMonoid[N: Number] = new SetVecThings[N].monoid
      implicit final def setVecIsAbelianGroup[N: Number] = new SetVecThings[N].abelian
      implicit final def setVecIsVectorSpace[N: Number] = new SetVecThings[N].vectorSpace

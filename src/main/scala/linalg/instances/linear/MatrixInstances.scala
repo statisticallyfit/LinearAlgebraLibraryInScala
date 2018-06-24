@@ -2,7 +2,6 @@ package linalg.instances.linear
 
 
 import spire.algebra.Eq
-
 import linalg.implicits._
 import linalg._
 import linalg.matrix.Matrix
@@ -14,6 +13,7 @@ import scala.language.implicitConversions
 import scala.util.control.Breaks.{break, breakable}
 import org.apache.commons.lang3.StringUtils
 
+import scala.collection.mutable.Seq
 import scala.collection.mutable.ListBuffer
 import scala.reflect.runtime.universe._
 import scala.util.control.Breaks._
@@ -27,11 +27,11 @@ class MatrixThings[N: Number] {
      // TODO for setveclike and matrix things.
 
 
-     class MatrixHasAbsoluteValue extends Absolute[Matrix[N], Matrix[N]] {
+     /*class MatrixHasAbsoluteValue extends Absolute[Matrix[N], Matrix[N]] {
 
           def absoluteValue(mat: Matrix[N]): Matrix[N] =
                Matrix(mat.getColumns().map(vec => vec.abs()):_*)
-     }
+     }*/
 
      class MatrixHasDimension extends Dimension[Matrix[N]]{
           def dimension(mat: Matrix[N]): Int = mat.getColumns().head.dimension()
@@ -72,6 +72,17 @@ class MatrixThings[N: Number] {
      class MatrixIsSetVecLike extends MatrixIsVectorSpace with SetVecLike[Matrix[N], N]{
           def isZero(mat: Matrix[N]): Boolean = mat.getColumns().forall(col => col.isZero)
 
+          def identity(size: Int): Matrix[N] ={
+               val list = ListBuffer.fill[N](size, size)(Number[N].zero)
+
+               for(r <- 0 until size) {
+                    for(c <- 0 until size)
+                         if(r == c)
+                              list(r)(c) = Number.ONE[N]
+               }
+               Matrix.fromSeqs(list:_*)
+          }
+
           def rowEchelon(mat: Matrix[N]): Matrix[N] =
                Matrix(Util.Gen.rowEchelon[N](mat).getColumns():_*)
 
@@ -86,9 +97,15 @@ class MatrixThings[N: Number] {
 
           def inverse(mat: Matrix[N]): Matrix[N] = ??? // TODO - solve using augmented?
 
-          def transpose(mat: Matrix[N]): Matrix[N] = Matrix(mat.getRows():_*)
+          def transpose(mat: Matrix[N]): Matrix[N] = Matrix(mat.getRows(): _*)
 
           def conjugateTranspose(mat: Matrix[N]): Matrix[N] =
+               Matrix.fromSeqs(mat.getColumns()
+                    .map(vecCol => vecCol.getElements()
+                         .map(elem => elem.conjugate()))).transpose()
+
+
+
           /*
           def power(m: M, exp: F): M //use linear algebra formula for matrix powers
      def inverse(m: M): M
@@ -100,7 +117,7 @@ class MatrixThings[N: Number] {
      def minor(m: M, rowIndex: Int, colIndex: Int): F
      def determinant(m: M): M
      def trace(m: M): F
-           */
+     }*/
      }
 
 
@@ -108,7 +125,7 @@ class MatrixThings[N: Number] {
      //span, basis ... etc
 
 
-     val absolute = new MatrixHasAbsoluteValue
+     //val absolute = new MatrixHasAbsoluteValue
      val eq = new MatrixHasEq
      val dim = new MatrixHasDimension
      val monoid = new MatrixIsMonoid
@@ -121,7 +138,7 @@ class MatrixThings[N: Number] {
 
 trait MatrixInstances {
 
-     implicit final def matrixHasAbsoluteValue[N: Number] = new MatrixThings[N].absolute
+     //implicit final def matrixHasAbsoluteValue[N: Number] = new MatrixThings[N].absolute
      implicit final def matrixIsMonoid[N: Number] = new MatrixThings[N].monoid
      implicit final def matrixIsAbelianGroup[N: Number] = new MatrixThings[N].abelian
      implicit final def matrixIsVectorSpace[N: Number] = new MatrixThings[N].vectorSpace

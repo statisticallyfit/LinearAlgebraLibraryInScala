@@ -24,7 +24,7 @@ trait Number[N] extends Field[N] /*with Absolute[N, N] with Root[N,N]*/ with Equ
      def isZero(x: N): Boolean //= eqv(zero, x)
      def isNegative(x: N): Boolean
 
-     def conjugate(x: N): N 
+     def conjugate(x: N): N
 
      def doubleValue(x: N): Double
      def from(x: Int): N

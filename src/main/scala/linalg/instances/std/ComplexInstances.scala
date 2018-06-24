@@ -80,6 +80,7 @@ class ComplexThings[R:RealNumber] {
           with ComplexHasEquality
           with Number[Complex[R]]  {
 
+          def conjugate(x: Complex[R]): Complex[R] = Complex(x.re, x.im.negate())
           def isZero(x: Complex[R]): Boolean = x.re.isZero && x.im.isZero
           def isNegative(x: Complex[R]): Boolean = x.re.isNegative && x.im.isNegative
           def doubleValue(x: Complex[R]): Double = Complex.magnitude(x).toDouble

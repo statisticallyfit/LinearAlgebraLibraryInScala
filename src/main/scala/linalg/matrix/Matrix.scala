@@ -4,7 +4,8 @@ import linalg.implicits._
 import linalg._
 import linalg.vector.{SetOfVectors, Vector}
 import org.apache.commons.lang3.StringUtils
-import scala.collection.mutable.ListBuffer
+
+import scala.collection.mutable.{ListBuffer, Seq}
 import scala.reflect.runtime.universe._
 import scala.util.control.Breaks._
 
@@ -142,17 +143,17 @@ object Matrix {
 
 
      def ZERO[N: Number](mat: Matrix[N]): Matrix[N] =
-          Matrix.fromBuffers(ListBuffer.fill[N](mat.numCols, mat.numRows)(Number.ZERO[N]): _*)
+          Matrix.fromSeqs(ListBuffer.fill[N](mat.numCols, mat.numRows)(Number.ZERO[N]): _*)
 
      def ZERO[N: Number](nrows: Int, ncols: Int): Matrix[N] =
-          Matrix.fromBuffers(ListBuffer.fill[N](ncols, nrows)(Number.ZERO[N]): _*)
+          Matrix.fromSeqs(ListBuffer.fill[N](ncols, nrows)(Number.ZERO[N]): _*)
 
      def IDENTITY[N: Number](size: Int): Matrix[N] = {
           val list = ListBuffer.fill[N](size, size)(Number.ZERO[N])
           for (r <- 0 until size) {
                for (c <- 0 until size) if (r == c) list(r)(c) = Number.ONE[N]
           }
-          Matrix.fromBuffers(list.toList: _*)
+          Matrix.fromSeqs(list.toList: _*)
      }
 
      //makes identity matrix using which is bigger - numrows or numcols
@@ -163,10 +164,17 @@ object Matrix {
           for (r <- 0 until size) {
                for (c <- 0 until size) if (r == c) list(r)(c) = Number.ONE[N]
           }
-          Matrix.fromBuffers(list.toList: _*)
+          Matrix.fromSeqs(list.toList: _*)
      }
 
-     def fromBuffers[N: Number](buffs: ListBuffer[N]*): Matrix[N] =
+     def fromSeqs[N: Number](seqs: Seq[N]*): Matrix[N] = Matrix(seqs.map(aSeq => Vector(aSeq:_*)):_*)
+
+
+     //assume data is along column
+     def fromSingleSeq[N: Number](numRows: Int, numCols: Int, seq: Seq[N]): Matrix[N] =
+          fromSeqs(seq.grouped(numCols).toList:_*) //.toList.map(_.toList)
+
+     /*def fromBuffers[N: Number](buffs: ListBuffer[N]*): Matrix[N] =
           new Matrix(buffs.map(list => new Vector(list: _*)): _*)
 
      def fromLists[N: Number](lists: List[N]*): Matrix[N] =
@@ -176,6 +184,6 @@ object Matrix {
      def fromList[N: Number](nr: Int, nc: Int, list: Seq[N] /*, isRow: Boolean*/): Matrix[N] = {
           //assume data is along column
           Matrix.fromLists(list.grouped(nc).toList.map(_.toList): _*)
-     }
+     }*/
 }
 
