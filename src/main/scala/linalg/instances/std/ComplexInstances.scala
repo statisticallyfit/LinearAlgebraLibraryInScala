@@ -21,11 +21,23 @@ class ComplexThings[R:RealNumber] {
           def absoluteValue(z: Complex[R]): R = Complex.magnitude(z)
      }
 
-
      trait ComplexIsRoot extends Root[Complex[R], R] {
           def power(base: Complex[R], exp: R): Complex[R] =
                Complex(Complex.magnitude(base) ^ exp, Complex.angle(base) * exp)
      }
+
+     /*trait ComplexIsAbsoluteComplex extends Absolute[Complex[R], Complex[R]]{
+          def absoluteValue(z: Complex[R]): Complex[R] =
+               Complex(Complex.magnitude(z), RealNumber[R].zero)
+     }
+
+
+     //TODO is this right??
+     trait ComplexIsRootComplex extends Root[Complex[R], Complex[R]]{
+          def power(base: Complex[R], exp: Complex[R]): Complex[R] =
+               Complex(Complex.magnitude(base) ^ Complex.magnitude(exp),
+                    Complex.angle(base) * Complex.magnitude(exp))
+     }*/
 
      trait ComplexHasEquality extends Equality[Complex[R]] {
           def eqv(x: Complex[R], y: Complex[R]): Boolean = x.re :==: y.re && x.im :==: y.im
@@ -63,8 +75,8 @@ class ComplexThings[R:RealNumber] {
      // note use traits to extend additional ones like abeliangroup, no need to repeat them here.
 
      class ComplexIsNumber extends ComplexIsField
-          with ComplexIsAbsolute
-          with ComplexIsRoot
+          with ComplexIsAbsolute //with ComplexIsAbsoluteComplex
+          with ComplexIsRoot //with ComplexIsRootComplex
           with ComplexHasEquality
           with Number[Complex[R]]  {
 
@@ -74,24 +86,10 @@ class ComplexThings[R:RealNumber] {
           def from(x: Int): Complex[R] = Complex(RealNumber[R].from(x))
      }
 
-//     val ab = new ComplexIsAbsolute
-//     val eq = new ComplexHasEquality
-//     val root = new ComplexIsRoot
-//     val monoid = new ComplexIsMonoid
-//     val field = new ComplexIsField
-//     val abelian = new ComplexIsAbelianGroup
-//     val ring = new ComplexIsRing
      val number = new ComplexIsNumber
 }
 
 trait ComplexInstances {
 
-//     implicit final def complexIsAbsolute[R: RealNumber] = new ComplexThings[R].ab
-//     implicit final def complexHasEquality[R: RealNumber] = new ComplexThings[R].eq
-//     implicit final def complexIsRoot[R: RealNumber] = new ComplexThings[R].root
-//     implicit final def complexIsMonoid[R: RealNumber] = new ComplexThings[R].monoid
-//     implicit final def complexIsField[R: RealNumber] = new ComplexThings[R].field
-//     implicit final def complexIsAbelianGroup[R: RealNumber] = new ComplexThings[R].abelian
-//     implicit final def complexIsRing[R: RealNumber] = new ComplexThings[R].ring
      implicit final def complexIsNumber[R: RealNumber] = new ComplexThings[R].number
 }

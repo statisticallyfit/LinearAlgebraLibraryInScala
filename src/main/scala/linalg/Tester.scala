@@ -29,6 +29,9 @@ object Tester extends App {
      Vector(1,2,3).dimension()
      Vector(1,2,3).isLinearlyIndependent()
 
+     Vector(1,2).abs()
+     m.abs()
+
      /*val mat: Matrix[Int] = Matrix(Vector(3,5,7), Vector(9, 8, 5))
      mat.rowReducedEchelon()
      mat.adjoint()
