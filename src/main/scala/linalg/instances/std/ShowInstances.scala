@@ -3,7 +3,7 @@ package linalg.instances.std
 import linalg.implicits._
 import linalg._
 import linalg.kernel.{Complex, Imaginary, Rational, Real}
-import linalg.vector.{SetOfVectors, Vector /*,Polynomial*/}
+import linalg.vector.{SetOfVectors, Vector}
 import org.apache.commons.lang3.StringUtils
 
 import scala.language.higherKinds

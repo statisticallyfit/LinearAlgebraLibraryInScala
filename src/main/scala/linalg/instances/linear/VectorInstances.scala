@@ -2,11 +2,10 @@ package linalg.instances.linear
 
 
 import spire.algebra.Eq
-
 import linalg.implicits._
 import linalg._
 import linalg.util._
-import linalg.vector.{SetOfVectors, Vector}
+import linalg.vector.{Polynomial, SetOfVectors, Vec2, Vector}
 
 import scala.collection.mutable.Seq
 
@@ -27,111 +26,53 @@ class VectorThings[N: Number]{
      class VectorIsMonoid extends Monoid[Vector[N]]{
 
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
-
-          def plus(v: Vector[N], w: Vector[N]): Vector[N] ={
-               Util.Gen.ensureSize(v, w)
-               Vector(v.getElements().zip(w.getElements()).map(pair => pair._1 + pair._2):_*)
-          }
+          def plus(v: Vector[N], w: Vector[N]): Vector[N] = Util.plus(v, w)
      }
-
 
      class VectorIsAbelianGroup extends VectorIsMonoid with AbelianGroup[Vector[N]]{
-
-          def negate(v: Vector[N]): Vector[N] = Vector(v.getElements().map(e => e.negate()):_*)
+          def negate(v: Vector[N]): Vector[N] = Util.negate(v)
      }
-
 
      class VectorIsVectorSpace extends VectorIsAbelianGroup with VectorSpace[Vector[N], N]{
 
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
-
-          def scale(v: Vector[N], factor: N): Vector[N] = Vector(v.getElements().map(e => e * factor):_*)
-
+          def scale(v: Vector[N], factor: N): Vector[N] = Util.scale(v, factor)
      }
 
      class VectorIsInnerProductSpace extends VectorIsVectorSpace with InnerProductSpace[Vector[N], N]{
-
-          def innerProduct(v: Vector[N], w: Vector[N]): N = {
-               Util.Gen.ensureSize(v, w)
-               v.getElements().zip(w.getElements()).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
-          }
+          def innerProduct(v: Vector[N], w: Vector[N]): N = Util.innerProduct(v, w)
      }
-
 
      class VectorIsNormedVectorSpace extends VectorIsInnerProductSpace with NormedVectorSpace[Vector[N], N]{
-
-          def norm(v: Vector[N])(implicit field: Field[N], root: Root[N, N]): N = {
-
-               val two: N = field.one + field.one
-               val sum: N = Util.Gen.sumElements[N](Vector(v.getElements().map(e => root.power(e, two)):_*))
-               sum.sqrt()
-          }
+          def norm(v: Vector[N])(implicit field: Field[N], root: Root[N, N]): N = Util.norm(v)
      }
-
 
      class VectorIsHilbertSpace extends VectorIsNormedVectorSpace with HilbertSpace[Vector[N], N]{
-
           def angle(v: Vector[N], w: Vector[N])(implicit t: Trig[N], field: Field[N], r: Root[N,N]): N =
-               field.divide(innerProduct(v, w),  field.times(norm(v), norm(w)).arccos() )
+               Util.angle(v, w)
      }
-
 
      class VectorIsVectorLike extends VectorIsHilbertSpace with VectorLike[Vector[N], N]{
 
-          def isZero(v: Vector[N]): Boolean = v.getElements().forall(e => e.isZero)
-
+          def isZero(v: Vector[N]): Boolean = Util.isZero(v)
           def projection(v: Vector[N], onto: Vector[N])(implicit field: Field[N], r: Root[N,N]): Vector[N] =
-               scale(onto, field.divide(innerProduct(v, onto), norm(onto)) )
-
-          def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = {
-               Util.Gen.ensureSize(v, w)
-
-               val as: Seq[N] = v.getElements()
-               val bs: Seq[N] = w.getElements()
-
-               val result: Seq[Seq[N]] = as.map(a => bs.map(b => a * b))
-
-               SetOfVectors.fromSeqs(result:_*)
-          }
-
-          def crossProduct(u: Vector[N], v: Vector[N])/*(implicit d: Dimension[Vector[N]])*/:
-          Option[Vector[N]] = {
-
-               //TODO hacky way to get dimension/length but with Dimension doesn't work...
-               if(u.getElements().length == 3 && v.getElements().length == 3){
-                    val w1: N = (u.get(2) * v.get(3)) - (u.get(3) * v.get(2))
-                    val w2: N = (u.get(3) * v.get(1)) - (u.get(1) * v.get(3))
-                    val w3: N = (u.get(1) * v.get(2)) - (u.get(2) * v.get(1))
-
-                    Some(Vector(w1, w2, w3))
-
-               } else None
-          }
+               Util.projection(v, onto)
+          def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = Util.outerProduct(v, w)
+          def crossProduct(u: Vector[N], v: Vector[N]): Option[Vector[N]] = Util.crossProduct(u, v)
      }
 
-
      class VectorHasDimension extends Dimension[Vector[N]] {
-          def dimension(v: Vector[N]): Int = v.getElements().length
+          def dimension(v: Vector[N]): Int = Util.dimension(v)
      }
 
      class VectorHasEq extends Eq[Vector[N]] {
-
-          def eqv(v: Vector[N], w: Vector[N]): Boolean ={
-               v.getElements().zip(w.getElements())
-                    .forall(vwElemPair => vwElemPair._1 :==: vwElemPair._2)
-          }
+          def eqv(v: Vector[N], w: Vector[N]): Boolean = Util.eqv(v, w)
      }
 
      class VectorCanHaveLinearIndependence extends LinearIndependence[Vector[N]] {
 
-          def linearlyIndependent(v: Vector[N], w: Vector[N]): Boolean ={
-               val rref: SetOfVectors[N] = Util.Gen.rowReducedEchelon[N](SetOfVectors(v, w))
-               val rrefSquare: SetOfVectors[N] = SetOfVectors(Util.Gen.expressRowsAsCols[N](rref.getRowsAt(0, 1)):_*)
-               //rref :==: SetOfVectors.IDENTITY[N](2)
-               ???
-          }
-
-          def isLinearlyIndependent(v: Vector[N]): Boolean = true //yes a single vector is lin indep.
+          def linearlyIndependent(v: Vector[N], w: Vector[N]): Boolean = Util.linearlyIndependent(v, w)
+          def isLinearlyIndependent(v: Vector[N]): Boolean = Util.isLinearlyIndependent(v)
      }
 
      //val absolute = new VectorHasAbsoluteValue
@@ -149,10 +90,6 @@ class VectorThings[N: Number]{
 
 
 trait VectorInstances {
-
-     //TODO test whether not strictly necessary to have each one like this, can just have
-     //the ending trait VectorLike as class and instance below like in ComplexIsNumber ...
-
      //implicit final def vectorHasAbsoluteValue[N: Number] = new VectorThings[N].absolute
      implicit final def vectorIsMonoid[N: Number] = new VectorThings[N].monoid
      implicit final def vectorIsAbelianGroup[N: Number] = new VectorThings[N].abelian

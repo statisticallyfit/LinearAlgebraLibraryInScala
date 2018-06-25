@@ -10,14 +10,6 @@ import linalg.util._
 
 import scala.language.higherKinds
 import scala.language.implicitConversions
-import scala.util.control.Breaks.{break, breakable}
-import org.apache.commons.lang3.StringUtils
-
-import scala.collection.mutable
-import scala.collection.mutable.Seq
-import scala.collection.mutable.ListBuffer
-import scala.reflect.runtime.universe._
-import scala.util.control.Breaks._
 
 
 
@@ -35,110 +27,51 @@ class MatrixThings[N: Number] {
      }*/
 
      class MatrixHasDimension extends Dimension[Matrix[N]]{
-          def dimension(mat: Matrix[N]): Int = mat.getColumns().head.dimension()
+          def dimension(mat: Matrix[N]): Int = Util.dimension(mat)
      }
 
      class MatrixHasEq extends Eq[Matrix[N]]{
-          def eqv(mat1: Matrix[N], mat2: Matrix[N]): Boolean = {
-               Util.Gen.ensureSize(mat1, mat2)
-
-               mat1.getColumns()
-                    .zip(mat2.getColumns())
-                    .forall(colPair => Eq[Vector[N]].eqv(colPair._1, colPair._2))
-          }
+          def eqv(mat1: Matrix[N], mat2: Matrix[N]): Boolean = Util.eqv(mat1, mat2)
      }
 
      class MatrixIsMonoid extends Monoid[Matrix[N]]{
 
           val zero: Matrix[N] = Matrix(Vector.ZERO[N](1))
 
-          def plus(mat1: Matrix[N], mat2: Matrix[N]): Matrix[N] ={
-               Util.Gen.ensureSize(mat1, mat2)
-               Matrix(mat1.getColumns().zip(mat2.getColumns())
-                    .map(colPair => colPair._1 + colPair._2):_*)
-          }
+          def plus(mat1: Matrix[N], mat2: Matrix[N]): Matrix[N] = Util.plus(mat1, mat2).toMatrix
      }
 
      class MatrixIsAbelianGroup extends MatrixIsMonoid with AbelianGroup[Matrix[N]]{
-          def negate(mat: Matrix[N]): Matrix[N] = Matrix(mat.getColumns().map(c => c.negate()):_*)
+          def negate(mat: Matrix[N]): Matrix[N] = Util.negate(mat).toMatrix
      }
 
      class MatrixIsVectorSpace extends MatrixIsAbelianGroup with VectorSpace[Matrix[N], N]{
           val one: Matrix[N] = Matrix(Vector.ONE[N](1))
 
-          def scale(v: Matrix[N], factor: N): Matrix[N] =
-               Matrix(v.getColumns().map(col => col.scale(factor)):_*)
+          def scale(mat: Matrix[N], factor: N): Matrix[N] = Util.scale(mat, factor).toMatrix
      }
 
      class MatrixIsSetVecLike extends MatrixIsVectorSpace with SetVecLike[Matrix[N], N]{
-          def isZero(mat: Matrix[N]): Boolean = mat.getColumns().forall(col => col.isZero)
-
-          def identity(size: Int): Matrix[N] ={
-               val list = ListBuffer.fill[N](size, size)(Number[N].zero)
-
-               for(r <- 0 until size) {
-                    for(c <- 0 until size)
-                         if(r == c)
-                              list(r)(c) = Number.ONE[N]
-               }
-               Matrix.fromSeqs(list:_*)
-          }
-
-          def rowEchelon(mat: Matrix[N]): Matrix[N] =
-               Matrix(Util.Gen.rowEchelon[N](mat).getColumns():_*)
-
-          def rowReducedEchelon(mat: Matrix[N]): Matrix[N] =
-               Matrix(Util.Gen.rowReducedEchelon[N](mat).getColumns():_*)
+          def isZero(mat: Matrix[N]): Boolean = Util.isZero(mat)
+          def identity(size: Int): Matrix[N] = Matrix(Util.identity(size).getColumns():_*)
+          def rowEchelon(mat: Matrix[N]): Matrix[N] = Util.rowEchelon(mat).toMatrix
+          def rowReducedEchelon(mat: Matrix[N]): Matrix[N] = Util.rowReducedEchelon(mat).toMatrix
 
      }
 
      class MatrixIsMatrixLike extends MatrixIsSetVecLike with MatrixLike[Matrix[N], N] {
 
-          def power(mat1: Matrix[N], exp: N): Matrix[N] = ???
-
-          def inverse(mat: Matrix[N]): Matrix[N] = ??? // TODO - solve using augmented?
-
-          def transpose(mat: Matrix[N]): Matrix[N] = Matrix(mat.getRows(): _*)
-
-          def conjugateTranspose(mat: Matrix[N]): Matrix[N] =
-               transpose(Matrix.fromSeqs(mat.getColumns().map(col => col.getElements()
-                    .map(e => e.conjugate())):_*))
-
-          def adjoint(mat: Matrix[N]): Matrix[N] = {
-               //definition 6.19: adjoint = transpose(cofactor) if matrix is square
-               //can apply this definition only if matrix is square, not checking this here.
-               val newMat: ListBuffer[Vector[N]] = ListBuffer() //ListBuffer.fill[N](numRows, numCols)(Number.ZERO[N])
-
-               for(r <- 0 until mat.numRows){
-                    val row: Vector[N] = Vector.ZERO[N](mat.numCols)
-
-                    for(c <- 0 until mat.numCols){
-                         val cof = ((r + c) % 2 == 0) match {
-                              case true => minor(mat, r, c)
-                              case false => minor(mat, r, c).negate()
-                         }
-                         row.set(c)(cof)
-                    }
-                    newMat += row
-               }
-               //implicit transpose (we could have done (matrix (rowtocol(mat)).transpose
-               Matrix(newMat:_*)
-          }
-
-          def cofactor(mat: Matrix[N]): Matrix[N] ={
-
-               val indexes: IndexedSeq[(Int, Int)] = for(r <- 0 until numRows; c <- 0 until numCols) yield (r, c)
-               val cofactors: List[N] = indexes.map(indexPair => cofactor(indexPair._1, indexPair._2)).toList
-               Matrix.fromList(numRows, numCols, cofactors).transpose()
-          }
-
-          /*
-     def cofactor(m: M): M
-     def minor(m: M): M
-     def minor(m: M, rowIndex: Int, colIndex: Int): F
-     def determinant(m: M): M
-     def trace(m: M): F
-     }*/
+          def power(mat: Matrix[N], exp: N): Matrix[N] = Util.power(mat, exp)
+          def inverse(mat: Matrix[N]): Matrix[N] = Util.inverse(mat)
+          def transpose(mat: Matrix[N]): Matrix[N] = Util.transpose(mat)
+          def conjugateTranspose(mat: Matrix[N]): Matrix[N] = Util.conjugateTranspose(mat)
+          def adjoint(mat: Matrix[N]): Matrix[N] =  Util.adjoint(mat)
+          def cofactor(mat: Matrix[N]): Matrix[N] = Util.cofactor(mat)
+          def cofactor(mat: Matrix[N], r:Int, c:Int): N = Util.cofactor(mat, r, c)
+          def minor(mat: Matrix[N]): Matrix[N] = Util.minor(mat)
+          def minor(mat: Matrix[N], r: Int, c: Int): N = Util.minor(mat, r, c)
+          def determinant(mat: Matrix[N]): N = Util.determinant(mat)
+          def trace(mat: Matrix[N]): N = Util.trace(mat)
      }
 
 

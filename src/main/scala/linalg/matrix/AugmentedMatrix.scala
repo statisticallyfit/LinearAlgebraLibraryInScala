@@ -1,12 +1,42 @@
 package linalg.matrix
 
+import linalg._
+import linalg.implicits._
+import linalg.vector.Vector
+import linalg.util._
+
+import scala.collection.mutable.ListBuffer
+
 /**
   *
   */
-class AugmentedMatrix {
+class AugmentedMatrix[N: Number](private val A: Matrix[N], private val B: Matrix[N])
+     extends Matrix[N](Util.colCombine(A, B).getColumns():_*)
 
+
+object AugmentedMatrix {
+     def apply[N: Number](A: Matrix[N], B: Matrix[N]): AugmentedMatrix[N] =
+          new AugmentedMatrix(A, B)
+
+     def apply[N: Number](nr: Int, nc: Int): AugmentedMatrix[N] = AugmentedMatrix.ZERO[N](nr, nc)
+
+     def ZERO[N: Number](nrows: Int, ncols: Int): AugmentedMatrix[N] =
+          AugmentedMatrix.fromSeqs(ListBuffer.fill[N](ncols, nrows)(Number.ZERO[N]): _*)
+
+     def IDENTITY[N: Number](size: Int)(implicit ev: SetVecLike[AugmentedMatrix[N],N]): AugmentedMatrix[N] =
+          ev.identity(size)
+
+     def fromSeqs[N: Number](seqs: Seq[N]*): AugmentedMatrix[N] = AugmentedMatrix(seqs.map(aSeq => Vector(aSeq:_*)):_*)
+
+     //assume data is along column
+     def fromSingleSeq[N: Number](numRows: Int, numCols: Int, seq: Seq[N]): AugmentedMatrix[N] =
+          fromSeqs(seq.grouped(numCols).toList:_*) //.toList.map(_.toList)
+
+
+     def fromSeq[N: Number](nr: Int, nc: Int, seq: Seq[N]): AugmentedMatrix[N] ={
+          fromSeqs(seq.grouped(nc).toList.map(s => Seq(s:_*)):_*)
+     }
 }
-
 
 //class AugmentedMatrix[N <: Number[N]: TypeTag](A: Matrix[N], B: Matrix[N])
 //     extends Matrix[N](A.combine(B).getColumns():_*) {
@@ -145,14 +175,4 @@ class AugmentedMatrix {
 //     }
 //}
 //
-//
-//object AugmentedMatrix {
-//     def apply[N <: Number[N]: TypeTag](A: Matrix[N], B: Matrix[N]): AugmentedMatrix[N] ={
-//          new AugmentedMatrix[N](A, B)
-//     }
-//
-//     def apply[N <: Number[N]: TypeTag](A: Matrix[N], b: Vector[N]): AugmentedMatrix[N] ={
-//          new AugmentedMatrix[N](A, b)
-//     }
-//}
 //

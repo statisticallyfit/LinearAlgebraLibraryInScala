@@ -22,7 +22,7 @@ trait MatrixLike[M, F] extends SetVecLike[M, F] {
      def cofactor(m: M): M
      def minor(m: M): M
      def minor(m: M, rowIndex: Int, colIndex: Int): F
-     def determinant(m: M): M
+     def determinant(m: M): F
      def trace(m: M): F
 }
 

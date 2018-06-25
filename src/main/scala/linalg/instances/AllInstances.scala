@@ -28,4 +28,5 @@ trait AllInstances
      with VectorInstances
      with SetVecInstances
      with MatrixInstances
+     with JacobianMatrixInstances
 

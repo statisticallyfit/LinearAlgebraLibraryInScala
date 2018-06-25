@@ -1,6 +1,7 @@
 package linalg.syntax
 
 import linalg._
+import linalg.matrix.Matrix
 
 import scala.language.higherKinds
 import scala.language.implicitConversions
@@ -19,7 +20,7 @@ trait MatrixLikeSyntax extends SetVecLikeSyntax {
           def cofactor(): M[N] = mat.cofactor(current)
           def minor(): M[N] = mat.minor(current)
           def minor(rowIndex: Int, colIndex: Int): N = mat.minor(current, rowIndex, colIndex)
-          def determinant(): M[N] = mat.determinant(current)
+          def determinant(): N = mat.determinant(current)
           def trace(): N = mat.trace(current)
      }
 }

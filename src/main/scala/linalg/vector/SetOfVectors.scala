@@ -21,7 +21,6 @@ class SetOfVectors[N: Number](private val cols: Vector[N]*) {
 
      private val columns: Seq[Vector[N]] = Seq(cols:_*)
      val numRows: Int = columns.head.dimension()
-     //note is recursive here since goes back to instances file: Dimension[SetOfVectors[N]].dimension(this)
      val numCols: Int = columns.length
 
      def copy(): SetOfVectors[N] = SetOfVectors(columns:_*)
@@ -43,7 +42,7 @@ class SetOfVectors[N: Number](private val cols: Vector[N]*) {
           //val rows: Seq[Vector[N]] = Seq()
           //for(r <- 0 until this.numRows) rows(r) = Vector(columns.map(colVec => colVec.get(r)):_*)
           //rows
-          Util.Gen.expressColsAsRows(columns)
+          Util.expressColsAsRows(columns)
      }
 
      /**
@@ -67,8 +66,6 @@ class SetOfVectors[N: Number](private val cols: Vector[N]*) {
 
 
      override def toString: String = Show[SetOfVectors[N]].show(this)
-     //TODO why 'could not find implicit value for param ev in linalg.kernel.Show??
-          //Show[SetOfVectors[N]].show(this)
 }
 
 
@@ -88,9 +85,6 @@ object SetOfVectors {
 
      def IDENTITY[N: Number](size: Int)(implicit ev: SetVecLike[SetOfVectors[N], N]):SetOfVectors[N] =
           ev.identity(size)
-
-     def IDENTITY[N: Number](vset: SetOfVectors[N])(implicit ev: SetVecLike[SetOfVectors[N], N]): SetOfVectors[N] =
-          ev.identity(vset.dimension())
 
      def fromSeqs[N: Number](seqs: Seq[N]*): SetOfVectors[N] = SetOfVectors(seqs.map(aSeq => Vector(aSeq:_*)):_*)
 

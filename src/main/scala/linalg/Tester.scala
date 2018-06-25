@@ -2,7 +2,7 @@ package linalg
 
 import linalg.implicits._
 import linalg.kernel.{Complex, Rational, Real}
-import linalg.matrix.{JacobianMatrix, Matrix}
+import linalg.matrix.{HilbertMatrix, JacobianMatrix, Matrix}
 import linalg.vector.{SetOfVectors, Vector}
 import linalg.util._
 
@@ -32,15 +32,16 @@ object Tester extends App {
      //Vector(1,2).abs()
      //TODO m.abs()
 
-     /*val mat: Matrix[Int] = Matrix(Vector(3,5,7), Vector(9, 8, 5))
+     val mat: Matrix[Int] = Matrix(Vector(3,5,7), Vector(9, 8, 5))
      mat.rowReducedEchelon()
      mat.adjoint()
 
-     val m1: JacobianMatrix[Int] = new JacobianMatrix[Int](Vector[Int](1,2,3), Vector[Int](3,4,2))
+     val m1: HilbertMatrix[Int] = HilbertMatrix(Vector(1,2,3), Vector(3,4,2))
      m1.rowReducedEchelon()
      m1.adjoint()
+     m1.dimension()
 
-     mat + mat*/
+     mat + mat
 
 
      // -----------------------------------------------------------------------------------------------

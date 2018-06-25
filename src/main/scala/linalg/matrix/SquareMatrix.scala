@@ -13,8 +13,9 @@ import scala.collection.mutable.ListBuffer
 
 //TODO: ssquarematrix implements setveclike using hlist shapeless so that no need
 // for extending from Matrix (no effect, anyway)
-class SquareMatrix[N: Number](mat: Matrix[N]) extends Matrix[N](mat.getColumns():_*)
-
+class SquareMatrix[N: Number](mat: Matrix[N]) extends Matrix[N](mat.getColumns():_*) {
+     require(Util.Id.isSquare(mat))
+}
 
 
 object SquareMatrix {
@@ -22,27 +23,23 @@ object SquareMatrix {
      def apply[N: Number](n:Int): SquareMatrix[N] =
           new SquareMatrix(Matrix.ZERO[N](n, n))
 
+     def apply[N: Number](mat: Matrix[N]): SquareMatrix[N] = new SquareMatrix(mat)
+
      def apply[N: Number](cols: Vector[N]*): SquareMatrix[N] = new SquareMatrix(Matrix(cols:_*))
 
      def ZERO[N: Number](n:Int): SquareMatrix[N] = new SquareMatrix(Matrix.ZERO[N](n, n))
 
      def IDENTITY[N: Number](size:Int): SquareMatrix[N] = new SquareMatrix(Matrix.IDENTITY[N](size))
 
-     def DIAGONAL[N: Number](diag: Vector[N]): SquareMatrix[N] ={
+     def fromSeqs[N: Number](seqs: Seq[N]*): SquareMatrix[N] = SquareMatrix(seqs.map(aSeq => Vector(aSeq:_*)):_*)
 
-          val mat: ListBuffer[ListBuffer[N]] = ListBuffer()
-          for(r <- 0 until diag.dimension()){
-               for(c <- 0 until diag.dimension()){
-                    if(r == c) mat(r)(c) = diag.get(r)
-                    else mat(r)(c) = Number[N].zero
-               }
-          }
-          new SquareMatrix(Matrix.fromBuffers(mat:_*))
+     //assume data is along column
+     def fromSingleSeq[N: Number](numRows: Int, numCols: Int, seq: Seq[N]): SquareMatrix[N] =
+          fromSeqs(seq.grouped(numCols).toList:_*) //.toList.map(_.toList)
+
+
+     def fromSeq[N: Number](nr: Int, nc: Int, seq: Seq[N]): SquareMatrix[N] ={
+          fromSeqs(seq.grouped(nc).toList.map(s => Seq(s:_*)):_*)
      }
-
-     def DIAGONAL[N: Number](elem: N, size: Int): SquareMatrix[N] ={
-          DIAGONAL(Vector(List.fill[N](size)(elem):_*))
-     }
-
 }
 
