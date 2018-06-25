@@ -95,13 +95,13 @@ class JacobianMatrixThings[N: Number] {
 trait JacobianMatrixInstances {
 
      //implicit final def matrixHasAbsoluteValue[N: Number] = new MatrixThings[N].absolute
-     implicit final def jMatrixIsMonoid[N: Number] = new JacobianMatrixThings[N].monoid
-     implicit final def jMatrixIsAbelianGroup[N: Number] = new JacobianMatrixThings[N].abelian
-     implicit final def jMatrixIsVectorSpace[N: Number] = new JacobianMatrixThings[N].vectorSpace
-     implicit final def jMatrixIsSetVecLike[N: Number] = new JacobianMatrixThings[N].vsetLike
-     implicit final def jMatrixHasEq[N: Number] = new JacobianMatrixThings[N].eq
-     implicit final def jMatrixHasDimension[N: Number] = new JacobianMatrixThings[N].dim
-     implicit final def jMatrixIsMatrixLike[N: Number] = new JacobianMatrixThings[N].matrixLike
+     implicit final def jacobianMatrixIsMonoid[N: Number] = new JacobianMatrixThings[N].monoid
+     implicit final def jacobianMatrixIsAbelianGroup[N: Number] = new JacobianMatrixThings[N].abelian
+     implicit final def jacobianMatrixIsVectorSpace[N: Number] = new JacobianMatrixThings[N].vectorSpace
+     implicit final def jacobianMatrixIsSetVecLike[N: Number] = new JacobianMatrixThings[N].vsetLike
+     implicit final def jacobianMatrixHasEq[N: Number] = new JacobianMatrixThings[N].eq
+     implicit final def jacobianMatrixHasDimension[N: Number] = new JacobianMatrixThings[N].dim
+     implicit final def jacobianMatrixIsMatrixLike[N: Number] = new JacobianMatrixThings[N].matrixLike
 
 
 }

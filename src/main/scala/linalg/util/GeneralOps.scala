@@ -11,7 +11,7 @@ trait GeneralOps {
      /**
        * Inserts element at position i, leaving list the same length as before.
        */
-     def insert[N: Number](elem: N, i: Int, list: List[N]): List[N] = {
+     def insert[N: Number](elem: N, i: Int, list: Seq[N]): Seq[N] = {
           val (first, second) = list.splitAt(i)
           (first :+ elem) ++: second.tail
      }
@@ -19,7 +19,7 @@ trait GeneralOps {
      /**
        * Inserts list at position i, leaving list of lists the same length as before.
        */
-     def insert[N: Number](elems: List[N], i: Int, list: List[List[N]]): List[List[N]] = {
+     def insert[N: Number](elems: Seq[N], i: Int, list: Seq[Seq[N]]): Seq[Seq[N]] = {
           val (first, second) = list.splitAt(i)
           (first :+ elems) ++: second.tail
      }

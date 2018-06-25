@@ -64,7 +64,7 @@ class SetVecThings[N: Number] {
           //private val vv: SetVecLike[SetOfVectors[N], N] = implicitly[SetVecLike[SetOfVectors[N], N]]
 
 
-          def span(vset: SetOfVectors[N]): SetOfVectors[N] = ??? //vv.rowReducedEchelon(vset)
+          def span(vset: SetOfVectors[N]): SetOfVectors[N] = Util.span(vset)
 
           def doesSetSpanTheSpace(vset: SetOfVectors[N]): Boolean ={
                ???
@@ -80,12 +80,12 @@ class SetVecThings[N: Number] {
      }
 
      //val absolute = new SetVecHasAbsoluteValue
+     val eq = new SetVecHasEq
+     val dim = new SetVecHasDimension
      val monoid = new SetVecIsMonoid
      val abelian = new SetVecIsAbelianGroup
      val vectorSpace = new SetVecIsVectorSpace
      val vsetLike = new SetVecIsSetVecLike
-     val eq = new SetVecHasEq
-     val dim = new SetVecHasDimension
 }
 
 trait SetVecInstances {

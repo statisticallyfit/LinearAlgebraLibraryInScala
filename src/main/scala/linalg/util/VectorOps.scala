@@ -118,5 +118,4 @@ trait VectorOps {
           }
      }
 
-
 }

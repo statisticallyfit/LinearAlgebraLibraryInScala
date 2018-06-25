@@ -29,4 +29,5 @@ trait AllInstances
      with SetVecInstances
      with MatrixInstances
      with JacobianMatrixInstances
+     with HilbertMatrixInstances
 

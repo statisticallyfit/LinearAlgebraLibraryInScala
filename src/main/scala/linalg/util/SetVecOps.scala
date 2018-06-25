@@ -4,6 +4,7 @@ import linalg._
 import linalg.implicits._
 import linalg.vector.{SetOfVectors, Vector}
 import cats.Eq
+import linalg.matrix.Matrix
 
 import scala.collection.mutable.{ListBuffer, Seq}
 import scala.util.control.Breaks.{break, breakable}
@@ -62,6 +63,7 @@ trait SetVecOps {
           SetOfVectors(expressRowsAsCols(getNonZeroRows(theRRef)):_*)
      }
 
+     def span[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = rowReducedEchelon(vset)
 
 
 
@@ -199,6 +201,9 @@ trait SetVecOps {
           indices2
      }
 
+     def expressRowsAsCols[N:Number](mat: Matrix[N]): Seq[Vector[N]] = expressRowsAsCols(mat.getRows())
+
+     def expressColsAsRows[N:Number](mat: Matrix[N]): Seq[Vector[N]] = expressColsAsRows(mat.getColumns())
 
      def expressRowsAsCols[N:Number](rows: Seq[Vector[N]]): Seq[Vector[N]] = {
           //converting from row to col representation

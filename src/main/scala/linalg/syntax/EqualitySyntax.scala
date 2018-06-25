@@ -8,7 +8,9 @@ import scala.language.implicitConversions
 /**
   *
   */
-trait EqualitySyntax {
+trait EqualitySyntax extends EqualityUnderlyingSyntax with cats.syntax.EqSyntax
+
+trait EqualityUnderlyingSyntax {
 
      implicit class EqualityOps[E: Equality](current: E){
 

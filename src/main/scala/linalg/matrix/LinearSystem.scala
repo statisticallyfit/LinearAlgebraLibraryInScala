@@ -14,7 +14,9 @@ trait LinearSystem[S, F] extends MatrixLike[S, F] {
      def isConsistent(s: S): Boolean  = ! isInconsistent(s)
 
      def hasNoSolution(s: S): Boolean = isInconsistent(s)
-     def hasUniqueSolution(s: S)(implicit e: Eq[S]): Boolean //= e.eqv(rowReducedEchelon(s), identity)
+     def hasUniqueSolution(s: S): Boolean
+     def hasInfiniteSolutions(s: S): Boolean
+     //def hasUniqueSolution(s: S)(implicit e: Eq[S]): Boolean = e.eqv(rowReducedEchelon(s), identity)
 
      def infiniteSolutionSolver(s: S): S
      def solve(s: S): Option[S]

@@ -2,8 +2,9 @@ package linalg
 
 import linalg.kernel.{Rational, Real}
 import linalg.vector.{SetOfVectors, Vector}
-import linalg.matrix.{JacobianMatrix, Matrix}
+import linalg.matrix._
 
+import scala.collection.mutable.ListBuffer
 import scala.language.implicitConversions
 
 /**
@@ -17,20 +18,21 @@ trait GeneralImplicits {
      // Converting Double To Real
      implicit def doubleToReal(double: Double): Real = Real(double)
 
+     implicit class VectorImplicits[N:Number](v: Vector[N]) {
+          def toListB: ListBuffer[N] = ListBuffer(v.getElements():_*)
+     }
 
      //converting setvec to matrix so that plus(vset, wset) works with matrices too (fine to
      // pass in matrices but returning setvec is wrong for a matrix
      implicit class SetVecToMatrix[N: Number](vset: SetOfVectors[N]) {
           def toMatrix: Matrix[N] = Matrix(vset.getColumns():_*)
-     }
-
-     implicit class SetVecToJacobian[N: Number](vset: SetOfVectors[N]) {
           def toJacobianMatrix: JacobianMatrix[N] = JacobianMatrix(vset.getColumns():_*)
+          def toHilbertMatrix: HilbertMatrix[N] = HilbertMatrix(vset.getColumns():_*)
+          def toHessianMatrix: HessianMatrix[N] = HessianMatrix(vset.getColumns():_*)
+          def toSquareMatrix: SquareMatrix[N] = SquareMatrix(vset.getColumns():_*)
+          def toSimilarMatrix: SimilarMatrix[N] = SimilarMatrix(vset.getColumns():_*)
+          def toAugMatrix: AugmentedMatrix[N] = AugmentedMatrix(vset.getColumns():_*)
+          //TODO def toHessenbergMatrix: HessenbergMatrix[N] = HessenbergMatrix(vset.getColumns():_*)
+          //TODO hermitian, lowertri, uppertri, orthog
      }
-
-     /*implicit def matrixToJacobianMatrix[N:Number](mat: Matrix[N]): JacobianMatrix[N] =
-          JacobianMatrix(mat.getColumns():_*)*/
-
-     /*implicit def setVecToJacobian[N:Number](vset: SetOfVectors[N]): JacobianMatrix[N] =
-          JacobianMatrix(vset.getColumns():_*)*/
 }

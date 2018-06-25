@@ -9,8 +9,9 @@ import cats.Eq
   */
 //todo theorem 4.2.6 in howard: implement Eq for Span type
 
+//abstract class Span[V[_], W[_], F](implicit vec: VectorLike[V[F], F], w: SetVecLike[W[F], F]){
 
-trait Span[V, W, F] {
+trait Span[V, W, F]{
 
      // Returns a set that spans/generates the generic vecspace (gets the basis)
      def span(vset: W): W  //= s.rowReducedEchelon(vset)
@@ -36,7 +37,7 @@ trait Span[V, W, F] {
 
      // Gets the coefficients the relate the vset to the vector v in the linear combination.
      // They are:  k1v1 + k2v2 + k3v3 + ... = v, where vset = {v1,v2,v3...} and v = v.
-     def getSpanningCoefficients(vset: W, v: V): Option[List[F]]
+     def getSpanningCoefficients(vset: W, v: V): Option[Seq[F]]
 }
 
 

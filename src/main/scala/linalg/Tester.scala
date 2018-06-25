@@ -36,10 +36,15 @@ object Tester extends App {
      mat.rowReducedEchelon()
      mat.adjoint()
 
-     val m1: HilbertMatrix[Int] = HilbertMatrix(Vector(1,2,3), Vector(3,4,2))
+     val m1: JacobianMatrix[Int] = JacobianMatrix(Vector(1,2,3), Vector(3,4,2))
      m1.rowReducedEchelon()
      m1.adjoint()
      m1.dimension()
+
+     val m2: HilbertMatrix[Int] = HilbertMatrix(Vector(1,2,3), Vector(3,4,2))
+     m2.rowReducedEchelon()
+     m2.adjoint()
+     m2.dimension()
 
      mat + mat
 
