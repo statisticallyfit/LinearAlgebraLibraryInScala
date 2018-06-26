@@ -14,5 +14,6 @@ trait SetVecLikeSyntax extends VectorSpaceSyntax {
           def rowReducedEchelon(): S[N] = ev.rowReducedEchelon(current)
           def minus(other: S[N]): S[N] = ev.minus(current, other)
           def isZero: Boolean = ev.isZero(current)
+          def size(): (Int, Int) = ev.size(current)
      }
 }

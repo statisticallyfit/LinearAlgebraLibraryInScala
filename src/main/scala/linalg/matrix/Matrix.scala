@@ -25,8 +25,8 @@ object Matrix {
           Matrix.fromSeqs(ListBuffer.fill[N](ncols, nrows)(Number.ZERO[N]): _*)
 
      def IDENTITY[N: Number](mat: SetOfVectors[N]): Matrix[N] = {
-          val largestSize: Int = List(mat.numRows, mat.numCols).max
-          IDENTITY[N](largestSize)
+          //val largestSize: Int = List(mat.numRows, mat.numCols).max
+          IDENTITY[N](mat.dimension())
      }
 
      def IDENTITY[N: Number](size: Int): Matrix[N] = Util.identity[N](size).toMatrix

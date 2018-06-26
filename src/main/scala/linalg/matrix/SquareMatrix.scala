@@ -32,8 +32,8 @@ object SquareMatrix {
      def IDENTITY[N: Number](size:Int): SquareMatrix[N] = new SquareMatrix(Matrix.IDENTITY[N](size))
 
      def IDENTITY[N: Number](mat: Matrix[N]): SquareMatrix[N] = {
-          val largestSize: Int = List(mat.numRows, mat.numCols).max
-          IDENTITY[N](largestSize)
+          //val largestSize: Int = List(mat.numRows, mat.numCols).max
+          IDENTITY[N](mat.dimension())
      }
 
      def fromSeqs[N: Number](seqs: Seq[N]*): SquareMatrix[N] = SquareMatrix(seqs.map(aSeq => Vector(aSeq:_*)):_*)

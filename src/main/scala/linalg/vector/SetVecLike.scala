@@ -14,6 +14,7 @@ trait SetVecLike[V, F] extends VectorSpace[V, F]{
 
      def minus(v: V, w: V): V = plus(v, negate(w))
      def isZero(v: V): Boolean
+     def size(v: V): (Int, Int)
 }
 
 object SetVecLike {

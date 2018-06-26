@@ -46,6 +46,7 @@ class SetVecThings[N: Number] {
      class SetVecIsSetVecLike extends SetVecIsVectorSpace with SetVecLike[SetOfVectors[N], N]{
           def isZero(vset: SetOfVectors[N]): Boolean = Util.isZero(vset)
           def rowReducedEchelon(vset: SetOfVectors[N]): SetOfVectors[N] = Util.rowReducedEchelon[N](vset)
+          def size(mat: SetOfVectors[N]): (Int, Int) = Util.size(mat)
 
      }
 

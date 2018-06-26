@@ -50,7 +50,7 @@ class HilbertMatrixThings[N: Number] {
           def isZero(mat: HilbertMatrix[N]): Boolean = Util.isZero(mat)
           def rowReducedEchelon(mat: HilbertMatrix[N]): HilbertMatrix[N] =
                Util.rowReducedEchelon(mat).toHilbertMatrix
-
+          def size(mat: HilbertMatrix[N]): (Int, Int) = Util.size(mat)
      }
 
      class HilbertMatrixIsMatrixLike extends HilbertMatrixIsSetVecLike with MatrixLike[HilbertMatrix[N], N] {

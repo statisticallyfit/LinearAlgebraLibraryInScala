@@ -6,7 +6,7 @@ package linalg.theory.space
 trait RowSpace[R, F] extends VectorSpace[R, F] {
 
      def isInRowSpace(vset: R, v: R): Boolean
-     def rowSpaceBasis(vset: R): R
+     def rowSpace(vset: R): R // gets the basis of the rowspace of the vector set / matrix
 }
 
 

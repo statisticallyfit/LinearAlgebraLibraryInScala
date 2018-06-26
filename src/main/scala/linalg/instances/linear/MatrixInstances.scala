@@ -54,7 +54,7 @@ class MatrixThings[N: Number] {
      class MatrixIsSetVecLike extends MatrixIsVectorSpace with SetVecLike[Matrix[N], N]{
           def isZero(mat: Matrix[N]): Boolean = Util.isZero(mat)
           def rowReducedEchelon(mat: Matrix[N]): Matrix[N] = Util.rowReducedEchelon(mat).toMatrix
-
+          def size(mat: Matrix[N]): (Int, Int) = Util.size(mat)
      }
 
      class MatrixIsMatrixLike extends MatrixIsSetVecLike with MatrixLike[Matrix[N], N] {

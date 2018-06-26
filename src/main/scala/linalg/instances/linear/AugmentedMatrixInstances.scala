@@ -52,7 +52,7 @@ class AugmentedMatrixThings[N: Number] {
           def rowReducedEchelon(mat: AugmentedMatrix[N]): AugmentedMatrix[N] =
                AugmentedMatrix(mat.rrefA, mat.rrefB)
 
-
+          def size(mat: AugmentedMatrix[N]): (Int, Int) = Util.size(mat)
      }
 
      class AugmentedMatrixIsMatrixLike extends AugmentedMatrixIsSetVecLike with MatrixLike[AugmentedMatrix[N], N] {

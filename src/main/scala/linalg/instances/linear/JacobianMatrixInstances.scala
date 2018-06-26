@@ -56,6 +56,7 @@ class JacobianMatrixThings[N: Number] {
           def rowReducedEchelon(mat: JacobianMatrix[N]): JacobianMatrix[N] =
                Util.rowReducedEchelon(mat).toJacobianMatrix
 
+          def size(mat: JacobianMatrix[N]): (Int, Int) = Util.size(mat)
      }
 
      class JacobianMatrixIsMatrixLike extends JacobianMatrixIsSetVecLike with MatrixLike[JacobianMatrix[N], N] {

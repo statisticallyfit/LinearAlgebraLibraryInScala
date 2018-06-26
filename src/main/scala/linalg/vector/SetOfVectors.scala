@@ -93,8 +93,8 @@ object SetOfVectors {
      def IDENTITY[N: Number](size: Int):SetOfVectors[N] = Util.identity[N](size)
 
      def IDENTITY[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] ={
-          val largestSize: Int = List(vset.numRows, vset.numCols).max
-          IDENTITY[N](largestSize)
+          //val largestSize: Int = List(vset.numRows, vset.numCols).max
+          IDENTITY[N](vset.dimension()) //useful for finding rowspace etc, page 237 howard
      }
 
      def fromSeqs[N: Number](seqs: Seq[N]*): SetOfVectors[N] = SetOfVectors(seqs.map(aSeq => Vector(aSeq:_*)):_*)

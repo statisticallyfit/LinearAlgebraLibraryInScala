@@ -21,19 +21,20 @@ trait SetVecOps {
        * @return
        */
 
+     def size[N: Number](vset: SetOfVectors[N]): (Int, Int) = (vset.numRows, vset.numCols)
+
      def dimension[N: Number](vset: SetOfVectors[N]): Int = vset.getColumns().head.dimension()
 
      def eqv[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean = {
-          try {
-               Util.ensureSize(vset, wset)
-          } catch {
-               case _: Exception => false
+          vset.size() == wset.size() match {
+               case false => false
+               case true =>{
+                    //else if no exception ...
+                    vset.getColumns()
+                         .zip(wset.getColumns())
+                         .forall(colPair => Eq[Vector[N]].eqv(colPair._1, colPair._2))
+               }
           }
-
-          //else if no exception ...
-          vset.getColumns()
-               .zip(wset.getColumns())
-               .forall(colPair => Eq[Vector[N]].eqv(colPair._1, colPair._2))
      }
 
      def plus[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): SetOfVectors[N] ={
@@ -134,9 +135,15 @@ trait SetVecOps {
      }
 
      def linearlyIndependent[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean ={
-          val largestDim = Seq(vset.dimension(), wset.dimension()).max
-          val aug = AugmentedMatrix(vset + wset, SetOfVectors.ZERO[N](largestDim))
-          aug.rrefA === Matrix.IDENTITY[N](aug.rrefA)
+          vset.size() == wset.size() match {
+               case false => false
+               case true => {
+                    //TODO is it correct to use the numCols?
+                    val dim = Seq(vset.dimension(), wset.dimension()).max
+                    val aug = AugmentedMatrix(vset + wset, SetOfVectors.ZERO[N](dim))
+                    aug.rrefA === Matrix.IDENTITY[N](aug.rrefA)
+               }
+          }
      }
 
      def isLinearlyIndependent[N: Number](vset: SetOfVectors[N]): Boolean = {

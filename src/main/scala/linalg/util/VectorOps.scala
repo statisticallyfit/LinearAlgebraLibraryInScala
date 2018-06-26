@@ -94,6 +94,7 @@ trait VectorOps {
      def sumElements[N:Number](v: Vector[N]): N = v.getElements().reduceLeft[N](_ + _)
 
 
+
      def ensureSize[N:Number](v: Vector[N], w: Vector[N], SIZE: Int = 0): Unit = {
 
           SIZE match {
