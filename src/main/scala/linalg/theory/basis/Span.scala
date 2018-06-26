@@ -1,8 +1,8 @@
 package linalg.theory.basis
 
 import linalg._
-
 import cats.Eq
+import linalg.matrix.Matrix
 
 /**
   *
@@ -37,7 +37,7 @@ trait Span[V, W, F]{
 
      // Gets the coefficients the relate the vset to the vector v in the linear combination.
      // They are:  k1v1 + k2v2 + k3v3 + ... = v, where vset = {v1,v2,v3...} and v = v.
-     def getSpanningCoefficients(vset: W, v: V): Option[Seq[F]]
+     def getSpanningCoefficients(vset: W, v: V): Option[W]
 }
 
 

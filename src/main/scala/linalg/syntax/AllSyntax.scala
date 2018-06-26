@@ -28,9 +28,10 @@ trait AllSyntax
      with NormedVectorSpaceSyntax
      with VectorLikeSyntax
      with SetVecLikeSyntax
-     with LinearIndependenceSyntax
      with MatrixLikeSyntax
+     with LinearIndependenceSyntax
      with LinearSystemSyntax
+     with SpanSyntax
 
 
 

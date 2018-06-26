@@ -4,7 +4,7 @@ import linalg._
 import linalg.implicits._
 import linalg.vector.{SetOfVectors, Vector}
 import cats.Eq
-import linalg.matrix.Matrix
+import linalg.matrix.{AugmentedMatrix, Matrix}
 
 import scala.collection.mutable.{ListBuffer, Seq}
 import scala.util.control.Breaks.{break, breakable}
@@ -64,6 +64,22 @@ trait SetVecOps {
      }
 
      def span[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = rowReducedEchelon(vset)
+
+     def doesSetSpanTheSpace[N: Number](vset: SetOfVectors[N]): Boolean ={
+          val system = AugmentedMatrix(vset, Matrix.IDENTITY[N](vset))
+          system.isConsistent()
+     }
+
+     def doesSetSpanTheVector[N: Number](vset: SetOfVectors[N], v: Vector[N]): Boolean ={
+          val system = AugmentedMatrix(vset, v)
+          system.isConsistent()
+     }
+
+     def getSpanningCoefficients[N: Number](vset: SetOfVectors[N], v: Vector[N]): Option[Matrix[N]] ={
+          AugmentedMatrix(vset, v).solve()
+     }
+
+
 
 
 

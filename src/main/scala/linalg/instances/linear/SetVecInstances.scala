@@ -62,21 +62,11 @@ class SetVecThings[N: Number] {
      class SetVecSpan extends SetVecIsSetVecLike with Span[Vector[N], SetOfVectors[N], N]{
 
           def span(vset: SetOfVectors[N]): SetOfVectors[N] = Util.span(vset)
-          def doesSetSpanTheSpace(vset: SetOfVectors[N]): Boolean ={
-               val system = AugmentedMatrix(vset, Matrix.IDENTITY[N](vset))
-               system.isConsistent()
-          }
-
-          def doesSetSpanTheVector(vset: SetOfVectors[N], v: Vector[N]): Boolean ={
-               val system = AugmentedMatrix(vset, v)
-               system.isConsistent()
-          }
-
-          def getSpanningCoefficients(vset: SetOfVectors[N], v: Vector[N]): Option[List[N]] ={
-               doesSetSpanTheVector(vset, v) match {
-                    case true => 
-               }
-          }
+          def doesSetSpanTheSpace(vset: SetOfVectors[N]): Boolean = Util.doesSetSpanTheSpace(vset)
+          def doesSetSpanTheVector(vset: SetOfVectors[N], v: Vector[N]): Boolean =
+               Util.doesSetSpanTheVector(vset, v)
+          def getSpanningCoefficients(vset: SetOfVectors[N], v: Vector[N]): Option[Matrix[N]] =
+               Util.getSpanningCoefficients(vset, v)
      }
 
      //val absolute = new SetVecHasAbsoluteValue
@@ -86,17 +76,19 @@ class SetVecThings[N: Number] {
      val abelian = new SetVecIsAbelianGroup
      val vectorSpace = new SetVecIsVectorSpace
      val vsetLike = new SetVecIsSetVecLike
+     val span = new SetVecSpan
 }
 
 trait SetVecInstances {
 
      //implicit final def setVecHasAbsoluteValue[N: Number] = new SetVecThings[N].absolute
+     implicit final def setVecHasEq[N: Number] = new SetVecThings[N].eq
+     implicit final def setVecHasDimension[N: Number] = new SetVecThings[N].dim
      implicit final def setVecIsMonoid[N: Number] = new SetVecThings[N].monoid
      implicit final def setVecIsAbelianGroup[N: Number] = new SetVecThings[N].abelian
      implicit final def setVecIsVectorSpace[N: Number] = new SetVecThings[N].vectorSpace
      implicit final def setVecIsSetVecLike[N: Number] = new SetVecThings[N].vsetLike
-     implicit final def setVecHasEq[N: Number] = new SetVecThings[N].eq
-     implicit final def setVecHasDimension[N: Number] = new SetVecThings[N].dim
+     implicit final def setVecHasSpan[N: Number] = new SetVecThings[N].span
 }
 
 
