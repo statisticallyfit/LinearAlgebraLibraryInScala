@@ -15,7 +15,8 @@ trait SpanSyntax {
           def span(): W[N] = ev.span(current)
           def doesSetSpanTheSpace(): Boolean = ev.doesSetSpanTheSpace(current)
           def doesSetSpanTheVector(vector: V[N]): Boolean = ev.doesSetSpanTheVector(current, vector)
-          def isSpanned(vector: V[N]): Boolean = ev.isSpannedBy(vector, current)
+          def isSpanned(vector: V[N]): Boolean = ev.isInSpan(vector, current)
+          def isInSpan(vector: V[N]): Boolean = ev.isInSpan(vector, current) //same, different wording.
           def getSpanningCoefficients(vector: V[N]): Option[W[N]] = ev.getSpanningCoefficients(current, vector)
      }
 }

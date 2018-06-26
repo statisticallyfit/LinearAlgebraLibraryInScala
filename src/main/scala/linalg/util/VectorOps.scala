@@ -74,12 +74,8 @@ trait VectorOps {
                .forall(vwElemPair => vwElemPair._1 :==: vwElemPair._2)
      }
 
-     def linearlyIndependent[N: Number](v: Vector[N], w: Vector[N]): Boolean ={
-          val rref: SetOfVectors[N] = Util.rowReducedEchelon[N](SetOfVectors(v, w))
-          val rrefSquare: SetOfVectors[N] = SetOfVectors(Util.expressRowsAsCols[N](rref.getRowsAt(0, 1)):_*)
-          //rref :==: SetOfVectors.IDENTITY[N](2)
-          ???
-     }
+     def linearlyIndependent[N: Number](v: Vector[N], w: Vector[N]): Boolean =
+          Util.isLinearlyIndependent(Util.colCombine(v, w))
 
      def isLinearlyIndependent[N: Number](v: Vector[N]): Boolean = true //yes a single vector is lin indep.
 

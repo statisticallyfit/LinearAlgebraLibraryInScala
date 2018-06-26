@@ -69,14 +69,35 @@ class SetVecThings[N: Number] {
                Util.getSpanningCoefficients(vset, v)
      }
 
+     class SetVecBasis extends Basis[Vector[N], SetOfVectors[N], N]{
+          def basis(vset: SetOfVectors[N]): SetOfVectors[N] = Util.span(vset)
+          def isBasisOfSpace(vset: SetOfVectors[N]): Boolean = Util.doesSetSpanTheSpace(vset)
+          def isBasisOfVector(vset: SetOfVectors[N], v: Vector[N]): Boolean =
+               Util.doesSetSpanTheVector(vset, v)
+     }
+
+     class SetVecCanHaveLinearIndependence extends LinearIndependence[SetOfVectors[N]] {
+
+          def linearlyIndependent(vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean =
+               Util.linearlyIndependent(vset, wset)
+          def isLinearlyIndependent(vset: SetOfVectors[N]): Boolean = Util.isLinearlyIndependent(vset)
+     }
+
+     class SetVecHasRank extends Rank[SetOfVectors[N]] {
+          def rank(vset: SetOfVectors[N]): Int = Util.rank(vset)
+     }
+
      //val absolute = new SetVecHasAbsoluteValue
      val eq = new SetVecHasEq
      val dim = new SetVecHasDimension
      val monoid = new SetVecIsMonoid
      val abelian = new SetVecIsAbelianGroup
      val vectorSpace = new SetVecIsVectorSpace
-     val vsetLike = new SetVecIsSetVecLike
+     val setVecLike = new SetVecIsSetVecLike
      val span = new SetVecSpan
+     val basis = new SetVecBasis
+     val independence = new SetVecCanHaveLinearIndependence
+     val rank = new SetVecHasRank
 }
 
 trait SetVecInstances {
@@ -87,8 +108,11 @@ trait SetVecInstances {
      implicit final def setVecIsMonoid[N: Number] = new SetVecThings[N].monoid
      implicit final def setVecIsAbelianGroup[N: Number] = new SetVecThings[N].abelian
      implicit final def setVecIsVectorSpace[N: Number] = new SetVecThings[N].vectorSpace
-     implicit final def setVecIsSetVecLike[N: Number] = new SetVecThings[N].vsetLike
+     implicit final def setVecIsSetVecLike[N: Number] = new SetVecThings[N].setVecLike
      implicit final def setVecHasSpan[N: Number] = new SetVecThings[N].span
+     implicit final def setVecHasBasis[N: Number] = new SetVecThings[N].basis
+     implicit final def setVecCanHaveLinearIndependence[N: Number] = new SetVecThings[N].independence
+     implicit final def setVecHasRank[N: Number] = new SetVecThings[N].rank
 }
 
 

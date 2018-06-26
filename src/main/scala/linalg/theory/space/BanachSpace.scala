@@ -9,6 +9,7 @@ package linalg.theory.space
   *
   */
 
+/*
 trait BanachSpace[B, F] extends NormedVectorSpace[B, F] {
 
      // |⋅| : B → F
@@ -20,4 +21,4 @@ trait BanachSpace[B, F] extends NormedVectorSpace[B, F] {
 
 object BanachSpace {
      @inline final def apply[B, F](implicit ev: BanachSpace[B, F]): BanachSpace[B, F] = ev
-}
+}*/

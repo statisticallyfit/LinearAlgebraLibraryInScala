@@ -184,7 +184,7 @@ class AugmentedMatrixThings[N: Number] {
      val monoid = new AugmentedMatrixIsMonoid
      val abelian = new AugmentedMatrixIsAbelianGroup
      val vectorSpace = new AugmentedMatrixIsVectorSpace
-     val vsetLike = new AugmentedMatrixIsSetVecLike
+     val setVecLike = new AugmentedMatrixIsSetVecLike
      val matrixLike = new AugmentedMatrixIsMatrixLike
      val linearSystem = new AugmentedMatrixIsLinearSystem
 }
@@ -196,7 +196,7 @@ trait AugmentedMatrixInstances {
      implicit final def augMatrixIsMonoid[N: Number] = new AugmentedMatrixThings[N].monoid
      implicit final def augMatrixIsAbelianGroup[N: Number] = new AugmentedMatrixThings[N].abelian
      implicit final def augMatrixIsVectorSpace[N: Number] = new AugmentedMatrixThings[N].vectorSpace
-     implicit final def augMatrixIsSetVecLike[N: Number] = new AugmentedMatrixThings[N].vsetLike
+     implicit final def augMatrixIsSetVecLike[N: Number] = new AugmentedMatrixThings[N].setVecLike
      implicit final def augMatrixHasEq[N: Number] = new AugmentedMatrixThings[N].eq
      implicit final def augMatrixHasDimension[N: Number] = new AugmentedMatrixThings[N].dim
      implicit final def augMatrixIsMatrixLike[N: Number] = new AugmentedMatrixThings[N].matrixLike

@@ -87,7 +87,7 @@ class JacobianMatrixThings[N: Number] {
      val monoid = new JacobianMatrixIsMonoid
      val abelian = new JacobianMatrixIsAbelianGroup
      val vectorSpace = new JacobianMatrixIsVectorSpace
-     val vsetLike = new JacobianMatrixIsSetVecLike
+     val setVecLike = new JacobianMatrixIsSetVecLike
      val matrixLike = new JacobianMatrixIsMatrixLike
 }
 
@@ -98,7 +98,7 @@ trait JacobianMatrixInstances {
      implicit final def jacobianMatrixIsMonoid[N: Number] = new JacobianMatrixThings[N].monoid
      implicit final def jacobianMatrixIsAbelianGroup[N: Number] = new JacobianMatrixThings[N].abelian
      implicit final def jacobianMatrixIsVectorSpace[N: Number] = new JacobianMatrixThings[N].vectorSpace
-     implicit final def jacobianMatrixIsSetVecLike[N: Number] = new JacobianMatrixThings[N].vsetLike
+     implicit final def jacobianMatrixIsSetVecLike[N: Number] = new JacobianMatrixThings[N].setVecLike
      implicit final def jacobianMatrixHasEq[N: Number] = new JacobianMatrixThings[N].eq
      implicit final def jacobianMatrixHasDimension[N: Number] = new JacobianMatrixThings[N].dim
      implicit final def jacobianMatrixIsMatrixLike[N: Number] = new JacobianMatrixThings[N].matrixLike

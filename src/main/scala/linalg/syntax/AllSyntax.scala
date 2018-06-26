@@ -32,6 +32,7 @@ trait AllSyntax
      with LinearIndependenceSyntax
      with LinearSystemSyntax
      with SpanSyntax
+     with BasisSyntax
 
 
 

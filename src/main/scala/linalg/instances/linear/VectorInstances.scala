@@ -85,7 +85,7 @@ class VectorThings[N: Number]{
      val vectorLike = new VectorIsVectorLike
      val dim = new VectorHasDimension
      val eq = new VectorHasEq
-     val linearIndep = new VectorCanHaveLinearIndependence
+     val independence = new VectorCanHaveLinearIndependence
 }
 
 
@@ -100,6 +100,6 @@ trait VectorInstances {
      implicit final def vectorIsLikeAVector[N: Number] = new VectorThings[N].vectorLike
      implicit final def vectorHasDimension[N: Number] = new VectorThings[N].dim
      implicit final def vectorHasEq[N: Number] = new VectorThings[N].eq
-     implicit final def vectorCanBeLinearlyIndependent[N: Number] = new VectorThings[N].linearIndep
+     implicit final def vectorCanBeLinearlyIndependent[N: Number] = new VectorThings[N].independence
 }
 

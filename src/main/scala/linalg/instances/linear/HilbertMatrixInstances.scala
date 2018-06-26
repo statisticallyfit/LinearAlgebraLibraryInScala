@@ -82,7 +82,7 @@ class HilbertMatrixThings[N: Number] {
      val monoid = new HilbertMatrixIsMonoid
      val abelian = new HilbertMatrixIsAbelianGroup
      val vectorSpace = new HilbertMatrixIsVectorSpace
-     val vsetLike = new HilbertMatrixIsSetVecLike
+     val setVecLike = new HilbertMatrixIsSetVecLike
      val matrixLike = new HilbertMatrixIsMatrixLike
 }
 
@@ -93,7 +93,7 @@ trait HilbertMatrixInstances {
      implicit final def hilbertMatrixIsMonoid[N: Number] = new HilbertMatrixThings[N].monoid
      implicit final def hilbertMatrixIsAbelianGroup[N: Number] = new HilbertMatrixThings[N].abelian
      implicit final def hilbertMatrixIsVectorSpace[N: Number] = new HilbertMatrixThings[N].vectorSpace
-     implicit final def hilbertMatrixIsSetVecLike[N: Number] = new HilbertMatrixThings[N].vsetLike
+     implicit final def hilbertMatrixIsSetVecLike[N: Number] = new HilbertMatrixThings[N].setVecLike
      implicit final def hilbertMatrixHasEq[N: Number] = new HilbertMatrixThings[N].eq
      implicit final def hilbertMatrixHasDimension[N: Number] = new HilbertMatrixThings[N].dim
      implicit final def hilbertMatrixIsMatrixLike[N: Number] = new HilbertMatrixThings[N].matrixLike

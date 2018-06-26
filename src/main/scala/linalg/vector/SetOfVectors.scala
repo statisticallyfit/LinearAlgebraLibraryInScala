@@ -81,11 +81,18 @@ object SetOfVectors {
      def ZERO[N: Number](numCols: Int, numRows: Int): SetOfVectors[N] =
           SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number[N].zero):_*)
 
+     def ZERO[N: Number](n: Int): SetOfVectors[N] = ZERO(n, n)
+
      def ONE[N: Number](numCols: Int, numRows: Int): SetOfVectors[N] =
           SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number[N].one):_*)
 
      def IDENTITY[N: Number](size: Int)(implicit ev: SetVecLike[SetOfVectors[N], N]):SetOfVectors[N] =
           ev.identity(size)
+
+     def IDENTITY[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] ={
+          val largestSize: Int = List(vset.numRows, vset.numCols).max
+          IDENTITY[N](largestSize)
+     }
 
      def fromSeqs[N: Number](seqs: Seq[N]*): SetOfVectors[N] = SetOfVectors(seqs.map(aSeq => Vector(aSeq:_*)):_*)
 

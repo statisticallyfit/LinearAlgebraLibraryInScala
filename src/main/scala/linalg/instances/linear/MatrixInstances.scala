@@ -85,7 +85,7 @@ class MatrixThings[N: Number] {
      val monoid = new MatrixIsMonoid
      val abelian = new MatrixIsAbelianGroup
      val vectorSpace = new MatrixIsVectorSpace
-     val vsetLike = new MatrixIsSetVecLike
+     val setVecLike = new MatrixIsSetVecLike
      val matrixLike = new MatrixIsMatrixLike
 }
 
@@ -96,7 +96,7 @@ trait MatrixInstances {
      implicit final def matrixIsMonoid[N: Number] = new MatrixThings[N].monoid
      implicit final def matrixIsAbelianGroup[N: Number] = new MatrixThings[N].abelian
      implicit final def matrixIsVectorSpace[N: Number] = new MatrixThings[N].vectorSpace
-     implicit final def matrixIsSetVecLike[N: Number] = new MatrixThings[N].vsetLike
+     implicit final def matrixIsSetVecLike[N: Number] = new MatrixThings[N].setVecLike
      implicit final def matrixHasEq[N: Number] = new MatrixThings[N].eq
      implicit final def matrixHasDimension[N: Number] = new MatrixThings[N].dim
      implicit final def matrixIsMatrixLike[N: Number] = new MatrixThings[N].matrixLike

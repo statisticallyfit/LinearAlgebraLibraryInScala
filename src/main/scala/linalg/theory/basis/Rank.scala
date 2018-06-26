@@ -1,17 +1,16 @@
 package linalg.theory.basis
 
 
-import linalg._
 
 /**
   *
   *
   */
-trait Rank[V, F] extends VectorSpace[V, F] {
+trait Rank[V]  {
 
      def rank(vectorSpace: V): Int
 }
 
 object Rank {
-     @inline final def apply[V,F](implicit ev: Rank[V,F]): Rank[V,F] = ev
+     @inline final def apply[V](implicit ev: Rank[V]): Rank[V] = ev
 }

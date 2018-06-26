@@ -29,7 +29,7 @@ trait InnerProductSpace[I, F] extends VectorSpace[I, F] { self =>
      def innerProduct(i1: I, i2: I): F
      def dotProduct(i1: I, i2: I): F = innerProduct(i1, i2)
 
-     def normed(implicit ev: Root[F,F]): NormedVectorSpace[I, F] = ???/*new NormedInnerProductSpace[I, F] {
+     /*def normed(implicit ev: Root[F,F]): NormedVectorSpace[I, F] = new NormedInnerProductSpace[I, F] {
           val root: Root[F,F] = ev
           val innerSpace: InnerProductSpace[I, F] = self
 

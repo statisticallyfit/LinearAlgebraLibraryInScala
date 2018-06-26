@@ -35,11 +35,11 @@ package object linalg {
      val Show = linalg.kernel.Show
 
      //theory stuff
-     type Basis[B, F] = linalg.theory.basis.Basis[B, F]
-     type Dimension[V] = linalg.theory.basis.Dimension[V]
-     type LinearIndependence[V] = linalg.theory.basis.LinearIndependence[V]
-     type Rank[V, F] = linalg.theory.basis.Rank[V, F]
+     type Basis[V, B, F] = linalg.theory.basis.Basis[V, B, F]
      type Span[V, W, F] = linalg.theory.basis.Span[V, W, F]
+     type LinearIndependence[V] = linalg.theory.basis.LinearIndependence[V]
+     type Rank[V] = linalg.theory.basis.Rank[V]
+     type Dimension[V] = linalg.theory.basis.Dimension[V]
      type Transformation[V, W] = linalg.theory.basis.Transformation[V, W]
      val Basis = linalg.theory.basis.Basis
      val Dimension = linalg.theory.basis.Dimension

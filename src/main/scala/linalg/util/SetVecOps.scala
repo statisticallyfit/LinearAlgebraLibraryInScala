@@ -79,14 +79,26 @@ trait SetVecOps {
           AugmentedMatrix(vset, v).solve()
      }
 
+     def linearlyIndependent[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean ={
+          val largestDim = Seq(vset.dimension(), wset.dimension()).max
+          val aug = AugmentedMatrix(vset + wset, SetOfVectors.ZERO[N](largestDim))
+          aug.rrefA === Matrix.IDENTITY[N](aug.rrefA)
+     }
+
+     def isLinearlyIndependent[N: Number](vset: SetOfVectors[N]): Boolean = {
+          vset.rowReducedEchelon() === SetOfVectors.IDENTITY(vset)
+     }
+
+     def rank[N: Number](vset: SetOfVectors[N]): Int = {
+          val rref: SetOfVectors[N] = Util.rowReducedEchelon(vset)
+          rref.getRows().count(row => ! row.isZero)
+     }
 
 
 
 
 
-
-
-     // Utils
+     // Utils ------------------------------------------------------------------------------------
 
      def colCombine[N:Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): SetOfVectors[N] =
           SetOfVectors((vset.getColumns() ++ wset.getColumns()):_*)
