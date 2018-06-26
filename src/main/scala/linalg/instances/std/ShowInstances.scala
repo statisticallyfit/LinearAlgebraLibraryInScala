@@ -21,14 +21,13 @@ trait ShowInstances {
 
      implicit object DoubleHasShow extends Show[Double] {
           def show(x: Double): String = {
-               if(x == 0) "0" else x.toString
+               if(x == 0) {
+                    "0"
+               } else {
+                    val (first, last): (String, String) = x.toString.splitAt(x.toString.indexOf("."))
 
-               val (first, last): (String, String) = x.toString.splitAt(x.toString.indexOf("."))
-
-               if(last.toDouble == 0){
-                    if(first.toDouble == 0) "0" //getting rid of minus sign in cases like "-0.0"
-                    else first
-               } else x.toString
+                    if(last.toDouble == 0) first else x.toString
+               }
           }
      }
 

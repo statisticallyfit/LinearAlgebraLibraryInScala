@@ -137,28 +137,37 @@ object Tester extends App {
 
 
      // set vec linalg things
-     val vset: SetOfVectors[Real] = SetOfVectors(
+     val vset1: SetOfVectors[Real] = SetOfVectors(
           Vector(1.0,2.0,0.0,2.0),Vector(3.0,6.0,0.0,6.0), Vector(-2.0,-5.0,5.0,0.0), Vector(0.0,-2.0,10.0,8.0),
           Vector(2.0,4.0,0.0,4.0), Vector(0.0,-3.0,15.0,18.0)
      )
      val b: Vector[Real] = Vector(0.0,-1.0,5.0,6.0)
+     println("\n\nvset1: " + vset1)
+
+     val aug1: AugmentedMatrix[Real] = AugmentedMatrix(vset1, b)
+     println("Augmented: " + aug1)
+
+     val augref1 = aug1.rowReducedEchelon()
+     println("Aug rref: " + augref1)
+     println("Augmented solved: " + aug1.solve())
 
 
-     println("HERE: " + Real(-0.0))
 
-     /*val vset: SetOfVectors[Rational] = SetOfVectors(
+
+
+     val vset2: SetOfVectors[Rational] = SetOfVectors(
           Vector(1,2,0,2),Vector(3,6,0,6), Vector(-2,-5,5,0), Vector(0,-2,10,8),
           Vector(2,4,0,4), Vector(0,-3,15,18)
      )
-     val b: Vector[Rational] = Vector(0,-1,5,6)*/
-     println("\n\nvset: " + vset)
+     val b2: Vector[Rational] = Vector(0,-1,5,6)
+     println("\n\nvset2: " + vset2)
 
-     val aug: AugmentedMatrix[Real] = AugmentedMatrix(vset, b)
-     println("Augmented: " + aug)
+     val aug2: AugmentedMatrix[Rational] = AugmentedMatrix(vset2, b2)
+     println("Augmented2: " + aug2)
 
-     val augref = aug.rowReducedEchelon()
-     println("Aug rref: " + augref)
-     println("Augmented solved: " + aug.solve())
+     val augref2 = aug2.rowReducedEchelon()
+     println("Aug rref2: " + augref2)
+     println("Augmented solved: " + aug2.solve())
 
 
 
