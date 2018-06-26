@@ -14,8 +14,8 @@ class AugmentedMatrix[N: Number](val A: SetOfVectors[N], val B: SetOfVectors[N])
      extends Matrix[N](Util.colCombine(A, B).getColumns():_*) {
 
 
-     val rrefAll: AugmentedMatrix[N] = Util.rowReducedEchelon(this).toAugMatrix
-     val rrefA: SetOfVectors[N] = A.rowReducedEchelon() //note implicit vecset => matrix
+     val rrefAll: SetOfVectors[N] = Util.rowReducedEchelon(this)
+     val rrefA: SetOfVectors[N] = SetOfVectors(rrefAll.getColumns().take(A.numCols):_*)
      val rrefB: SetOfVectors[N] = SetOfVectors(rrefAll.getColumns().takeRight(B.numCols):_*)
 
      override def toString: String = Show[AugmentedMatrix[N]].show(this)
@@ -35,8 +35,13 @@ object AugmentedMatrix {
      def apply[N: Number](A: SetOfVectors[N], b: Vector[N]): AugmentedMatrix[N] =
           new AugmentedMatrix[N](A, Matrix(b))
 
-     def apply[N: Number](cols: Vector[N]*): AugmentedMatrix[N] =
-          new AugmentedMatrix[N](Matrix(cols.dropRight(1):_*), Matrix(cols.last))
+     def apply[N: Number](cols: Vector[N]*): AugmentedMatrix[N] ={
+          if(cols.length == 1){
+               AugmentedMatrix(Matrix(cols:_*))
+          } else { //if length is 2 or greater
+               AugmentedMatrix(Matrix(cols.dropRight(1):_*), Matrix(cols.last))
+          }
+     }
 
      def apply[N: Number](nr: Int, nc: Int): AugmentedMatrix[N] = AugmentedMatrix.ZERO[N](nr, nc)
 
@@ -45,7 +50,7 @@ object AugmentedMatrix {
 
      def IDENTITY[N: Number](size: Int): AugmentedMatrix[N] = Util.identity[N](size).toAugMatrix
 
-     def fromSeqs[N: Number](seqs: Seq[N]*): AugmentedMatrix[N] = AugmentedMatrix(seqs.map(aSeq => Vector(aSeq:_*)):_*)
+     def fromSeqs[N: Number](seqs: Seq[N]*): AugmentedMatrix[N] = AugmentedMatrix(seqs.map(_.toVec):_*)
 
      //assume data is along column
      def fromSingleSeq[N: Number](numRows: Int, numCols: Int, seq: Seq[N]): AugmentedMatrix[N] =

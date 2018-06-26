@@ -1,10 +1,14 @@
-import linalg.util.Util
-import linalg.vector.{SetOfVectors, Vector}
-import linalg.implicits._
+val x = 0.333
 
 
-val vset = SetOfVectors(
-     Vector(1,2,2,-1),Vector(-3,-6,-6,3) , Vector(4,9,9,-4), Vector(-2,-1,-1,2),
-     Vector(5,8,9,-5), Vector(4,2,7,-4)
-)
-Util.getIndicesOfFreeColumns(vset.rowReducedEchelon())
+
+val (first, last): (String, String) = x.toString.splitAt(x.toString.indexOf("."))
+
+if(last.toDouble == 0){
+     if(first.toDouble == 0) "0" //getting rid of minus sign in cases like "-0.0"
+     else first
+} else {
+
+     x.toString
+}
+

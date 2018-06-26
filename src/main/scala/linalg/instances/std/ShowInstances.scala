@@ -19,9 +19,20 @@ trait ShowInstances {
 
      implicit object IntHasShow extends Show[Int] {def show(x: Int): String = x.toString}
 
-     implicit object DoubleHasShow extends Show[Double] {def show(x: Double): String = x.toString}
+     implicit object DoubleHasShow extends Show[Double] {
+          def show(x: Double): String = {
+               if(x == 0) "0" else x.toString
 
-     implicit object RealHasShow extends Show[Real] { def show(x: Real): String = x.double.toString }
+               val (first, last): (String, String) = x.toString.splitAt(x.toString.indexOf("."))
+
+               if(last.toDouble == 0){
+                    if(first.toDouble == 0) "0" //getting rid of minus sign in cases like "-0.0"
+                    else first
+               } else x.toString
+          }
+     }
+
+     implicit object RealHasShow extends Show[Real] { def show(x: Real): String = x.double.show }
 
 
      implicit object RationalHasShow extends Show[Rational] {

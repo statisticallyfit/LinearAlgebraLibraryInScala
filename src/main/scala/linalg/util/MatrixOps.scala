@@ -2,10 +2,11 @@ package linalg.util
 
 import linalg._
 import linalg.implicits._
-import linalg.matrix.{Matrix, SquareMatrix}
-import linalg.vector.Vector
+import linalg.matrix.{AugmentedMatrix, Matrix, SquareMatrix}
+import linalg.vector.{SetOfVectors, Vector}
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, Seq}
+import scala.util.control.Breaks.{break, breakable}
 
 /**
   *
@@ -47,7 +48,7 @@ trait MatrixOps {
      def cofactor[N: Number](mat: Matrix[N]): Matrix[N] ={
 
           val indexes: IndexedSeq[(Int, Int)] = for(r <- 0 until mat.numRows; c <- 0 until mat.numCols) yield (r, c)
-          val cofactors: Seq[N] = indexes.map(indexPair => cofactor(mat, indexPair._1, indexPair._2))
+          val cofactors = indexes.map(indexPair => cofactor(mat, indexPair._1, indexPair._2))
           transpose(Matrix.fromSeq(mat.numRows, mat.numCols, cofactors))
      }
 
@@ -58,7 +59,7 @@ trait MatrixOps {
 
      def minor[N: Number](mat: Matrix[N]): Matrix[N] ={
           val indexes: IndexedSeq[(Int, Int)] = for(r <- 0 until mat.numRows; c <- 0 until mat.numCols) yield (r, c)
-          val minors: Seq[N] = indexes.map(indexPair => minor(mat, indexPair._1, indexPair._2))
+          val minors = indexes.map(indexPair => minor(mat, indexPair._1, indexPair._2))
           transpose(Matrix.fromSeq(mat.numRows, mat.numCols, minors)) //isrow=true since we travel along rows.
      }
 
@@ -103,6 +104,127 @@ trait MatrixOps {
           }
           Util.sumElements(diag)
      }
+
+
+
+
+     def isInconsistent[N: Number](mat: AugmentedMatrix[N]): Boolean = {
+          //does there exist a zero row in rrefA where the same row has consts in the rrefB?
+          mat.rrefAll.getRows().exists(row => row.getElements().init.forall(_.isZero) &&
+               row.getElements().drop(mat.A.numCols).exists(elem => ! elem.isZero))
+     }
+
+     //Assume: the system of equations is in matrix A and the user has passed the correct
+     // identity matrix as matrix B. //TODO correct? Or just skip B and make the correct identity mat here???
+     def hasUniqueSolution[N: Number](mat: AugmentedMatrix[N]): Boolean =
+          mat.rrefA === Matrix.IDENTITY[N](mat.rrefA)
+
+
+     def hasInfiniteSolutions[N: Number](mat: AugmentedMatrix[N]): Boolean = {
+          mat.isConsistent() && mat.rrefA === Matrix.IDENTITY[N](mat.rrefA)
+     }
+
+     def infiniteSolutionSolver[N: Number](mat: AugmentedMatrix[N]): Matrix[N] ={
+          //get the indices of free cols
+          val freeIndices: Array[Int] = Util.getIndicesOfFreeColumns(mat.rrefA)
+          //get the freecolumns and attach to each column another zero vector to make it length = numcolsrref
+          val freeCols: List[Vector[N]] = mat.rrefA.getColumns().zipWithIndex
+               .filter(colIndexPair => freeIndices.contains(colIndexPair._2)).map(_._1).toList
+
+          //STEP 1: make the matrix of free cols
+          var free: Matrix[N] = Matrix[N](freeCols:_*)
+          //remove any zero rows
+          free = Matrix(free.getRows().filterNot(vec => vec.isZero):_*).transpose() //transpose so rows again
+          //STEP 2: minus the B rows with nonzero free rows (Brows - freerows), this can just be multiplied by -1
+          // since if hwe have just free variable cols then the constants will not minus these.
+          free = free.scale(Number[N].one.negate())
+          //new Matrix(B.getRows().take(free.numRows).zip(free.getRows()).map(p => p._1 - p._2):_*).transpose()
+
+          // make new "matrix" from listbuffer that is old rref transposed with numcol = numfree and zeroes
+          // everywhere but in row positions where free col positions we put rows of identity matrix
+          val id: Seq[Seq[N]] = Matrix.IDENTITY[N](free.numCols).getRows().map(_.getElements())
+          val sol: Seq[Seq[N]] = Seq.fill[N](mat.rrefA.numCols, free.numCols)(Number.ZERO[N])
+          val freeRows: Seq[Seq[N]] = free.getRows().map(_.getElements())
+          //fill the row pos with identity rows corresponding to free col pos
+          var freeRowIndex: Int = 0
+          var idRowIndex: Int = 0
+          var r:Int = 0
+          while(r < sol.length) {
+               if(freeIndices.contains(r)) {
+                    breakable {
+                         if(idRowIndex >= id.length) break
+                         //else
+                         sol(r) = id(idRowIndex)
+                         idRowIndex = idRowIndex + 1
+                    }
+               } else {
+                    breakable {
+                         if(freeRowIndex >= freeRows.length) break
+                         //else, it's a zero row and then put the free col rows in it
+                         sol(r) = freeRows(freeRowIndex)
+                         freeRowIndex = freeRowIndex + 1
+                    }
+               }
+               r = r + 1
+          }
+
+          val solution: Matrix[N] = Matrix.fromSeqs(sol:_*).transpose()
+
+
+          //TODO separate this part to be getParticularSolution() and getGeneralSolution()
+          //TODO from page 240 of howard
+          //then add the B cols to the front of our solution, never the case for kernel where B={0}
+          if(mat.B.isZero)
+               solution
+          else {
+               //else making constants column and elongating it such that it is as long as solution numrows
+               // Step 1: first get the pivot indexes (where pivot 1)
+               val indices: Array[Int] = (0 until mat.rrefA.numCols).toArray
+               val pivotIndices: Array[Int] = indices.diff(freeIndices)
+               // Step 2: zip pivotindices with rrefB - assert always will be same length since
+               // it's sliced from rrefThis. Filter to get tuples with nonzero rrefB elements.
+               val tuples = pivotIndices.zip(Util.expressColsAsRows(mat.rrefB))
+               val tuplesNoZeroRows = tuples.filter({
+                    case (index, vec) => ! vec.getElements().forall(e => e.isZero)
+               })
+               // Step 3: fill zeroes between the elements indices.
+               val maxIndex: Int = tuplesNoZeroRows.map(_._1).max // get max index to make list
+
+               var newRrefB: Seq[Vector[N]] =
+                    Util.expressColsAsRows(Matrix.ZERO[N](maxIndex + 1,
+                         mat.rrefB.numCols))
+
+               // inserting the elements in the tuples at the indices.
+               for((index, vec) <- tuplesNoZeroRows){
+                    newRrefB = Util.insertVec(vec, index, newRrefB)
+               }
+               newRrefB = Util.expressRowsAsCols(newRrefB)
+
+               Util.colCombine(Matrix(newRrefB:_*), solution).toMatrix
+          }
+     }
+
+     def solve[N: Number](mat: AugmentedMatrix[N]): Option[Matrix[N]] ={
+          if(mat.hasNoSolution()) None
+          else if(hasUniqueSolution(mat)) Some(Matrix[N](mat.rrefAll.getColumns().takeRight(mat.B.numCols):_*))
+          else Some(infiniteSolutionSolver(mat))
+     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

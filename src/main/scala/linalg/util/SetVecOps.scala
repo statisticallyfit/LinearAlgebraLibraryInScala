@@ -24,8 +24,13 @@ trait SetVecOps {
      def dimension[N: Number](vset: SetOfVectors[N]): Int = vset.getColumns().head.dimension()
 
      def eqv[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean = {
-          Util.ensureSize(vset, wset)
+          try {
+               Util.ensureSize(vset, wset)
+          } catch {
+               case _: Exception => false
+          }
 
+          //else if no exception ...
           vset.getColumns()
                .zip(wset.getColumns())
                .forall(colPair => Eq[Vector[N]].eqv(colPair._1, colPair._2))
@@ -57,12 +62,51 @@ trait SetVecOps {
      }
 
 
-     def rowEchelon[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = rref(vset, reduced = false)
+     //def rowEchelon[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = rref(vset, reduced = false)
 
      def rowReducedEchelon[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
-          val theRRef: SetOfVectors[N] = rref(vset, reduced=true)
-          SetOfVectors(expressRowsAsCols(getNonZeroRows(theRRef)):_*)
+          var echelonMatrix: SetOfVectors[N] = vset.copy()
+          var lead: Int = 0
+          val nRows: Int = vset.numRows
+          val nCols: Int = vset.numCols
+
+          breakable {
+               for(r <- 0 until nRows){
+                    if(lead >= nCols){
+                         break
+                    }
+                    var i: Int = r
+                    while (echelonMatrix.get(i, lead).isZero) { //then find the pivot element
+                         i = i + 1
+                         if (i == nRows){
+                              i = r
+                              lead = lead + 1
+                              if(lead == nCols) { //then we have found last pivot
+                                   return echelonMatrix
+                              }
+                         }
+                    }
+
+                    //swap rows i and r
+                    if(i != r) echelonMatrix = swapRows(i, r, echelonMatrix)
+
+                    //divide row r by rref[r][lead]
+                    echelonMatrix = scaleRow(r, echelonMatrix.get(r, lead).inverse(), echelonMatrix)
+
+                    for(j <- 0 until nRows){ //back-substitute upwards
+                         if(j != r){  //subtract row r * -rref[j][lead] from row j
+                              echelonMatrix = sumRows(j, r, echelonMatrix.get(j, lead).negate(), echelonMatrix)
+                         }
+                    }
+
+                    lead = lead + 1 //now looking for a pivot further to the right
+               }
+          }
+          //TODO nonzero rows alert fix where applicable SetOfVectors(expressRowsAsCols(getNonZeroRows(theRRef)):_*)
+          SetOfVectors(Util.expressRowsAsCols(getNonZeroRows(echelonMatrix)):_*)
      }
+
+
 
      def span[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = rowReducedEchelon(vset)
 
@@ -133,16 +177,15 @@ trait SetVecOps {
        */
      def scaleRow[N:Number](row: Int, factor: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
 
-          val rowMat: Seq[N] = vset.getRows().reduceLeft((accRow, yRow) => Util.lengthCombine(accRow, yRow))
-               .getElements()
+          val rowMat: Seq[N] = vset.getRows().reduceLeft((accRow, yRow) =>
+               Util.lengthCombine(accRow, yRow)).getElements()
 
           for (i <- row * vset.numCols until ((row + 1) * vset.numCols)) {
                rowMat(i) = rowMat(i) * factor
           }
 
           //converting from row to col representation
-          val rows: Seq[Vector[N]] = Seq(rowMat.toList.grouped(vset.numCols).toList
-               .map(list => Vector(list: _*)): _*)
+          val rows: Seq[Vector[N]] = Seq(rowMat.grouped(vset.numCols).toList.map(_.toVec):_*)
 
           SetOfVectors(expressRowsAsCols[N](rows): _*)
      }
@@ -154,16 +197,15 @@ trait SetVecOps {
        * @return A new matrix, with the columns changed appropriately.
        */
      def sumRows[N:Number](rowA: Int, rowB: Int, scale: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
-          val oldMatList: Seq[N] = vset.getRows().reduceLeft((accRow, yRow) => Util.lengthCombine(accRow, yRow))
-               .getElements()
+          val oldMatList: Seq[N] = vset.getRows().reduceLeft((accRow, yRow) =>
+               Util.lengthCombine(accRow, yRow)).getElements()
           val newMatList: Seq[N] = oldMatList
           for (i <- 0 until vset.numCols) { // for each value in rowA
                newMatList(rowA * vset.numCols + i) += oldMatList(rowB * vset.numCols + i) * scale //
           }
 
           // using grouped so we get cols again
-          val rows: Seq[Vector[N]] = Seq(newMatList.grouped(vset.numCols).toList
-               .map(list => new Vector(list: _*)): _*)
+          val rows: Seq[Vector[N]] = Seq(newMatList.grouped(vset.numCols).toList.map(_.toVec):_*)
 
           SetOfVectors(expressRowsAsCols[N](rows): _*)
      }
@@ -175,7 +217,8 @@ trait SetVecOps {
        * @return A new matrix, with the columns changed appropriately.
        */
      def sumCols[N:Number](colA: Int, colB: Int, scale: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
-          val oldMatList: Seq[N] = vset.getColumns().reduceLeft((accCol, yCol) => Util.lengthCombine(accCol, yCol)).getElements()
+          val oldMatList: Seq[N] = vset.getColumns().reduceLeft((accCol, yCol) =>
+               Util.lengthCombine(accCol, yCol)).getElements()
           val newMatList: Seq[N] = oldMatList
           for (i <- 0 until vset.numRows) { // for each value in rowA
                newMatList(colA * vset.numRows + i) += oldMatList(colB * vset.numRows + i) * scale //
@@ -211,22 +254,22 @@ trait SetVecOps {
           SetOfVectors(cols: _*)
      }
 
-     def seqToVecSet[N:Number](seq: N*): SetOfVectors[N] = {
+     /*def seqToVecSet[N:Number](seq: N*): SetOfVectors[N] = {
           val vset = SetOfVectors[N](seq.length, 0)
           for (i <- 0 until seq.length) vset.set(i, 0)(seq(i))
           vset
-     }
+     }*/
 
 
 
      //precondition: expects the rref to come from undetermined system -- used for Solver
      // Gets indices of columns of original matrix with leading ones when in rref form.
      def getIndicesOfFreeColumns[N:Number](rref: SetOfVectors[N]): Array[Int] = {
-          def countNonZero(v: Vector[N]): Int = v.getElements().count(e => e != 0)
+          def countNonZero(v: Vector[N]): Int = v.getElements().count(e => ! e.isZero)
 
           //assumes we only have a single element in the vector
           def itsSingleElemIsNotOne(v: Vector[N]): Boolean = countNonZero(v) == 1 &&
-               v.getElements().exists(e => e != 1 && e != 0)
+               v.getElements().exists(e => e =!= Number[N].one &&  ! e.isZero)
 
           val vecIndexPair: Seq[(Vector[N], Int)] = rref.getColumns().zipWithIndex
 
@@ -238,13 +281,15 @@ trait SetVecOps {
                          None
           })
           //need options to preserve type else Array[Any]
-          val indices2 = indices.filter(op => op.isDefined).map(_.get).toArray
+          val indices2 = indices.filter(option => option.isDefined).map(_.get).toArray
           indices2
      }
 
-     def expressRowsAsCols[N:Number](mat: SetOfVectors[N]): Seq[Vector[N]] = expressRowsAsCols(mat.getRows())
+     def expressRowsAsCols[N:Number](mat: SetOfVectors[N]): Seq[Vector[N]] =
+          expressRowsAsCols(mat.getRows())
 
-     def expressColsAsRows[N:Number](mat: SetOfVectors[N]): Seq[Vector[N]] = expressColsAsRows(mat.getColumns())
+     def expressColsAsRows[N:Number](mat: SetOfVectors[N]): Seq[Vector[N]] =
+          expressColsAsRows(mat.getColumns())
 
      def expressRowsAsCols[N:Number](rows: Seq[Vector[N]]): Seq[Vector[N]] = {
           //converting from row to col representation
@@ -253,9 +298,9 @@ trait SetVecOps {
           val colBuff: Seq[Seq[N]] = Seq.fill[N](ncol, nrow)(Number[N].zero)
 
           for (c <- 0 until ncol) {
-               colBuff(c) = rows.map(row => row.get(c)).toListB
+               colBuff(c) = rows.map(row => row.get(c))
           }
-          colBuff.map(buff => new Vector(buff: _*))
+          colBuff.map(_.toVec)
      }
 
      def expressColsAsRows[N:Number](cols: Seq[Vector[N]]): Seq[Vector[N]] = {
@@ -267,48 +312,4 @@ trait SetVecOps {
           vset.getRows().filterNot(row => row.isZero)
 
 
-
-     private def rref[N: Number](vset: SetOfVectors[N], reduced: Boolean): SetOfVectors[N] ={
-          var echelonMatrix: SetOfVectors[N] = vset.copy()
-          var lead: Int = 0
-          val nRows: Int = vset.numRows
-          val nCols: Int = vset.numCols
-
-          breakable {
-               for(r <- 0 until nRows){
-                    if(lead >= nCols){
-                         break
-                    }
-                    var i: Int = r
-                    while (echelonMatrix.get(i, lead).isZero) { //then find the pivot element
-                         i = i + 1
-                         if (i == nRows){
-                              i = r
-                              lead = lead + 1
-                              if(lead == nCols) { //then we have found last pivot
-                                   return echelonMatrix
-                              }
-                         }
-                    }
-
-                    //swap rows i and r
-                    if(i != r) echelonMatrix = swapRows(i, r, echelonMatrix)
-
-                    //divide row r by rref[r][lead]
-                    echelonMatrix = scaleRow(r, echelonMatrix.get(r, lead).inverse(), echelonMatrix)
-
-                    for(j <- 0 until nRows){ //back-substitute upwards
-                         if(j != r){  //subtract row r * -rref[j][lead] from row j
-                              echelonMatrix = sumRows(j, r,
-                                   echelonMatrix.get(j, lead).negate(),
-                                   echelonMatrix)
-                         }
-                    }
-
-                    lead = lead + 1 //now looking for a pivot further to the right
-               }
-          }
-
-          echelonMatrix
-     }
 }

@@ -36,7 +36,7 @@ class Vector[N: Number](private val elems: N*) {
      override def toString: String = Show[Vector[N]].show(this)
 }
 
-class Vec2[N: Number](elems: N*) extends Vector(elems:_*)
+//class Vec2[N: Number](elems: N*) extends Vector(elems:_*)
 
 
 object Vector {

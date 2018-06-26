@@ -47,12 +47,12 @@ trait RationalIsTrig extends Trig[Rational] /*with Number[Rational]*/ {
 }
 
 trait RationalIsMonoid extends Monoid[Rational]{
-     val zero: Rational = Rational.ONE
+     val zero: Rational = Rational.ZERO
      def plus(x: Rational, y: Rational): Rational = Rational(x.num*y.den + y.num*x.den, x.den*y.den)
 }
 
 trait RationalIsAbelianGroup extends AbelianGroup[Rational] with RationalIsMonoid {
-     def negate(x: Rational): Rational = Rational(-x.num, -x.den)
+     def negate(x: Rational): Rational = Rational(-x.num, x.den)
 }
 
 trait RationalIsRing extends Ring[Rational] with RationalIsAbelianGroup {

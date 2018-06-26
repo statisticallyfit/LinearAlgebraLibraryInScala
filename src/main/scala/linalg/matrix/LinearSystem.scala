@@ -18,7 +18,7 @@ trait LinearSystem[S, F] extends MatrixLike[S, F] {
      def hasInfiniteSolutions(s: S): Boolean
      //def hasUniqueSolution(s: S)(implicit e: Eq[S]): Boolean = e.eqv(rowReducedEchelon(s), identity)
 
-     def infiniteSolutionSolver(s: S): S
+     def infiniteSolutionSolver(s: S): Matrix[F]
      def solve(s: S): Option[Matrix[F]]
 }
 

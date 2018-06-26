@@ -4,6 +4,7 @@ import linalg.kernel.{Rational, Real}
 import linalg.vector.{SetOfVectors, Vector}
 import linalg.matrix._
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.language.implicitConversions
 
@@ -20,11 +21,16 @@ trait GeneralImplicits {
 
      implicit class VectorImplicits[N:Number](v: Vector[N]) {
           def toListB: ListBuffer[N] = ListBuffer(v.getElements():_*)
+          def toSeqM: mutable.Seq[N] = v.getElements()
      }
 
      implicit class SeqImplicits[N:Number](v: Seq[N]) {
           def toListB: ListBuffer[N] = ListBuffer(v:_*)
+          def toVec: Vector[N] = Vector[N](v:_*)
+          def toSeqM: mutable.Seq[N] = mutable.Seq(v:_*)
      }
+
+
 
      //converting setvec to matrix so that plus(vset, wset) works with matrices too (fine to
      // pass in matrices but returning setvec is wrong for a matrix

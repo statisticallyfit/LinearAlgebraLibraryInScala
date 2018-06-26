@@ -71,7 +71,7 @@ trait VectorOps {
 
      def eqv[N: Number](v: Vector[N], w: Vector[N]): Boolean ={
           v.getElements().zip(w.getElements())
-               .forall(vwElemPair => vwElemPair._1 :==: vwElemPair._2)
+               .forall(vwElemPair => vwElemPair._1 === vwElemPair._2)
      }
 
      def linearlyIndependent[N: Number](v: Vector[N], w: Vector[N]): Boolean =
