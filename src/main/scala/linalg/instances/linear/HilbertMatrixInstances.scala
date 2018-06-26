@@ -48,7 +48,7 @@ class HilbertMatrixThings[N: Number] {
 
      class HilbertMatrixIsSetVecLike extends HilbertMatrixIsVectorSpace with SetVecLike[HilbertMatrix[N], N]{
           def isZero(mat: HilbertMatrix[N]): Boolean = Util.isZero(mat)
-          def identity(size: Int): HilbertMatrix[N] = HilbertMatrix(Util.identity(size).getColumns():_*)
+          //def identity(size: Int): HilbertMatrix[N] = HilbertMatrix(Util.identity(size).getColumns():_*)
           def rowEchelon(mat: HilbertMatrix[N]): HilbertMatrix[N] =
                Util.rowEchelon(mat).toHilbertMatrix
           def rowReducedEchelon(mat: HilbertMatrix[N]): HilbertMatrix[N] =

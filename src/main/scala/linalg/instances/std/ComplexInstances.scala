@@ -1,8 +1,9 @@
 package linalg.instances.std
 
+import cats.Eq
 import linalg.implicits._
 import linalg._
-import linalg.kernel.{Complex}
+import linalg.kernel.Complex
 //import linalg.theory.{AbelianGroup, Field, Monoid, Ring}
 
 /**
@@ -39,10 +40,12 @@ class ComplexThings[R:RealNumber] {
                     Complex.angle(base) * Complex.magnitude(exp))
      }*/
 
-     trait ComplexHasEquality extends Equality[Complex[R]] {
-          def eqv(x: Complex[R], y: Complex[R]): Boolean = x.re :==: y.re && x.im :==: y.im
+     trait ComplexHasEq extends Eq[Complex[R]] {
+          def eqv(x: Complex[R], y: Complex[R]): Boolean = x.re === y.re && x.im === y.im
+     }
 
-          def lessThan(x: Complex[R], y: Complex[R]): Boolean = x.re < y.re || (x.re :==: y.re && x.im < y.im)
+     trait ComplexHasEquality extends ComplexHasEq with Equality[Complex[R]] {
+          def lessThan(x: Complex[R], y: Complex[R]): Boolean = x.re < y.re || (x.re === y.re && x.im < y.im)
      }
 
      trait ComplexIsMonoid extends Monoid[Complex[R]] {
@@ -77,6 +80,7 @@ class ComplexThings[R:RealNumber] {
      class ComplexIsNumber extends ComplexIsField
           with ComplexIsAbsolute //with ComplexIsAbsoluteComplex
           with ComplexIsRoot //with ComplexIsRootComplex
+          with ComplexHasEq
           with ComplexHasEquality
           with Number[Complex[R]]  {
 

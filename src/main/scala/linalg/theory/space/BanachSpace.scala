@@ -1,4 +1,5 @@
-package linalg.theory.space
+
+/*package linalg.theory.space
 
 
 /**
@@ -9,7 +10,6 @@ package linalg.theory.space
   *
   */
 
-/*
 trait BanachSpace[B, F] extends NormedVectorSpace[B, F] {
 
      // |⋅| : B → F

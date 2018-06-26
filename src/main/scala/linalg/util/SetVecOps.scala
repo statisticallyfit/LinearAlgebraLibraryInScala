@@ -6,6 +6,7 @@ import linalg.vector.{SetOfVectors, Vector}
 import cats.Eq
 import linalg.matrix.{AugmentedMatrix, Matrix}
 
+import scala.collection.mutable
 import scala.collection.mutable.{ListBuffer, Seq}
 import scala.util.control.Breaks.{break, breakable}
 
@@ -74,6 +75,15 @@ trait SetVecOps {
           val system = AugmentedMatrix(vset, v)
           system.isConsistent()
      }
+
+     //Page 246 of howard: basis for the space spanned by a set of vectors
+     def basis[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
+          val freeCols: Seq[Int] = getIndicesOfFreeColumns(vset.rowReducedEchelon())
+          SetOfVectors(vset.getColumnsAt(freeCols:_*):_*)
+     }
+
+     def isBasisOfSpace[N: Number](vset: SetOfVectors[N]): Boolean = vset === basis(vset)
+
 
      def getSpanningCoefficients[N: Number](vset: SetOfVectors[N], v: Vector[N]): Option[Matrix[N]] ={
           AugmentedMatrix(vset, v).solve()
@@ -207,7 +217,10 @@ trait SetVecOps {
           vset
      }
 
+
+
      //precondition: expects the rref to come from undetermined system -- used for Solver
+     // Gets indices of columns of original matrix with leading ones when in rref form.
      def getIndicesOfFreeColumns[N:Number](rref: SetOfVectors[N]): Array[Int] = {
           def countNonZero(v: Vector[N]): Int = v.getElements().count(e => e != 0)
 

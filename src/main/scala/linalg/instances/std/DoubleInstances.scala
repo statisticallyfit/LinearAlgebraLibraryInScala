@@ -1,5 +1,6 @@
 package linalg.instances.std
 
+import cats.Eq
 import linalg._
 
 /**
@@ -14,8 +15,11 @@ trait DoubleIsRoot extends Root[Double, Double] {
      def power(base: Double, exp: Double): Double = math.pow(base, exp)
 }
 
-trait DoubleHasEquality extends Equality[Double]{
+trait DoubleHasEq extends Eq[Double] {
      def eqv(x: Double, y: Double): Boolean = x == y
+}
+
+trait DoubleHasEquality extends DoubleHasEq with Equality[Double]{
      def lessThan(x: Double, y: Double): Boolean = x < y
 }
 
@@ -66,6 +70,7 @@ class DoubleIsRealNumber extends DoubleIsField
      with DoubleIsTrigonometric
      with DoubleIsAbsolute
      with DoubleIsRoot
+     with DoubleHasEq
      with DoubleHasEquality
      with RealNumber[Double] {
 

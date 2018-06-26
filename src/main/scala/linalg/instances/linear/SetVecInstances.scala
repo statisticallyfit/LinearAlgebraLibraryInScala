@@ -45,7 +45,7 @@ class SetVecThings[N: Number] {
 
      class SetVecIsSetVecLike extends SetVecIsVectorSpace with SetVecLike[SetOfVectors[N], N]{
           def isZero(vset: SetOfVectors[N]): Boolean = Util.isZero(vset)
-          def identity(size: Int): SetOfVectors[N] = Util.identity(size)
+          //def identity(size: Int): SetOfVectors[N] = Util.identity(size)
           def rowEchelon(vset: SetOfVectors[N]): SetOfVectors[N] = Util.rowEchelon[N](vset)
           def rowReducedEchelon(vset: SetOfVectors[N]): SetOfVectors[N] = Util.rowReducedEchelon[N](vset)
 
@@ -69,9 +69,13 @@ class SetVecThings[N: Number] {
                Util.getSpanningCoefficients(vset, v)
      }
 
+     //TODO ATTENTION!!! rowreducedechelon is implemented by removing zero rows at the end
+     // TODO so need to fix that because a vset is only a basis of a space R^n if it is n by n and
+     // TODO the cols are linealry independent.
      class SetVecBasis extends Basis[Vector[N], SetOfVectors[N], N]{
-          def basis(vset: SetOfVectors[N]): SetOfVectors[N] = Util.span(vset)
-          def isBasisOfSpace(vset: SetOfVectors[N]): Boolean = Util.doesSetSpanTheSpace(vset)
+          //TODO check example 8 howard if impl. is truly correct ...
+          def basis(vset: SetOfVectors[N]): SetOfVectors[N] = Util.basis(vset)
+          def isBasisOfSpace(vset: SetOfVectors[N]): Boolean = Util.isBasisOfSpace(vset)
           def isBasisOfVector(vset: SetOfVectors[N], v: Vector[N]): Boolean =
                Util.doesSetSpanTheVector(vset, v)
      }
@@ -89,14 +93,14 @@ class SetVecThings[N: Number] {
 
      //val absolute = new SetVecHasAbsoluteValue
      val eq = new SetVecHasEq
-     val dim = new SetVecHasDimension
      val monoid = new SetVecIsMonoid
      val abelian = new SetVecIsAbelianGroup
      val vectorSpace = new SetVecIsVectorSpace
      val setVecLike = new SetVecIsSetVecLike
+     val independence = new SetVecCanHaveLinearIndependence
      val span = new SetVecSpan
      val basis = new SetVecBasis
-     val independence = new SetVecCanHaveLinearIndependence
+     val dim = new SetVecHasDimension
      val rank = new SetVecHasRank
 }
 

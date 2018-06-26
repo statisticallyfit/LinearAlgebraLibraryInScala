@@ -10,9 +10,6 @@ import linalg._
 
 trait NormedVectorSpace[V, F] extends VectorSpace[V, F] {
 
-     //this: Field[F] =>
-
-     //note defining norm() just in normedinnerprodspace only - normedvecspace doesn't know about innerprod.
      def norm(v: V)(implicit f: Field[F], r: Root[F, F]): F
 
      def normalize(v: V)(implicit field: Field[F], r: Root[F, F]): V = scale(v, field.inverse(norm(v)))
@@ -25,11 +22,6 @@ trait NormedVectorSpace[V, F] extends VectorSpace[V, F] {
 
 
 
-object NormedVectorSpace extends NormedVectorSpaceBase  {
+object NormedVectorSpace {
      @inline final def apply[V, F](implicit ev: NormedVectorSpace[V, F]): NormedVectorSpace[V, F] = ev
-}
-
-private[space] trait NormedVectorSpaceBase {
-     implicit def InnerProductSpaceIsNormedVectorSpace[V, F](implicit space: InnerProductSpace[V, F], nroot:
-          Root[F,F]): NormedVectorSpace[V, F] = space.normed
 }

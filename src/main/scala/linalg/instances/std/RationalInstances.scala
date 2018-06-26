@@ -1,5 +1,6 @@
 package linalg.instances.std
 
+import cats.Eq
 import linalg._
 import linalg.kernel.Rational
 
@@ -21,9 +22,11 @@ trait RationalIsRoot extends Root[Rational, Rational] {
      def power(base: Rational, exp: Rational): Rational =
           Rational(math.pow(RationalUtil.makeDouble(base), RationalUtil.makeDouble(exp)))
 }
-
-trait RationalHasEquality extends Equality[Rational]{
+trait RationalHasEq extends Eq[Rational] {
      def eqv(x: Rational, y: Rational): Boolean = x.num * y.den == y.num * x.den
+}
+
+trait RationalHasEquality extends RationalHasEq with Equality[Rational]{
      def lessThan(x: Rational, y: Rational): Boolean = x.num * y.den < y.num * x.den
 }
 
@@ -69,6 +72,7 @@ class RationalIsRealNumber extends RationalIsField
      with RationalIsTrig
      with RationalIsAbsolute
      with RationalIsRoot
+     with RationalHasEq
      with RationalHasEquality
      with RealNumber[Rational] {
 

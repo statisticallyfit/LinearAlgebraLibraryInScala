@@ -28,6 +28,8 @@ class SetOfVectors[N: Number](private val cols: Vector[N]*) {
      def copy(cols: Seq[Vector[N]]): SetOfVectors[N] = SetOfVectors(cols:_*)
 
      def getColumnsSeq(): Seq[Seq[N]] = Seq(columns.map(vec => vec.getElements()):_*)
+     def getRowsSeq(): Seq[Seq[N]] = Seq(getRows().map(vec => vec.getElements()):_*)
+
      def getColumns(): Seq[Vector[N]] = Seq(columns:_*)
      def getColumn(colIndex: Int): Vector[N] = columns(colIndex)
 
@@ -54,6 +56,8 @@ class SetOfVectors[N: Number](private val cols: Vector[N]*) {
           val someRows = for(i <- indices) yield allRows(i)
           Seq(someRows:_*)
      }
+
+     def getColumnsAt(indices: Int*): Seq[Vector[N]] = this.toMatrix.transpose().getRowsAt(indices:_*)
 
      def setColumn(colIndex: Int, col: Vector[N]): Unit = columns(colIndex) = col
      def setRow(rowIndex: Int, row: Vector[N]): Unit = {
@@ -86,8 +90,7 @@ object SetOfVectors {
      def ONE[N: Number](numCols: Int, numRows: Int): SetOfVectors[N] =
           SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number[N].one):_*)
 
-     def IDENTITY[N: Number](size: Int)(implicit ev: SetVecLike[SetOfVectors[N], N]):SetOfVectors[N] =
-          ev.identity(size)
+     def IDENTITY[N: Number](size: Int):SetOfVectors[N] = Util.identity[N](size)
 
      def IDENTITY[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] ={
           val largestSize: Int = List(vset.numRows, vset.numCols).max

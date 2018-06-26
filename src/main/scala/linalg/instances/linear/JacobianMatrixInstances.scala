@@ -53,7 +53,7 @@ class JacobianMatrixThings[N: Number] {
 
      class JacobianMatrixIsSetVecLike extends JacobianMatrixIsVectorSpace with SetVecLike[JacobianMatrix[N], N]{
           def isZero(mat: JacobianMatrix[N]): Boolean = Util.isZero(mat)
-          def identity(size: Int): JacobianMatrix[N] = JacobianMatrix(Util.identity(size).getColumns():_*)
+          //def identity(size: Int): JacobianMatrix[N] = JacobianMatrix(Util.identity(size).getColumns():_*)
           def rowEchelon(mat: JacobianMatrix[N]): JacobianMatrix[N] =
                Util.rowEchelon(mat).toJacobianMatrix
           def rowReducedEchelon(mat: JacobianMatrix[N]): JacobianMatrix[N] =

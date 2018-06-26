@@ -1,5 +1,6 @@
 package linalg.instances.std
 
+import cats.Eq
 import linalg._
 
 /**
@@ -18,8 +19,11 @@ trait IntIsRoot extends Root[Int, Int] {
      def power(base: Int, exp: Int): Int = math.pow(base, exp).toInt
 }
 
-trait IntHasEquality extends Equality[Int]{
+trait IntHasEq extends Eq[Int] {
      def eqv(x: Int, y: Int): Boolean = x == y
+}
+
+trait IntHasEquality extends IntHasEq with Equality[Int]{
      def lessThan(x: Int, y: Int): Boolean = x < y
 }
 
@@ -69,6 +73,7 @@ class IntIsRealNumber extends IntIsField
      with IntIsTrigonometric
      with IntIsAbsolute
      with IntIsRoot
+     with IntHasEq
      with IntHasEquality
      with RealNumber[Int] {
 

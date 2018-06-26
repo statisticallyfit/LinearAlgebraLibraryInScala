@@ -49,7 +49,7 @@ class AugmentedMatrixThings[N: Number] {
 
      class AugmentedMatrixIsSetVecLike extends AugmentedMatrixIsVectorSpace with SetVecLike[AugmentedMatrix[N], N]{
           def isZero(mat: AugmentedMatrix[N]): Boolean = Util.isZero(mat)
-          def identity(size: Int): AugmentedMatrix[N] = AugmentedMatrix(Util.identity(size).getColumns():_*)
+          //def identity(size: Int): AugmentedMatrix[N] = AugmentedMatrix(Util.identity(size).getColumns():_*)
           def rowEchelon(mat: AugmentedMatrix[N]): AugmentedMatrix[N] =
                Util.rowEchelon(mat).toAugMatrix
           def rowReducedEchelon(mat: AugmentedMatrix[N]): AugmentedMatrix[N] =
@@ -138,6 +138,9 @@ class AugmentedMatrixThings[N: Number] {
 
                val solution: Matrix[N] = Matrix.fromSeqs(sol:_*).transpose()
 
+
+               //TODO separate this part to be getParticularSolution() and getGeneralSolution()
+               //TODO from page 240 of howard
                //then add the B cols to the front of our solution, never the case for kernel where B={0}
                if(mat.B.isZero)
                     solution.toAugMatrix
@@ -154,12 +157,11 @@ class AugmentedMatrixThings[N: Number] {
                     })
                     // Step 3: fill zeroes between the elements indices.
                     val maxIndex: Int = tuplesNoZeroRows.map(_._1).max // get max index to make list
-                    var newRrefB: Seq[Vector[N]] = Util.expressColsAsRows(
-                         Matrix.ZERO[N](maxIndex + 1, mat.rrefB.numCols))
+                    var newRrefB: Seq[Vector[N]] = Util.expressColsAsRows(Matrix.ZERO[N](maxIndex + 1, mat.rrefB.numCols))
 
                     // inserting the elements in the tuples at the indices.
-                    for((index, elems) <- tuplesNoZeroRows){
-                         newRrefB = Util.insert(elems, index, newRrefB)
+                    for((index, vec) <- tuplesNoZeroRows){
+                         newRrefB = Util.insertVec(vec, index, newRrefB)
                     }
                     newRrefB = Util.expressRowsAsCols(newRrefB)
 

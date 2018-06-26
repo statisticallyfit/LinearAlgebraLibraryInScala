@@ -4,7 +4,9 @@ package linalg.theory.space
   *
   */
 trait RowSpace[R, F] extends VectorSpace[R, F] {
-//todo see class to sketch out methods
+
+     def isInRowSpace(vset: R, v: R): Boolean
+     def rowSpaceBasis(vset: R): R
 }
 
 

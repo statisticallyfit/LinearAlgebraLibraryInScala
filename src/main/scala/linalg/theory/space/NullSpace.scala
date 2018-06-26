@@ -3,11 +3,12 @@ package linalg.theory.space
 /**
   *
   */
-trait NullSpace[N, F] extends VectorSpace[N, F] {
-     //todo see class to sketch out methods
+trait NullSpace[U, F] extends VectorSpace[U, F] {
+     def isInNullSpace(vset: U): Boolean
+     def nullity(vset: U): Int
 }
 
 
 object NullSpace {
-     @inline final def apply[N, F](implicit ev: NullSpace[N, F]): NullSpace[N, F] = ev
+     @inline final def apply[U, F](implicit ev: NullSpace[U, F]): NullSpace[U, F] = ev
 }

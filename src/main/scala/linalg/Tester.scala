@@ -1,8 +1,9 @@
 package linalg
 
 import linalg.implicits._
+import linalg.instances.linear.AugmentedMatrixInstances
 import linalg.kernel.{Complex, Rational, Real}
-import linalg.matrix.{HilbertMatrix, JacobianMatrix, Matrix}
+import linalg.matrix.{AugmentedMatrix, HilbertMatrix, JacobianMatrix, Matrix}
 import linalg.vector.{SetOfVectors, Vector}
 import linalg.util._
 
@@ -20,9 +21,7 @@ import shapeless._
 
 object Tester extends App {
 
-
-     //class Matrix implements matrixlike which extends from setveclike - does matrix have access to setveclike methods?
-     val m: SetOfVectors[Int] = SetOfVectors(Vector(1,2,3), Vector(-8, 4, 2))
+     /*val m: SetOfVectors[Int] = SetOfVectors(Vector(1,2,3), Vector(-8, 4, 2))
      println("rref(m) = " + m.rowReducedEchelon())
      println("dimension = " + m.dimension())
 
@@ -46,13 +45,13 @@ object Tester extends App {
      m2.adjoint()
      m2.dimension()
 
-     mat + mat
+     mat + mat*/
 
 
      // -----------------------------------------------------------------------------------------------
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i + Rational(1)
-     val b: Complex[Int] = 3 + 5.i + 3
-     val c: Complex[Int] = 1 - 2.i
+     val b1: Complex[Int] = 3 + 5.i + 3
+     val c1: Complex[Int] = 1 - 2.i
 
      val r1: Rational = Rational(2)
      val r2: Rational = Rational(4,5)
@@ -69,11 +68,11 @@ object Tester extends App {
 
 
      println(r1 + r2)
-     println(c)
+     println(c1)
 
-     println(b < c)
-     println(b :==: c)
-     println((4 + 3.i) :==: (4 + 3.i))
+     println(b1 < c1)
+     println(b1 === c1)
+     println((4 + 3.i) === (4 + 3.i))
      println((2 + 5.i) < (2 + 7.i))
      println((2 + 5.i) < (2 - 5.i))
      println((8 + 2.i) + (9 + 2.i))
@@ -81,7 +80,7 @@ object Tester extends App {
      println((8 + 2.i) < (9 + 2.i))
 
      println(a)
-     println(b)
+     println(b1)
      println(a + Rational(1))
      println(Rational(33) + a)
      println(23.0 + (1.0 + 3.0.i))
@@ -135,6 +134,18 @@ object Tester extends App {
      println(s1.getRow(0))
 
      println("copy: " + s1.copy())
+
+
+     // set vec linalg things
+
+     val vset: SetOfVectors[Rational] = SetOfVectors(
+          Vector(1,2,2,-1),Vector(-3,-6,-6,3) , Vector(4,9,9,-4), Vector(-2,-1,-1,2),
+          Vector(5,8,9,-5), Vector(4,2,7,-4)
+     )
+     val b: Vector[Rational] = Vector(0,-1,5,6)
+     val aug: AugmentedMatrix[Rational] = AugmentedMatrix(vset, b)
+
+     println(aug.solve())
 }
 
 

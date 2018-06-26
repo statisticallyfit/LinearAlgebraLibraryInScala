@@ -1,3 +1,4 @@
+/*
 package linalg.theory.space
 
 /**
@@ -11,3 +12,4 @@ object ContinuousFunctionSpace {
      @inline final def apply[C, F]
      (implicit ev: ContinuousFunctionSpace[C, F]): ContinuousFunctionSpace[C, F] = ev
 }
+*/

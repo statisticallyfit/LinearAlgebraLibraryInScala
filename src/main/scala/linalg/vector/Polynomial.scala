@@ -10,7 +10,7 @@ import linalg._
 ////note: can make it parametrized by Number if you like (in case you want Complex type too)
 //
 ////todo either make it extend vector or make it something that implements veclike
-case class Polynomial[R: RealNumber](ps: R*) /*extends Vector[R](ps:_*)*/ {
+class Polynomial[R: RealNumber](private val ps: R*) /*extends Vector[R](ps:_*)*/ {
 
      override def toString: String = Show[Polynomial[R]].show(this)
      //this.asInstanceOf[Polynomial[R]].show

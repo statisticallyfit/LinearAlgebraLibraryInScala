@@ -18,6 +18,6 @@ trait LinearSystemSyntax extends MatrixLikeSyntax {
           def hasUniqueSolution(): Boolean = sys.hasUniqueSolution(current)
           def hasInfiniteSolutions(): Boolean = sys.hasInfiniteSolutions(current)
           def infiniteSolutionSolver(): S[N] = sys.infiniteSolutionSolver(current)
-          def solve(): Option[S[N]] = sys.solve(current)
+          def solve(): Option[Matrix[N]] = sys.solve(current)
      }
 }

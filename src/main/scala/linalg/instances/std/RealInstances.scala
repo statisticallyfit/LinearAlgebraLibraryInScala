@@ -1,5 +1,6 @@
 package linalg.instances.std
 
+import cats.Eq
 import linalg._
 import linalg.kernel.Real
 
@@ -18,8 +19,11 @@ trait RealIsRoot extends Root[Real, Real] {
      def power(base: Real, exp: Real): Real = Real(math.pow(base.double, exp.double))
 }
 
-trait RealHasEquality extends Equality[Real]{
+trait RealHasEq extends Eq[Real]{
      def eqv(x: Real, y: Real): Boolean = x.double == y.double
+}
+
+trait RealHasEquality extends RealHasEq with Equality[Real]{
      def lessThan(x: Real, y: Real): Boolean = x.double < y.double
 }
 
@@ -68,6 +72,7 @@ class RealIsRealNumber extends RealIsField
      with RealIsTrig
      with RealIsAbsolute
      with RealIsRoot
+     with RealHasEq
      with RealHasEquality
      with RealNumber[Real] {
 

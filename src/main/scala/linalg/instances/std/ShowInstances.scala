@@ -4,7 +4,7 @@ import linalg.implicits._
 import linalg._
 import linalg.kernel.{Complex, Imaginary, Rational, Real}
 import linalg.matrix.AugmentedMatrix
-import linalg.vector.{SetOfVectors, Vector}
+import linalg.vector.{Polynomial, SetOfVectors, Vector}
 import org.apache.commons.lang3.StringUtils
 
 import scala.collection.mutable.ListBuffer
@@ -53,9 +53,11 @@ trait ShowInstances {
      }
 
      //todo
-     /*implicit def PolynomialHasShow[R: RealNumber] = new Show[Polynomial[R]]{
-          def show(poly: Polynomial[R]): String = showVecSet(SetOfVectors(poly))
-     }*/
+     implicit def PolynomialHasShow[R: RealNumber] = new Show[Polynomial[R]]{
+          def show(poly: Polynomial[R]): String = showPoly(poly)
+     }
+
+     private def showPoly[R: RealNumber](poly: Polynomial[R]): String = ???
 
      implicit def SetVecHasShow[N: Number] = new Show[SetOfVectors[N]]{
           def show(vset: SetOfVectors[N]): String = showVecSet(vset)
@@ -74,14 +76,13 @@ trait ShowInstances {
           val maxWidths: Seq[Int] = colsStr.map(vec => vec.reduceLeft((acc,y) =>
                if(acc.length > y.length) acc else y)).map(_.length)
 
-          val maxWidthsTwoDim: Seq[List[Int]] = maxWidths.map(elem => List.fill(mat.numRows)(elem))
+          val maxWidthsTwoDim: Seq[Seq[Int]] = maxWidths.map(elem => Seq.fill(mat.numRows)(elem))
 
           // col center length tupled with actual matrix col element in vector of vectors
-          val pairs = colsStr.zip(maxWidthsTwoDim).map(pair => pair._1.zip(pair._2))
-          val alignedCols/*: ListBuffer[List[String]]*/ = pairs.map(vec =>
-               vec.map(pair => StringUtils.leftPad(pair._1.toString, pair._2)))
+          val pairs: Seq[Seq[(String, Int)]] = colsStr.zip(maxWidthsTwoDim).map(pair => pair._1.zip(pair._2))
+          val alignedCols: Seq[Seq[String]] = pairs.map(vec => vec.map(pair => StringUtils.leftPad(pair._1.toString, pair._2)))
 
-          var sepAlignedCols: Seq[List[String]] = alignedCols.take(mat.A.numCols) ++= List.fill[String](mat.A.numRows)("|")
+          var sepAlignedCols: Seq[Seq[String]] = alignedCols.take(mat.A.numCols) :+ Seq.fill[String](mat.A.numRows)("|")
           sepAlignedCols = sepAlignedCols ++ alignedCols.drop(mat.A.numCols)
 
           // note: let maxWidth + 2 separate the numbers in the row

@@ -76,6 +76,7 @@ class VectorThings[N: Number]{
      }
 
      //val absolute = new VectorHasAbsoluteValue
+     val eq = new VectorHasEq
      val monoid = new VectorIsMonoid
      val abelian = new VectorIsAbelianGroup
      val vectorSpace = new VectorIsVectorSpace
@@ -84,7 +85,6 @@ class VectorThings[N: Number]{
      val hilbertSpace = new VectorIsHilbertSpace
      val vectorLike = new VectorIsVectorLike
      val dim = new VectorHasDimension
-     val eq = new VectorHasEq
      val independence = new VectorCanHaveLinearIndependence
 }
 

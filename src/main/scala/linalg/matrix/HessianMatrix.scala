@@ -22,8 +22,7 @@ object HessianMatrix {
      def ZERO[N: Number](nrows: Int, ncols: Int): HessianMatrix[N] =
           HessianMatrix.fromSeqs(ListBuffer.fill[N](ncols, nrows)(Number.ZERO[N]): _*)
 
-     def IDENTITY[N: Number](size: Int)(implicit ev: SetVecLike[HessianMatrix[N], N]): HessianMatrix[N] =
-          ev.identity(size)
+     def IDENTITY[N: Number](size: Int): HessianMatrix[N] = Util.identity[N](size).toHessianMatrix
 
      def fromSeqs[N: Number](seqs: Seq[N]*): HessianMatrix[N] = HessianMatrix(seqs.map(aSeq => Vector(aSeq:_*)):_*)
 

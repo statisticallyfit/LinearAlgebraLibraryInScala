@@ -22,8 +22,7 @@ object JacobianMatrix {
      def ZERO[N: Number](nrows: Int, ncols: Int): JacobianMatrix[N] =
           JacobianMatrix.fromSeqs(ListBuffer.fill[N](ncols, nrows)(Number.ZERO[N]): _*)
 
-     def IDENTITY[N: Number](size: Int)(implicit ev: SetVecLike[JacobianMatrix[N],N]): JacobianMatrix[N] =
-          ev.identity(size)
+     def IDENTITY[N: Number](size: Int): JacobianMatrix[N] = Util.identity[N](size).toJacobianMatrix
 
      def fromSeqs[N: Number](seqs: Seq[N]*): JacobianMatrix[N] = JacobianMatrix(seqs.map(aSeq => Vector(aSeq:_*)):_*)
 

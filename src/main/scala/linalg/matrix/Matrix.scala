@@ -3,7 +3,8 @@ package linalg.matrix
 import linalg.implicits._
 import linalg._
 import linalg.instances.linear.JacobianMatrixThings
-import linalg.vector.{SetOfVectors,  Vector}
+import linalg.util.Util
+import linalg.vector.{SetOfVectors, Vector}
 
 import scala.collection.mutable.ListBuffer
 
@@ -28,8 +29,7 @@ object Matrix {
           IDENTITY[N](largestSize)
      }
 
-     def IDENTITY[N: Number](size: Int)(implicit ev: SetVecLike[Matrix[N], N]): Matrix[N] =
-          ev.identity(size)
+     def IDENTITY[N: Number](size: Int): Matrix[N] = Util.identity[N](size).toMatrix
 
      def fromSeqs[N: Number](seqs: Seq[N]*): Matrix[N] = Matrix(seqs.map(aSeq => Vector(aSeq:_*)):_*)
 

@@ -43,8 +43,7 @@ object AugmentedMatrix {
      def ZERO[N: Number](nrows: Int, ncols: Int): AugmentedMatrix[N] =
           AugmentedMatrix.fromSeqs(ListBuffer.fill[N](ncols, nrows)(Number.ZERO[N]): _*)
 
-     def IDENTITY[N: Number](size: Int)(implicit ev: SetVecLike[AugmentedMatrix[N],N]): AugmentedMatrix[N] =
-          ev.identity(size)
+     def IDENTITY[N: Number](size: Int): AugmentedMatrix[N] = Util.identity[N](size).toAugMatrix
 
      def fromSeqs[N: Number](seqs: Seq[N]*): AugmentedMatrix[N] = AugmentedMatrix(seqs.map(aSeq => Vector(aSeq:_*)):_*)
 
