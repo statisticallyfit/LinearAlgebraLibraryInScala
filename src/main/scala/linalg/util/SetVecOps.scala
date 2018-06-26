@@ -201,9 +201,9 @@ trait SetVecOps {
           indices2
      }
 
-     def expressRowsAsCols[N:Number](mat: Matrix[N]): Seq[Vector[N]] = expressRowsAsCols(mat.getRows())
+     def expressRowsAsCols[N:Number](mat: SetOfVectors[N]): Seq[Vector[N]] = expressRowsAsCols(mat.getRows())
 
-     def expressColsAsRows[N:Number](mat: Matrix[N]): Seq[Vector[N]] = expressColsAsRows(mat.getColumns())
+     def expressColsAsRows[N:Number](mat: SetOfVectors[N]): Seq[Vector[N]] = expressColsAsRows(mat.getColumns())
 
      def expressRowsAsCols[N:Number](rows: Seq[Vector[N]]): Seq[Vector[N]] = {
           //converting from row to col representation
@@ -212,7 +212,7 @@ trait SetVecOps {
           val colBuff: Seq[Seq[N]] = Seq.fill[N](ncol, nrow)(Number[N].zero)
 
           for (c <- 0 until ncol) {
-               colBuff(c) = rows.map(row => row.get(c))
+               colBuff(c) = rows.map(row => row.get(c)).toListB
           }
           colBuff.map(buff => new Vector(buff: _*))
      }

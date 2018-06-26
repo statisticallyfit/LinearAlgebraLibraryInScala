@@ -2,6 +2,7 @@ package linalg.util
 
 import linalg._
 import linalg.implicits._
+import scala.collection.mutable.Seq
 
 /**
   *

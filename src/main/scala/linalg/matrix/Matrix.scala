@@ -23,6 +23,11 @@ object Matrix {
      def ZERO[N: Number](nrows: Int, ncols: Int): Matrix[N] =
           Matrix.fromSeqs(ListBuffer.fill[N](ncols, nrows)(Number.ZERO[N]): _*)
 
+     def IDENTITY[N: Number](mat: SetOfVectors[N]): Matrix[N] = {
+          val largestSize: Int = List(mat.numRows, mat.numCols).max
+          IDENTITY[N](largestSize)
+     }
+
      def IDENTITY[N: Number](size: Int)(implicit ev: SetVecLike[Matrix[N], N]): Matrix[N] =
           ev.identity(size)
 

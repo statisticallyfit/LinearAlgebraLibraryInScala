@@ -30,6 +30,7 @@ trait AllSyntax
      with SetVecLikeSyntax
      with LinearIndependenceSyntax
      with MatrixLikeSyntax
+     with LinearSystemSyntax
 
 
 

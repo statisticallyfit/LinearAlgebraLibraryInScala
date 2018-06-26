@@ -7,7 +7,7 @@ import linalg.matrix.{AugmentedMatrix, Matrix, SquareMatrix}
 import linalg.vector.{SetOfVectors, Vector}
 import linalg.util._
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.{ListBuffer, Seq}
 import scala.language.higherKinds
 import scala.language.implicitConversions
 import scala.util.control.Breaks._
@@ -76,7 +76,6 @@ class AugmentedMatrixThings[N: Number] {
      class AugmentedMatrixIsLinearSystem extends AugmentedMatrixIsMatrixLike with LinearSystem[AugmentedMatrix[N], N]{
 
 
-
           def isInconsistent(mat: AugmentedMatrix[N]): Boolean = {
                //does there exist a zero row in rrefA where the same row has consts in the rrefB?
                mat.rrefAll.getRows().exists(row => row.getElements().init.forall(_.isZero) &&
@@ -86,14 +85,14 @@ class AugmentedMatrixThings[N: Number] {
           //Assume: the system of equations is in matrix A and the user has passed the correct
           // identity matrix as matrix B. //TODO correct? Or just skip B and make the correct identity mat here???
           def hasUniqueSolution(mat: AugmentedMatrix[N]): Boolean =
-               mat.rrefA === SquareMatrix.IDENTITY[N](mat.rrefA)
+               mat.rrefA === Matrix.IDENTITY[N](mat.rrefA)
 
 
           def hasInfiniteSolutions(mat: AugmentedMatrix[N]): Boolean = {
-               isConsistent(mat) && mat.rrefA === SquareMatrix.IDENTITY[N](mat.rrefA)
+               isConsistent(mat) && mat.rrefA === Matrix.IDENTITY[N](mat.rrefA)
           }
 
-          private def infiniteSolutionSolver(mat: AugmentedMatrix[N]): Matrix[N] ={
+          def infiniteSolutionSolver(mat: AugmentedMatrix[N]): AugmentedMatrix[N] ={
                //get the indices of free cols
                val freeIndices: Array[Int] = Util.getIndicesOfFreeColumns(mat.rrefA)
                //get the freecolumns and attach to each column another zero vector to make it length = numcolsrref
@@ -111,9 +110,9 @@ class AugmentedMatrixThings[N: Number] {
 
                // make new "matrix" from listbuffer that is old rref transposed with numcol = numfree and zeroes
                // everywhere but in row positions where free col positions we put rows of identity matrix
-               val id: Seq[ListBuffer[N]] = Matrix.IDENTITY[N](free.numCols).getRows().map(vec => vec.toListB)
-               val sol: ListBuffer[ListBuffer[N]] = ListBuffer.fill[N](mat.rrefA.numCols, free.numCols)(Number.ZERO[N])
-               val freeRows: Seq[ListBuffer[N]] = free.getRows().map(vec => vec.toListB)
+               val id: Seq[Seq[N]] = Matrix.IDENTITY[N](free.numCols).getRows().map(vec => vec.toListB)
+               val sol: Seq[Seq[N]] = Seq.fill[N](mat.rrefA.numCols, free.numCols)(Number.ZERO[N])
+               val freeRows: Seq[Seq[N]] = free.getRows().map(vec => vec.toListB)
                //fill the row pos with identity rows corresponding to free col pos
                var freeRowIndex: Int = 0
                var idRowIndex: Int = 0
@@ -141,7 +140,7 @@ class AugmentedMatrixThings[N: Number] {
 
                //then add the B cols to the front of our solution, never the case for kernel where B={0}
                if(mat.B.isZero)
-                    solution
+                    solution.toAugMatrix
                else {
                     //else making constants column and elongating it such that it is as long as solution numrows
                     // Step 1: first get the pivot indexes (where pivot 1)
@@ -151,7 +150,7 @@ class AugmentedMatrixThings[N: Number] {
                     // it's sliced from rrefThis. Filter to get tuples with nonzero rrefB elements.
                     val tuples = pivotIndices.zip(Util.expressColsAsRows(mat.rrefB))
                     val tuplesNoZeroRows = tuples.filter({
-                         case (index, vec) => vec.getElements().forall(_ === Number[N].zero)
+                         case (index, vec) => vec.getElements().forall(e => e.isZero)
                     })
                     // Step 3: fill zeroes between the elements indices.
                     val maxIndex: Int = tuplesNoZeroRows.map(_._1).max // get max index to make list
@@ -163,15 +162,16 @@ class AugmentedMatrixThings[N: Number] {
                          newRrefB = Util.insert(elems, index, newRrefB)
                     }
                     newRrefB = Util.expressRowsAsCols(newRrefB)
-                    Matrix.fromSeqs(newRrefB:_*).combine(solution) //note implicit vecset => matrix
+
+                    AugmentedMatrix(Matrix(newRrefB:_*), solution)
                }
           }
 
 
-          def solve(): Option[Matrix[N]] ={
-               if(hasNoSolution()) None
-               else if(hasUniqueSolution()) Some(Matrix[N](rrefThis.getColumns().takeRight(B.numCols):_*))
-               else Some(infiniteSolutionSolver())
+          def solve(mat: AugmentedMatrix[N]): Option[Matrix[N]] ={
+               if(hasNoSolution(mat)) None
+               else if(hasUniqueSolution(mat)) Some(Matrix[N](mat.rrefAll.getColumns().takeRight(mat.B.numCols):_*))
+               else Some(infiniteSolutionSolver(mat))
           }
      }
 
@@ -186,6 +186,7 @@ class AugmentedMatrixThings[N: Number] {
      val vectorSpace = new AugmentedMatrixIsVectorSpace
      val vsetLike = new AugmentedMatrixIsSetVecLike
      val matrixLike = new AugmentedMatrixIsMatrixLike
+     val linearSystem = new AugmentedMatrixIsLinearSystem
 }
 
 
@@ -199,7 +200,7 @@ trait AugmentedMatrixInstances {
      implicit final def augMatrixHasEq[N: Number] = new AugmentedMatrixThings[N].eq
      implicit final def augMatrixHasDimension[N: Number] = new AugmentedMatrixThings[N].dim
      implicit final def augMatrixIsMatrixLike[N: Number] = new AugmentedMatrixThings[N].matrixLike
-
+     implicit final def augMatrixIsLinearSystem[N: Number] = new AugmentedMatrixThings[N].linearSystem
 
 }
 

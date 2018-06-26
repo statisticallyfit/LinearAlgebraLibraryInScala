@@ -3,9 +3,11 @@ package linalg.instances.std
 import linalg.implicits._
 import linalg._
 import linalg.kernel.{Complex, Imaginary, Rational, Real}
+import linalg.matrix.AugmentedMatrix
 import linalg.vector.{SetOfVectors, Vector}
 import org.apache.commons.lang3.StringUtils
 
+import scala.collection.mutable.ListBuffer
 import scala.language.higherKinds
 import scala.language.implicitConversions
 
@@ -58,6 +60,41 @@ trait ShowInstances {
      implicit def SetVecHasShow[N: Number] = new Show[SetOfVectors[N]]{
           def show(vset: SetOfVectors[N]): String = showVecSet(vset)
      }
+
+     implicit def AugmentedMatrixHasShow[N: Number] = new Show[AugmentedMatrix[N]] {
+          def show(mat: AugmentedMatrix[N]): String = showAugMatrix(mat)
+
+     }
+
+
+     private def showAugMatrix[N:Number](mat: AugmentedMatrix[N]): String ={
+          val colsStr: Seq[Seq[String]] = mat.getColumns().map(vec => vec.getElements().map(e => e.toString))
+
+          // max widths measured per col
+          val maxWidths: Seq[Int] = colsStr.map(vec => vec.reduceLeft((acc,y) =>
+               if(acc.length > y.length) acc else y)).map(_.length)
+
+          val maxWidthsTwoDim: Seq[List[Int]] = maxWidths.map(elem => List.fill(mat.numRows)(elem))
+
+          // col center length tupled with actual matrix col element in vector of vectors
+          val pairs = colsStr.zip(maxWidthsTwoDim).map(pair => pair._1.zip(pair._2))
+          val alignedCols/*: ListBuffer[List[String]]*/ = pairs.map(vec =>
+               vec.map(pair => StringUtils.leftPad(pair._1.toString, pair._2)))
+
+          var sepAlignedCols: Seq[List[String]] = alignedCols.take(mat.A.numCols) ++= List.fill[String](mat.A.numRows)("|")
+          sepAlignedCols = sepAlignedCols ++ alignedCols.drop(mat.A.numCols)
+
+          // note: let maxWidth + 2 separate the numbers in the row
+          if(mat.numRows == 1)
+               return "\n{" + sepAlignedCols.transpose.head.mkString("  ") + "}"
+          val firstRow: String = "\n/ " + sepAlignedCols.transpose.head.mkString("  ") + " \\\n"
+          val lastRow: String = "\\ " + sepAlignedCols.transpose.last.mkString("  ") + " /"
+          val middleRows: Seq[String] = sepAlignedCols.transpose.tail.init.map(list => "| " + list.mkString("  ") + " |\n")
+
+          firstRow + middleRows.mkString + lastRow
+     }
+
+
 
      private def showVecSet[N:Number](vset: SetOfVectors[N]): String ={
           val colsStr: Seq[Seq[String]] = vset.getColumns().map(vec => vec.getElements().map(elem => elem.toString))

@@ -2,6 +2,7 @@ package linalg.instances.linear
 
 import linalg.implicits._
 import linalg._
+import linalg.matrix.{AugmentedMatrix, Matrix}
 import linalg.vector.{SetOfVectors, Vector}
 import linalg.util._
 import spire.algebra.Eq
@@ -60,22 +61,21 @@ class SetVecThings[N: Number] {
 
      class SetVecSpan extends SetVecIsSetVecLike with Span[Vector[N], SetOfVectors[N], N]{
 
-          //TODO why doesn't implicit syntax work , why have to call rref with vv. ??
-          //private val vv: SetVecLike[SetOfVectors[N], N] = implicitly[SetVecLike[SetOfVectors[N], N]]
-
-
           def span(vset: SetOfVectors[N]): SetOfVectors[N] = Util.span(vset)
-
           def doesSetSpanTheSpace(vset: SetOfVectors[N]): Boolean ={
-               ???
+               val system = AugmentedMatrix(vset, Matrix.IDENTITY[N](vset))
+               system.isConsistent()
           }
 
           def doesSetSpanTheVector(vset: SetOfVectors[N], v: Vector[N]): Boolean ={
-               ???
+               val system = AugmentedMatrix(vset, v)
+               system.isConsistent()
           }
 
           def getSpanningCoefficients(vset: SetOfVectors[N], v: Vector[N]): Option[List[N]] ={
-               ???
+               doesSetSpanTheVector(vset, v) match {
+                    case true => 
+               }
           }
      }
 

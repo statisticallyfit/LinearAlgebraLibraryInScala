@@ -7,7 +7,8 @@ import linalg.util._
 
 import scala.language.higherKinds
 import scala.language.implicitConversions
-import scala.collection.mutable.{ListBuffer, Seq}
+
+import scala.collection.mutable.Seq
 
 /**
   *

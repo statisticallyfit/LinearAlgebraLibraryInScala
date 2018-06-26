@@ -22,6 +22,10 @@ trait GeneralImplicits {
           def toListB: ListBuffer[N] = ListBuffer(v.getElements():_*)
      }
 
+     implicit class SeqImplicits[N:Number](v: Seq[N]) {
+          def toListB: ListBuffer[N] = ListBuffer(v:_*)
+     }
+
      //converting setvec to matrix so that plus(vset, wset) works with matrices too (fine to
      // pass in matrices but returning setvec is wrong for a matrix
      implicit class SetVecToMatrix[N: Number](vset: SetOfVectors[N]) {
@@ -31,7 +35,7 @@ trait GeneralImplicits {
           def toHessianMatrix: HessianMatrix[N] = HessianMatrix(vset.getColumns():_*)
           def toSquareMatrix: SquareMatrix[N] = SquareMatrix(vset.getColumns():_*)
           def toSimilarMatrix: SimilarMatrix[N] = SimilarMatrix(vset.getColumns():_*)
-          def toAugMatrix: AugmentedMatrix[N] = AugmentedMatrix(vset.getColumns():_*)
+          def toAugMatrix: AugmentedMatrix[N] = AugmentedMatrix(vset.toMatrix) //so matrix B is zero
           //TODO def toHessenbergMatrix: HessenbergMatrix[N] = HessenbergMatrix(vset.getColumns():_*)
           //TODO hermitian, lowertri, uppertri, orthog
      }

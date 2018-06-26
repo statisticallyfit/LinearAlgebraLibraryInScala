@@ -30,4 +30,5 @@ trait AllInstances
      with MatrixInstances
      with JacobianMatrixInstances
      with HilbertMatrixInstances
+     with AugmentedMatrixInstances
 
