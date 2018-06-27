@@ -8,6 +8,7 @@ package linalg.theory.basis
   */
 trait Rank[V]  {
 
+     def isFullRank(vectorSpace: V): Boolean
      def rank(vectorSpace: V): Int
 }
 

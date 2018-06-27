@@ -2,6 +2,7 @@ package linalg.instances.std
 
 import cats.Eq
 import linalg._
+import linalg.kernel.Rational
 
 /**
   *
@@ -78,6 +79,7 @@ class DoubleIsRealNumber extends DoubleIsField
      def conjugate(x: Double): Double = x
      def isNegative(x: Double): Boolean = x < 0
      def doubleValue(x: Double): Double = x * 1.0
+     def denominator(x: Double): Int = Rational(x).den
      def from(x: Int): Double = x
 }
 

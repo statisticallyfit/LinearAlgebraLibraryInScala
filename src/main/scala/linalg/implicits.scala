@@ -36,9 +36,9 @@ trait GeneralImplicits {
      // pass in matrices but returning setvec is wrong for a matrix
      implicit class SetVecToMatrix[N: Number](vset: SetOfVectors[N]) {
           def toMatrix: Matrix[N] = Matrix(vset.getColumns():_*)
-          def toJacobianMatrix: JacobianMatrix[N] = JacobianMatrix(vset.getColumns():_*)
           def toHilbertMatrix: HilbertMatrix[N] = HilbertMatrix(vset.getColumns():_*)
-          def toHessianMatrix: HessianMatrix[N] = HessianMatrix(vset.getColumns():_*)
+          /*def toJacobianMatrix: JacobianMatrix[N] = JacobianMatrix(vset.getColumns():_*)
+          def toHessianMatrix: HessianMatrix[N] = HessianMatrix(vset.getColumns():_*)*/
           def toSquareMatrix: SquareMatrix[N] = SquareMatrix(vset.getColumns():_*)
           def toSimilarMatrix: SimilarMatrix[N] = SimilarMatrix(vset.getColumns():_*)
           def toAugMatrix: AugmentedMatrix[N] = AugmentedMatrix(vset.toMatrix) //so matrix B is zero

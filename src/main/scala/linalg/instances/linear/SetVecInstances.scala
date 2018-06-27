@@ -46,8 +46,8 @@ class SetVecThings[N: Number] {
      class SetVecIsSetVecLike extends SetVecIsVectorSpace with SetVecLike[SetOfVectors[N], N]{
           def isZero(vset: SetOfVectors[N]): Boolean = Util.isZero(vset)
           def rowReducedEchelon(vset: SetOfVectors[N]): SetOfVectors[N] = Util.rowReducedEchelon[N](vset)
+          def rowEchelon(mat: SetOfVectors[N]): SetOfVectors[N] = Util.rowEchelon(mat)
           def size(mat: SetOfVectors[N]): (Int, Int) = Util.size(mat)
-
      }
 
      class SetVecHasDimension extends Dimension[SetOfVectors[N]]{
@@ -88,6 +88,7 @@ class SetVecThings[N: Number] {
 
      class SetVecHasRank extends Rank[SetOfVectors[N]] {
           def rank(vset: SetOfVectors[N]): Int = Util.rank(vset)
+          def isFullRank(vset: SetOfVectors[N]): Boolean = Util.isFullRank(vset)
      }
 
      //val absolute = new SetVecHasAbsoluteValue

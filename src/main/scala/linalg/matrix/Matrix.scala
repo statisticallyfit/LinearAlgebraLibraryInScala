@@ -2,7 +2,6 @@ package linalg.matrix
 
 import linalg.implicits._
 import linalg._
-import linalg.instances.linear.JacobianMatrixThings
 import linalg.util.Util
 import linalg.vector.{SetOfVectors, Vector}
 

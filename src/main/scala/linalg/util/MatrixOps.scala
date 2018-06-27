@@ -13,7 +13,21 @@ import scala.util.control.Breaks.{break, breakable}
   */
 trait MatrixOps {
 
+     def multiply[N: Number](mat1: Matrix[N], mat2: Matrix[N]): Matrix[N] = {
+          Util.ensureSizeMat(mat1, mat2)
 
+          val prod: Seq[Seq[N]] = Seq.fill[N](mat1.numCols, mat1.numRows)(Number[N].zero)
+          for(r <- 0 until mat1.numRows){
+               for(c <- 0 until mat2.numCols){
+                    for(k <- 0 until mat1.numCols){
+                         //note it would be get(r, k) and get(k, c) if our internal matrices were represented with
+                         // rows, but they are represented in cols so use this inverted call.
+                         prod(c)(r) = (prod(c)(r) + mat1.get(k, r)) * mat2.get(c, k)
+                    }
+               }
+          }
+          Matrix.fromSeqs[N](prod:_*)
+     }
      def power[N: Number](mat1: Matrix[N], exp: N): Matrix[N] = ???
 
      def inverse[N: Number](mat: Matrix[N]): Matrix[N] = ??? // TODO - solve using augmented?
@@ -110,7 +124,7 @@ trait MatrixOps {
 
      def isInconsistent[N: Number](mat: AugmentedMatrix[N]): Boolean = {
           //does there exist a zero row in rrefA where the same row has consts in the rrefB?
-          mat.rrefAll.getRows().exists(row => row.getElements().init.forall(_.isZero) &&
+          mat.rrefEntire.getRows().exists(row => row.getElements().init.forall(_.isZero) &&
                row.getElements().drop(mat.A.numCols).exists(elem => ! elem.isZero))
      }
 
@@ -206,7 +220,7 @@ trait MatrixOps {
 
      def solve[N: Number](mat: AugmentedMatrix[N]): Option[Matrix[N]] ={
           if(mat.hasNoSolution()) None
-          else if(hasUniqueSolution(mat)) Some(Matrix[N](mat.rrefAll.getColumns().takeRight(mat.B.numCols):_*))
+          else if(hasUniqueSolution(mat)) Some(Matrix[N](mat.rrefEntire.getColumns().takeRight(mat.B.numCols):_*))
           else Some(infiniteSolutionSolver(mat))
      }
 
@@ -221,7 +235,12 @@ trait MatrixOps {
 
 
 
+     def ensureSizeMat[N:Number](mat1: Matrix[N], mat2: Matrix[N]): Unit = {
 
+          if(mat1.numCols != mat2.numRows) {
+               throw Util.MatrixLikeSizeException("Matrices do not have correct size for multiplication.")
+          }
+     }
 
 
 
@@ -237,46 +256,73 @@ trait MatrixOps {
      //TODO but then would have to make squarematlike typeclass -- too grainy.
      object Id {
 
+          def isIdentity[N: Number](mat: Matrix[N]): Boolean = {
+               if(!isSquare(mat)) return false
+
+               for(r <- 0 until mat.numRows){
+                    for(c <- 0 until mat.numCols){
+                         if((r != c && !mat.get(r,c).isZero) || (r == c && !mat.get(r,c).isZero)){
+                              return false //found a violation
+                         }
+                    }
+               }
+               true // no violation
+          }
+
           def isSquare[N: Number](mat: Matrix[N]): Boolean = mat.numRows == mat.numCols
 
-          def isSymmetric[N: Number](smat: SquareMatrix[N]): Boolean={
-               ??? //smat == smat.transpose()
-          }
+          def isSymmetric[N: Number](mat: Matrix[N]): Boolean = mat === mat.transpose()
 
-          def isHermitian[N: Number](smat: SquareMatrix[N]): Boolean={
-               ??? //smat == smat.conjugateTranspose()
-          }
+          def isSkewSymmetric[N: Number](mat: Matrix[N]): Boolean = mat === mat.transpose().negate()
 
-          //TODO need shapeless to automatically derive typeclass instances for squaremat??
-          def isUnitary[N: Number](smat: SquareMatrix[N]): Boolean ={
-               ???
-               ///SquareMatrix.IDENTITY[N](smat.dimension()) == (smat * smat.conjugateTranspose())
-          }
+          def isHermitian[N: Number](mat: Matrix[N]): Boolean = mat === mat.conjugateTranspose()
 
-          def isOrthogonal[N: Number](smat: SquareMatrix[N]): Boolean ={
-               ???
-               //SquareMatrix.IDENTITY[N](smat.dimension()) == (smat * smat.transpose())
-          }
+          def isUnitary[N: Number](mat: Matrix[N]): Boolean = isIdentity(mat * mat.conjugateTranspose())
+
+          def isOrthogonal[N: Number](mat: Matrix[N]): Boolean = isIdentity(mat * mat.transpose())
 
           def isLowerTriangular[N: Number](mat: Matrix[N]): Boolean ={
+               if(!isSquare(mat)) return false
+
                for(r <- 0 until mat.numRows){
                     for(c <- 0 until mat.numCols){
                          if(c > r && mat.get(r, c) != 0)
-                              false
+                              return false
                     }
                }
                true
           }
 
           def isUpperTriangular[N: Number](mat: Matrix[N]): Boolean ={
+               if(!isSquare(mat)) return false
+
                for(r <- 0 until mat.numRows){
                     for(c <- 0 until mat.numCols){
                          if(c < r && mat.get(r, c) != 0)
-                              false
+                              return false
                     }
                }
                true
           }
+
+          //TODO add more identity matrix functions for all kinds: Hessian, hilbert ... etc
+          def isHilbert[N: Number](mat: Matrix[N]): Boolean ={
+               if(!isSquare(mat)) return false
+
+               for(r <- 0 until mat.numRows) {
+                    for(c <- 0 until mat.numCols) {
+
+                         val hilbertValue: N = Number[N].one / Number[N].from(r + c - 1)
+
+                         if(mat.get(r,c) =!= hilbertValue){
+                              return false
+                         }
+                    }
+               }
+               true
+          }
+          //TODO if want to keep hessenberg, see this definition:
+          //TODO https://people.cs.kuleuven.be/~raf.vandebril/homepage/publications/papers_html/imp_q_ss/node2.html
      }
 
      object Trans {

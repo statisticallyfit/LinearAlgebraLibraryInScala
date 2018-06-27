@@ -49,6 +49,8 @@ class AugmentedMatrixThings[N: Number] {
 
      class AugmentedMatrixIsSetVecLike extends AugmentedMatrixIsVectorSpace with SetVecLike[AugmentedMatrix[N], N]{
           def isZero(mat: AugmentedMatrix[N]): Boolean = Util.isZero(mat)
+          def rowEchelon(mat: AugmentedMatrix[N]): AugmentedMatrix[N] =
+               AugmentedMatrix(mat.echelonA, mat.echelonB)
           def rowReducedEchelon(mat: AugmentedMatrix[N]): AugmentedMatrix[N] =
                AugmentedMatrix(mat.rrefA, mat.rrefB)
 
@@ -57,6 +59,8 @@ class AugmentedMatrixThings[N: Number] {
 
      class AugmentedMatrixIsMatrixLike extends AugmentedMatrixIsSetVecLike with MatrixLike[AugmentedMatrix[N], N] {
 
+          def multiply(mat1: AugmentedMatrix[N], mat2: AugmentedMatrix[N]): AugmentedMatrix[N] =
+               Util.multiply(mat1, mat2).toAugMatrix
           def power(mat: AugmentedMatrix[N], exp: N): AugmentedMatrix[N] = Util.power(mat, exp).toAugMatrix
           def inverse(mat: AugmentedMatrix[N]): AugmentedMatrix[N] = Util.inverse(mat).toAugMatrix
           def transpose(mat: AugmentedMatrix[N]): AugmentedMatrix[N] = Util.transpose(mat).toAugMatrix

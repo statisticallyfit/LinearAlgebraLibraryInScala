@@ -11,7 +11,8 @@ trait SetVecLikeSyntax extends VectorSpaceSyntax {
 
      implicit class SetVecLikeOps[S[_], N: Number](current: S[N])(implicit ev: SetVecLike[S[N], N]){
 
-          def rowReducedEchelon(): S[N] = ev.rowReducedEchelon(current)
+          def reducedEchelon(): S[N] = ev.rowReducedEchelon(current)
+          def echelon(): S[N] = ev.rowEchelon(current)
           def minus(other: S[N]): S[N] = ev.minus(current, other)
           def isZero: Boolean = ev.isZero(current)
           def size(): (Int, Int) = ev.size(current)

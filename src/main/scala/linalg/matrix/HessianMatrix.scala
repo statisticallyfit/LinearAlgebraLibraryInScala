@@ -1,3 +1,4 @@
+/*
 package linalg.matrix
 
 import linalg._
@@ -35,4 +36,4 @@ object HessianMatrix {
      def fromSeq[N: Number](nr: Int, nc: Int, seq: Seq[N]): HessianMatrix[N] ={
           fromSeqs(seq.grouped(nc).toList.map(s => Seq(s:_*)):_*)
      }
-}
+}*/

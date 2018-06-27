@@ -80,6 +80,7 @@ class RationalIsRealNumber extends RationalIsField
      def conjugate(x: Rational): Rational = x
      def isNegative(x: Rational): Boolean = x.num < 0
      def doubleValue(x: Rational): Double = x.num * 1.0 / x.den
+     def denominator(x: Rational): Int = x.den
      def from(x: Int): Rational = Rational(x)
 }
 

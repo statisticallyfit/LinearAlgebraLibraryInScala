@@ -5,7 +5,7 @@ import spire.algebra.Eq
 import linalg.implicits._
 import linalg._
 import linalg.util._
-import linalg.vector.{Polynomial, SetOfVectors, Vec2, Vector}
+import linalg.vector.{Polynomial, SetOfVectors, Vector}
 
 import scala.collection.mutable.Seq
 

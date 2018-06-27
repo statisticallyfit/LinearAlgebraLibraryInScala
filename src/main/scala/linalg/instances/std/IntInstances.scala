@@ -81,6 +81,7 @@ class IntIsRealNumber extends IntIsField
      def conjugate(x: Int): Int = x
      def isNegative(x: Int): Boolean = x < 0
      def doubleValue(x: Int): Double = x * 1.0
+     def denominator(x: Int): Int = 1
      def from(x: Int): Int = x
 }
 

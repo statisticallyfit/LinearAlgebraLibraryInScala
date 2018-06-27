@@ -5,7 +5,7 @@ package linalg.theory.space
   */
 trait NullSpace[U, F] extends VectorSpace[U, F] {
      def isInNullSpace(vset: U, v: U): Boolean
-     def nullSpace(vset: U): U
+     def nullSpace(vset: U): U // the basis formed by solutio
      def nullity(vset: U): Int
 }
 

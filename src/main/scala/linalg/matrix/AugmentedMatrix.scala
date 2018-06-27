@@ -14,9 +14,13 @@ class AugmentedMatrix[N: Number](val A: SetOfVectors[N], val B: SetOfVectors[N])
      extends Matrix[N](Util.colCombine(A, B).getColumns():_*) {
 
 
-     val rrefAll: SetOfVectors[N] = Util.rowReducedEchelon(this)
-     val rrefA: SetOfVectors[N] = SetOfVectors(rrefAll.getColumns().take(A.numCols):_*)
-     val rrefB: SetOfVectors[N] = SetOfVectors(rrefAll.getColumns().takeRight(B.numCols):_*)
+     val rrefEntire: SetOfVectors[N] = Util.rowReducedEchelon(this)
+     val rrefA: SetOfVectors[N] = SetOfVectors(rrefEntire.getColumns().take(A.numCols):_*)
+     val rrefB: SetOfVectors[N] = SetOfVectors(rrefEntire.getColumns().takeRight(B.numCols):_*)
+
+     val echelonEntire: SetOfVectors[N] = Util.rowEchelon(this)
+     val echelonA: SetOfVectors[N] = SetOfVectors(echelonEntire.getColumns().take(A.numCols):_*)
+     val echelonB: SetOfVectors[N] = SetOfVectors(echelonEntire.getColumns().takeRight(B.numCols):_*)
 
      override def toString: String = Show[AugmentedMatrix[N]].show(this)
 }

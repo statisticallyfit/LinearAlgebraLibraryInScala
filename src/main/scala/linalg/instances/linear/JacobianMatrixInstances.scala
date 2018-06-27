@@ -1,3 +1,4 @@
+/*
 
 package linalg.instances.linear
 
@@ -61,6 +62,8 @@ class JacobianMatrixThings[N: Number] {
 
      class JacobianMatrixIsMatrixLike extends JacobianMatrixIsSetVecLike with MatrixLike[JacobianMatrix[N], N] {
 
+          def multiply(mat1: JacobianMatrix[N], mat2: JacobianMatrix[N]): JacobianMatrix[N] =
+               Util.multiply(mat1, mat2).toJacobianMatrix
           def power(mat: JacobianMatrix[N], exp: N): JacobianMatrix[N] = Util.power(mat, exp).toJacobianMatrix
           def inverse(mat: JacobianMatrix[N]): JacobianMatrix[N] = Util.inverse(mat).toJacobianMatrix
           def transpose(mat: JacobianMatrix[N]): JacobianMatrix[N] = Util.transpose(mat).toJacobianMatrix
@@ -104,3 +107,4 @@ trait JacobianMatrixInstances {
 
 }
 
+*/

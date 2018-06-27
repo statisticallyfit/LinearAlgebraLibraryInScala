@@ -4,6 +4,7 @@ import linalg._
 import linalg.implicits._
 import linalg.vector.{SetOfVectors, Vector}
 import cats.Eq
+import linalg.kernel.Rational
 import linalg.matrix.{AugmentedMatrix, Matrix}
 
 import scala.collection.mutable
@@ -63,9 +64,64 @@ trait SetVecOps {
      }
 
 
-     //def rowEchelon[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = rref(vset, reduced = false)
+     def rowEchelon[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] =
+          rowEchelonNoFractions(vset)
+
+     private def rowEchelonNoFractions[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] ={
+          var echelon: SetOfVectors[N] = sedenionRref(vset, reduced = false)
+
+          def getMaxDenom(aRow: Vector[N]): Int = aRow.getElements().map(e => e.denominator()).max
+
+          for(r <- 0 until vset.numRows){
+               val maxDenom: N = Number[N].from(getMaxDenom(vset.getRow(r)))
+               echelon = scaleRow(r, maxDenom, echelon)
+          }
+          echelon
+     }
 
      def rowReducedEchelon[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
+          sedenionRref(vset, reduced=true)
+     }
+
+     private def sedenionRref[N: Number](vset: SetOfVectors[N], reduced: Boolean): SetOfVectors[N] ={
+          var echelon: SetOfVectors[N] = vset.copy(); // Clone Matrix so algorithm may be performed in place.
+
+          var i: Int = 0
+          var j: Int = 0
+
+          while(i < vset.numRows && j < vset.numCols) {
+               //look for target value in column
+               var iMax: Int = i
+
+               for (k <- (i + 1) until vset.numRows) {
+                    if (echelon.get(k, j) > echelon.get(iMax, j)) {
+                         iMax = k
+                    }
+               }
+               if (!echelon.get(iMax, j).isZero) {
+                    // Swap pivot row into place
+                    echelon = swapRows(i, iMax, echelon)
+                    // Scale pivot row
+                    echelon = scaleRow(i, echelon.get(i, j).inverse(), echelon)
+                    // Fill all lower rows with 0
+                    for (u <- (i + 1) until vset.numRows) {
+                         echelon = sumRows(u, i, echelon.get(u, j).negate(), echelon)
+                    }
+                    if (reduced) { //if above cols need filling ...
+                         val reversedIndices = (0 to (i - 1)).reverse
+                         for (u <- reversedIndices) {
+                              echelon = sumRows(u, i, echelon.get(u, j).negate(), echelon)
+                         }
+                    }
+                    // next row
+                    i = i + 1
+               }
+               j = j + 1 //next column
+          }
+          return echelon //Return the transformed matrix.
+     }
+
+     private def rref[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] ={
           var echelonMatrix: SetOfVectors[N] = vset.copy()
           var lead: Int = 0
           val nRows: Int = vset.numRows
@@ -123,7 +179,7 @@ trait SetVecOps {
 
      //Page 246 of howard: basis for the space spanned by a set of vectors
      def basis[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
-          val freeCols: Seq[Int] = getIndicesOfFreeColumns(vset.rowReducedEchelon())
+          val freeCols: Seq[Int] = getIndicesOfFreeColumns(vset.reducedEchelon())
           SetOfVectors(vset.getColumnsAt(freeCols:_*):_*)
      }
 
@@ -147,13 +203,15 @@ trait SetVecOps {
      }
 
      def isLinearlyIndependent[N: Number](vset: SetOfVectors[N]): Boolean = {
-          vset.rowReducedEchelon() === SetOfVectors.IDENTITY(vset)
+          vset.reducedEchelon() === SetOfVectors.IDENTITY(vset)
      }
 
      def rank[N: Number](vset: SetOfVectors[N]): Int = {
           val rref: SetOfVectors[N] = Util.rowReducedEchelon(vset)
           rref.getRows().count(row => ! row.isZero)
      }
+
+     def isFullRank[N: Number](vset: SetOfVectors[N]): Boolean = rank(vset) == vset.numRows
 
 
 

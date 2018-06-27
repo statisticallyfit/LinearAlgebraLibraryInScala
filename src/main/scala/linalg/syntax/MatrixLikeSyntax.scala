@@ -12,6 +12,7 @@ trait MatrixLikeSyntax extends SetVecLikeSyntax {
 
      implicit class MatrixLikeOps[M[_], N: Number](current: M[N])(implicit mat: MatrixLike[M[N], N]){
 
+          def *(other: M[N]): M[N] = mat.multiply(current, other)
           def power(exp: N): M[N] = mat.power(current, exp)
           def inverse(): M[N] = mat.inverse(current)
           def transpose(): M[N] = mat.transpose(current)

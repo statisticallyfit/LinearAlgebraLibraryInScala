@@ -7,7 +7,8 @@ package linalg.theory.basis
 trait Span[V, W, F]{
 
      // Returns a set that spans/generates the generic vecspace (gets the basis)
-     def span(vset: W): W
+     def span(vset: W): W //see page 198 poole, another way to do it without
+     // finding the basis, checking which set of vectors is linear independent.
 
      // If the system is consistent then it spans the space R#, where # = numrows.
      // Example 3.10 - singh book, page 198 = howard book

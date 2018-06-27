@@ -1,9 +1,8 @@
 package linalg
 
 import linalg.implicits._
-import linalg.instances.linear.AugmentedMatrixInstances
 import linalg.kernel.{Complex, Rational, Real}
-import linalg.matrix.{AugmentedMatrix, HilbertMatrix, JacobianMatrix, Matrix}
+import linalg.matrix.{AugmentedMatrix, HilbertMatrix, Matrix}
 import linalg.vector.{SetOfVectors, Vector}
 import linalg.util._
 
@@ -13,42 +12,9 @@ import scala.collection.mutable.ListBuffer
   */
 
 
-import shapeless._
-
-
-
-
 
 object Tester extends App {
 
-     /*val m: SetOfVectors[Int] = SetOfVectors(Vector(1,2,3), Vector(-8, 4, 2))
-     println("rref(m) = " + m.rowReducedEchelon())
-     println("dimension = " + m.dimension())
-
-     Vector(1,2,3).dimension()
-     Vector(1,2,3).isLinearlyIndependent()
-
-     //Vector(1,2).abs()
-     //TODO m.abs()
-
-     val mat: Matrix[Int] = Matrix(Vector(3,5,7), Vector(9, 8, 5))
-     mat.rowReducedEchelon()
-     mat.adjoint()
-
-     val m1: JacobianMatrix[Int] = JacobianMatrix(Vector(1,2,3), Vector(3,4,2))
-     m1.rowReducedEchelon()
-     m1.adjoint()
-     m1.dimension()
-
-     val m2: HilbertMatrix[Int] = HilbertMatrix(Vector(1,2,3), Vector(3,4,2))
-     m2.rowReducedEchelon()
-     m2.adjoint()
-     m2.dimension()
-
-     mat + mat*/
-
-
-     // -----------------------------------------------------------------------------------------------
      val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i + Rational(1)
      val b1: Complex[Int] = 3 + 5.i + 3
      val c1: Complex[Int] = 1 - 2.i
@@ -147,7 +113,7 @@ object Tester extends App {
      val aug1: AugmentedMatrix[Real] = AugmentedMatrix(vset1, b)
      println("Augmented: " + aug1)
 
-     val augref1 = aug1.rowReducedEchelon()
+     val augref1 = aug1.reducedEchelon()
      println("Aug rref: " + augref1)
      println("Augmented solved: " + aug1.solve())
 
@@ -165,7 +131,7 @@ object Tester extends App {
      val aug2: AugmentedMatrix[Rational] = AugmentedMatrix(vset2, b2)
      println("Augmented2: " + aug2)
 
-     val augref2 = aug2.rowReducedEchelon()
+     val augref2 = aug2.reducedEchelon()
      println("Aug rref2: " + augref2)
      println("Augmented solved: " + aug2.solve())
 
@@ -177,10 +143,19 @@ object Tester extends App {
      println(aug1A.rowReducedEchelon())
      Console.println("1A: " + aug1A.solve())*/
 
-     /*val mat1A: Matrix[Real] = Matrix(Vector(1.0,2.0,-1.0), Vector(3.0,-1.0,2.0),  Vector(2.0,-1.0,1.0))
-     val v1A: Vector[Real] = Vector(5.0,1.0,3.0)
-     val aug1A = AugmentedMatrix[Real](mat1A, v1A)
-     Console.println("1A: " + aug1A.solve())*/
+     val mat3: Matrix[Rational] = Matrix(
+          Vector(-1,1,2), Vector(3,2,1), Vector(2,-3,-2)
+     )
+     val b3: Vector[Rational] = Vector(1,-9, -3)
+     val aug3 = AugmentedMatrix[Rational](mat3, b3)
+     println(aug3.reducedEchelon())
+     println(aug3.echelon())
+     println("Example 2: " + aug3.solve())
+
+
+     val mat4: Matrix[Rational] = Matrix(Vector(3,2,0),
+          Vector(-1,1,-5), Vector(5,3,1))
+     println(mat4.echelon())
 }
 
 

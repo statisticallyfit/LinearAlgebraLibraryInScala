@@ -1,3 +1,4 @@
+/*
 package linalg.matrix
 
 
@@ -7,6 +8,9 @@ import linalg.util._
 /**
   *
   */
+//TODO if want to keep hessenberg, see this definition:
+//TODO https://people.cs.kuleuven.be/~raf.vandebril/homepage/publications/papers_html/imp_q_ss/node2.html
+
 class HessenbergMatrix[N : Number](smat: SquareMatrix[N])
      extends SquareMatrix[N](Util.Trans.HessenbergTransformer.makeHessenberg(smat))
 
@@ -31,3 +35,4 @@ object HessenbergMatrix {
           fromSeqs(seq.grouped(nc).toList.map(s => Seq(s:_*)):_*)
      }
 }
+*/

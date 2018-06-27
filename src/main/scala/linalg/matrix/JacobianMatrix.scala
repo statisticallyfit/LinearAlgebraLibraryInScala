@@ -1,3 +1,4 @@
+/*
 package linalg.matrix
 
 import linalg._
@@ -34,4 +35,4 @@ object JacobianMatrix {
      def fromSeq[N: Number](nr: Int, nc: Int, seq: Seq[N]): JacobianMatrix[N] ={
           fromSeqs(seq.grouped(nc).toList.map(s => Seq(s:_*)):_*)
      }
-}
+}*/

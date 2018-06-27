@@ -5,7 +5,7 @@ package linalg.theory.space
   */
 trait ColumnSpace[C, F] extends VectorSpace[C, F] {
 
-     def isInColumnSpace(vset: C, v: C): Boolean //is the vector v in the colspace of vset?
+     def isInColumnSpace(vset: C, v: C): Boolean // true if and only if A * x = v is consistent.
      def columnSpace(vset: C): C
 }
 

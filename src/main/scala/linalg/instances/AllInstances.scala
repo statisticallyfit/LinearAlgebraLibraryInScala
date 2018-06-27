@@ -28,7 +28,8 @@ trait AllInstances
      with VectorInstances
      with SetVecInstances
      with MatrixInstances
-     with JacobianMatrixInstances
-     with HilbertMatrixInstances
+     //with JacobianMatrixInstances
+     //with HilbertMatrixInstances
      with AugmentedMatrixInstances
+     with SquareMatrixInstances
 

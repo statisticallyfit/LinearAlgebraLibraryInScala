@@ -1,3 +1,4 @@
+/*
 package linalg.instances.linear
 
 import spire.algebra.Eq
@@ -13,6 +14,10 @@ import scala.language.implicitConversions
 /**
   *
   */
+  *
+  *
+  * //TODO Check over all these implementations - can't just do what we did for rref form, need
+  * to consider hilbert as separate entity,????
 
 class HilbertMatrixThings[N: Number] {
 
@@ -50,11 +55,14 @@ class HilbertMatrixThings[N: Number] {
           def isZero(mat: HilbertMatrix[N]): Boolean = Util.isZero(mat)
           def rowReducedEchelon(mat: HilbertMatrix[N]): HilbertMatrix[N] =
                Util.rowReducedEchelon(mat).toHilbertMatrix
+          def rowEchelon(mat: HilbertMatrix[N]): HilbertMatrix[N] = Util.rowEchelon(mat).toHilbertMatrix
           def size(mat: HilbertMatrix[N]): (Int, Int) = Util.size(mat)
      }
 
      class HilbertMatrixIsMatrixLike extends HilbertMatrixIsSetVecLike with MatrixLike[HilbertMatrix[N], N] {
 
+          def multiply(mat1: HilbertMatrix[N], mat2: HilbertMatrix[N]): HilbertMatrix[N] =
+               Util.multiply(mat1, mat2).toHilbertMatrix
           def power(mat: HilbertMatrix[N], exp: N): HilbertMatrix[N] = Util.power(mat, exp).toHilbertMatrix
           def inverse(mat: HilbertMatrix[N]): HilbertMatrix[N] = Util.inverse(mat).toHilbertMatrix
           def transpose(mat: HilbertMatrix[N]): HilbertMatrix[N] = Util.transpose(mat).toHilbertMatrix
@@ -98,3 +106,4 @@ trait HilbertMatrixInstances {
 
 }
 
+*/

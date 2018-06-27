@@ -13,7 +13,7 @@ trait MatrixLike[M, F] extends SetVecLike[M, F] {
 
      //val identity: M //rule: identity is dim-by-dim wide (so numrows by numrows wide)
      // so that we can test if set spans a space
-
+     def multiply(m1: M, m2: M): M
      def power(m: M, exp: F): M //use linear algebra formula for matrix powers
      def inverse(m: M): M
      def transpose(m: M): M
