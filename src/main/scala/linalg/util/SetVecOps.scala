@@ -68,22 +68,21 @@ trait SetVecOps {
           rowEchelonNoFractions(vset)
 
      private def rowEchelonNoFractions[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] ={
-          var echelon: SetOfVectors[N] = sedenionRref(vset, reduced = false)
+          var echelon: SetOfVectors[N] = rref(vset, reduced = false)
 
-          def getMaxDenom(aRow: Vector[N]): Int = aRow.getElements().map(e => e.denominator()).max
-
-          for(r <- 0 until vset.numRows){
-               val maxDenom: N = Number[N].from(getMaxDenom(vset.getRow(r)))
-               echelon = scaleRow(r, maxDenom, echelon)
+          for(r <- 0 until echelon.numRows){
+               val denoms: Seq[Int] = echelon.getRow(r).getElements().map(e => e.denominator())
+               val lcm: N = Number[N].from(Util.lcmSeq(denoms:_*))
+               echelon = scaleRow(r, lcm, echelon)
           }
           echelon
      }
 
      def rowReducedEchelon[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
-          sedenionRref(vset, reduced=true)
+          rref(vset, reduced=true)
      }
 
-     private def sedenionRref[N: Number](vset: SetOfVectors[N], reduced: Boolean): SetOfVectors[N] ={
+     private def rref[N: Number](vset: SetOfVectors[N], reduced: Boolean): SetOfVectors[N] ={
           var echelon: SetOfVectors[N] = vset.copy(); // Clone Matrix so algorithm may be performed in place.
 
           var i: Int = 0
@@ -121,48 +120,6 @@ trait SetVecOps {
           return echelon //Return the transformed matrix.
      }
 
-     private def rref[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] ={
-          var echelonMatrix: SetOfVectors[N] = vset.copy()
-          var lead: Int = 0
-          val nRows: Int = vset.numRows
-          val nCols: Int = vset.numCols
-
-          breakable {
-               for(r <- 0 until nRows){
-                    if(lead >= nCols){
-                         break
-                    }
-                    var i: Int = r
-                    while (echelonMatrix.get(i, lead).isZero) { //then find the pivot element
-                         i = i + 1
-                         if (i == nRows){
-                              i = r
-                              lead = lead + 1
-                              if(lead == nCols) { //then we have found last pivot
-                                   return echelonMatrix
-                              }
-                         }
-                    }
-
-                    //swap rows i and r
-                    if(i != r) echelonMatrix = swapRows(i, r, echelonMatrix)
-
-                    //divide row r by rref[r][lead]
-                    echelonMatrix = scaleRow(r, echelonMatrix.get(r, lead).inverse(), echelonMatrix)
-
-                    for(j <- 0 until nRows){ //back-substitute upwards
-                         if(j != r){  //subtract row r * -rref[j][lead] from row j
-                              echelonMatrix = sumRows(j, r, echelonMatrix.get(j, lead).negate(), echelonMatrix)
-                         }
-                    }
-
-                    lead = lead + 1 //now looking for a pivot further to the right
-               }
-          }
-          //TODO nonzero rows alert fix where applicable SetOfVectors(expressRowsAsCols(getNonZeroRows(theRRef)):_*)
-          SetOfVectors(Util.expressRowsAsCols(getNonZeroRows(echelonMatrix)):_*)
-     }
-
 
 
      def span[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = rowReducedEchelon(vset)
@@ -183,7 +140,8 @@ trait SetVecOps {
           SetOfVectors(vset.getColumnsAt(freeCols:_*):_*)
      }
 
-     def isBasisOfSpace[N: Number](vset: SetOfVectors[N]): Boolean = vset === basis(vset)
+     def isBasisOfSpace[N: Number](vset: SetOfVectors[N]): Boolean = vset.rank() == vset.numRows
+     //vset === basis(vset)
 
 
      def getSpanningCoefficients[N: Number](vset: SetOfVectors[N], v: Vector[N]): Option[Matrix[N]] ={

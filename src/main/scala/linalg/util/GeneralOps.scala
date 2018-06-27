@@ -12,6 +12,31 @@ import scala.collection.mutable.Seq
   */
 trait GeneralOps {
 
+     def lcm(a: Int, b: Int): Int = a * b / gcd(a, b)
+
+     def lcmSeq(xs: Int*): Int = xs.reduceLeft((acc, y) => lcm(acc, y))
+
+     def gcd(a: Int, b: Int): Int = {
+          // everything divides 0
+          if(a == 0 || b == 0){
+               return 0
+          }
+
+          //base case
+          if(a == b){
+               return a
+          }
+          // if a is greater
+          if (a > b){
+               return gcd(a - b, b)
+          }
+          //else
+          return gcd(a, b - a)
+     }
+
+     def gcdSeq(xs: Int*): Int = xs.reduceLeft((acc, y) => gcd(acc, y))
+
+
      /**
        * Inserts element at position i, leaving list the same length as before.
        */

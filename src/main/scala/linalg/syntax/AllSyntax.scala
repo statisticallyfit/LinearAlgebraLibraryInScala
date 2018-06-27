@@ -33,6 +33,7 @@ trait AllSyntax
      with LinearSystemSyntax
      with SpanSyntax
      with BasisSyntax
+     with RankSyntax
 
 
 

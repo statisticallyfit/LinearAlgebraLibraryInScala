@@ -156,6 +156,14 @@ object Tester extends App {
      val mat4: Matrix[Rational] = Matrix(Vector(3,2,0),
           Vector(-1,1,-5), Vector(5,3,1))
      println(mat4.echelon())
+     println("is a rowspace? example: " + AugmentedMatrix(mat4.echelon(), mat4.reducedEchelon()).reducedEchelon())
+
+
+     val mat5: Matrix[Rational] = Matrix(Vector(1,2,-3,4),
+          Vector(1,-1,2,1), Vector(3,0,1,6), Vector(1,1,-2,1),
+          Vector(6,-1,1,3))
+     val aug5: AugmentedMatrix[Rational] = AugmentedMatrix(mat5, Vector[Rational](0,0,0,0))
+     println(aug5.solve()) //this is the basis for the nullspace: solution to Ax = 0
 }
 
 
