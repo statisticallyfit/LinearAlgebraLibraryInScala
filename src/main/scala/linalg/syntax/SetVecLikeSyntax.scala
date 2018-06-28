@@ -16,5 +16,6 @@ trait SetVecLikeSyntax extends VectorSpaceSyntax {
           def minus(other: S[N]): S[N] = ev.minus(current, other)
           def isZero: Boolean = ev.isZero(current)
           def size(): (Int, Int) = ev.size(current)
+          def transpose(): S[N] = ev.transpose(current)
      }
 }

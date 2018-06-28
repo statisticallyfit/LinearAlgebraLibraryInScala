@@ -24,7 +24,7 @@ trait SetVecOps {
 
      def size[N: Number](vset: SetOfVectors[N]): (Int, Int) = (vset.numRows, vset.numCols)
 
-     def dimension[N: Number](vset: SetOfVectors[N]): Int = vset.getColumns().head.dimension()
+     def dimension[N: Number](vset: SetOfVectors[N]): Int = vset.basis().numCols
 
      def eqv[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean = {
           vset.size() == wset.size() match {
@@ -284,6 +284,8 @@ trait SetVecOps {
      }*/
 
 
+
+     def transpose[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = SetOfVectors(vset.getRows(): _*)
 
      //precondition: expects the rref to come from undetermined system -- used for Solver
      // Gets indices of columns of original matrix with leading ones when in rref form.

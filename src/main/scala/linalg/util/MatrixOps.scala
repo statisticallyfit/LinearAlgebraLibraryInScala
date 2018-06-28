@@ -32,11 +32,9 @@ trait MatrixOps {
 
      def inverse[N: Number](mat: Matrix[N]): Matrix[N] = ??? // TODO - solve using augmented?
 
-     def transpose[N: Number](mat: Matrix[N]): Matrix[N] = Matrix(mat.getRows(): _*)
-
      def conjugateTranspose[N: Number](mat: Matrix[N]): Matrix[N] =
-          transpose(Matrix.fromSeqs(mat.getColumns().map(col => col.getElements()
-               .map(e => e.conjugate())):_*))
+          Util.transpose(Matrix.fromSeqs(mat.getColumns().map(col => col.getElements()
+               .map(e => e.conjugate())):_*)).toMatrix
 
      def adjoint[N: Number](mat: Matrix[N]): Matrix[N] = {
           //definition 6.19: adjoint = transpose(cofactor) if matrix is square
@@ -63,7 +61,7 @@ trait MatrixOps {
 
           val indexes: IndexedSeq[(Int, Int)] = for(r <- 0 until mat.numRows; c <- 0 until mat.numCols) yield (r, c)
           val cofactors = indexes.map(indexPair => cofactor(mat, indexPair._1, indexPair._2))
-          transpose(Matrix.fromSeq(mat.numRows, mat.numCols, cofactors))
+          Util.transpose(Matrix.fromSeq(mat.numRows, mat.numCols, cofactors)).toMatrix
      }
 
      def cofactor[N: Number](mat: Matrix[N], r:Int, c:Int): N = ((r + c) % 2 == 0) match {
@@ -74,7 +72,8 @@ trait MatrixOps {
      def minor[N: Number](mat: Matrix[N]): Matrix[N] ={
           val indexes: IndexedSeq[(Int, Int)] = for(r <- 0 until mat.numRows; c <- 0 until mat.numCols) yield (r, c)
           val minors = indexes.map(indexPair => minor(mat, indexPair._1, indexPair._2))
-          transpose(Matrix.fromSeq(mat.numRows, mat.numCols, minors)) //isrow=true since we travel along rows.
+          Util.transpose(Matrix.fromSeq(mat.numRows, mat.numCols, minors)).toMatrix //isrow=true since we travel along
+          // rows.
      }
 
      def minor[N: Number](mat: Matrix[N], r: Int, c: Int): N ={
@@ -96,7 +95,7 @@ trait MatrixOps {
                     }
                }
           }
-          determinant(transpose(Matrix(newMat:_*)))
+          determinant(Util.transpose(Matrix(newMat:_*)).toMatrix)
      }
 
      def determinant[N: Number](mat: Matrix[N]): N ={

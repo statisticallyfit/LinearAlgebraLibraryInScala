@@ -48,6 +48,7 @@ class SetVecThings[N: Number] {
           def rowReducedEchelon(vset: SetOfVectors[N]): SetOfVectors[N] = Util.rowReducedEchelon[N](vset)
           def rowEchelon(mat: SetOfVectors[N]): SetOfVectors[N] = Util.rowEchelon(mat)
           def size(mat: SetOfVectors[N]): (Int, Int) = Util.size(mat)
+          def transpose(vset: SetOfVectors[N]): SetOfVectors[N] = Util.transpose(vset)
      }
 
      class SetVecHasDimension extends Dimension[SetOfVectors[N]]{
@@ -71,6 +72,7 @@ class SetVecThings[N: Number] {
      //TODO ATTENTION!!! rowreducedechelon is implemented by removing zero rows at the end
      // TODO so need to fix that because a vset is only a basis of a space R^n if it is n by n and
      // TODO the cols are linealry independent.
+
      class SetVecBasis extends Basis[Vector[N], SetOfVectors[N], N]{
           //TODO check example 8 howard if impl. is truly correct ...
           def basis(vset: SetOfVectors[N]): SetOfVectors[N] = Util.basis(vset)

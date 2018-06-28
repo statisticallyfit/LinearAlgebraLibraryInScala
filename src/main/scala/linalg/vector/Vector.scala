@@ -24,9 +24,26 @@ import scala.language.higherKinds
 class Vector[N: Number](private val elems: N*) {
 
      private val elements: Seq[N] = Seq(elems:_*)
+     private var isRowVector: Boolean = false
+     private var isColVector: Boolean = true
 
      def copy(): Vector[N] = Vector(elements:_*)
      def copy(es: Seq[N]): Vector[N] = Vector(es:_*)
+
+     def toRow(): Vector[N] = {
+          this.isRowVector = true
+          this.isColVector = false
+          this
+     }
+
+     def toCol(): Vector[N] = {
+          this.isRowVector = false
+          this.isColVector = true
+          this
+     }
+
+     def isRow(): Boolean = this.isRowVector
+     def isCol(): Boolean = this.isColVector
 
      def set(index: Int)(value: N): Unit = elements(index) = value
      def get(index: Int): N = elements(index) //elements(index)

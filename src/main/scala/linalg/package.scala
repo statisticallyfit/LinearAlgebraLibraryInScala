@@ -51,7 +51,7 @@ package object linalg {
      type VectorSpace[V, F] = linalg.theory.space.VectorSpace[V, F]
      //type Subspace[S, F] = linalg.theory.space.Subspace[S, F]
      type ColumnSpace[C, F] = linalg.theory.space.ColumnSpace[C, F]
-     type RowSpace[R, F] = linalg.theory.space.RowSpace[R, F]
+     type RowSpace[V, W, F] = linalg.theory.space.RowSpace[V, W, F]
      type NullSpace[N, F] = linalg.theory.space.NullSpace[N, F]
      type InnerProductSpace[I, F] = linalg.theory.space.InnerProductSpace[I, F]
      type NormedVectorSpace[N, F] = linalg.theory.space.NormedVectorSpace[N, F]

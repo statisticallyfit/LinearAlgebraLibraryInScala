@@ -3,7 +3,7 @@ package linalg.instances.std
 import linalg.implicits._
 import linalg._
 import linalg.kernel.{Complex, Imaginary, Rational, Real}
-import linalg.matrix.AugmentedMatrix
+import linalg.matrix.{AugmentedMatrix, Matrix}
 import linalg.vector.{Polynomial, SetOfVectors, Vector}
 import org.apache.commons.lang3.StringUtils
 
@@ -59,7 +59,14 @@ trait ShowInstances {
      }
 
      implicit def VectorHasShow[N: Number] = new Show[Vector[N]]{
-          def show(v: Vector[N]): String = showVecSet(SetOfVectors(v))
+
+          def show(v: Vector[N]): String = {
+
+               v.isCol() match {
+                    case true => showVecSet(SetOfVectors(v))
+                    case false => showVecSet(SetOfVectors(v).transpose()) //torowvec
+               }
+          }
      }
 
      //todo

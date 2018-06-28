@@ -59,10 +59,24 @@ class VectorThings[N: Number]{
                Util.projection(v, onto)
           def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = Util.outerProduct(v, w)
           def crossProduct(u: Vector[N], v: Vector[N]): Option[Vector[N]] = Util.crossProduct(u, v)
+          def transpose(v: Vector[N]): Vector[N] = {
+               v.isRow() match {
+                    case true => {
+                         val newVec: Vector[N] = Vector(v.getElements())
+                         newVec.toCol()
+                         newVec
+                    }
+                    case false => {
+                         val newVec: Vector[N] = Vector(v.getElements())
+                         newVec.toRow()
+                         newVec
+                    }
+               }
+          }
      }
 
      class VectorHasDimension extends Dimension[Vector[N]] {
-          def dimension(v: Vector[N]): Int = Util.dimension(v)
+          def dimension(v: Vector[N]): Int = 1 //dim of vec = num of vectors in a basis for the vec
      }
 
      class VectorHasEq extends Eq[Vector[N]] {

@@ -53,6 +53,7 @@ class SquareMatrixThings[N: Number] {
                Util.rowReducedEchelon(mat).toSquareMatrix
           def rowEchelon(mat: SquareMatrix[N]): SquareMatrix[N] = Util.rowEchelon(mat).toSquareMatrix
           def size(mat: SquareMatrix[N]): (Int, Int) = Util.size(mat)
+          def transpose(mat: SquareMatrix[N]): SquareMatrix[N] = Util.transpose(mat).toSquareMatrix
      }
 
      class SquareMatrixIsMatrixLike extends SquareMatrixIsSetVecLike with MatrixLike[SquareMatrix[N], N] {
@@ -61,7 +62,6 @@ class SquareMatrixThings[N: Number] {
                Util.multiply(mat1, mat2).toSquareMatrix
           def power(mat: SquareMatrix[N], exp: N): SquareMatrix[N] = Util.power(mat, exp).toSquareMatrix
           def inverse(mat: SquareMatrix[N]): SquareMatrix[N] = Util.inverse(mat).toSquareMatrix
-          def transpose(mat: SquareMatrix[N]): SquareMatrix[N] = Util.transpose(mat).toSquareMatrix
           def conjugateTranspose(mat: SquareMatrix[N]): SquareMatrix[N] = Util.conjugateTranspose(mat).toSquareMatrix
           def adjoint(mat: SquareMatrix[N]): SquareMatrix[N] =  Util.adjoint(mat).toSquareMatrix
           def cofactor(mat: SquareMatrix[N]): SquareMatrix[N] = Util.cofactor(mat).toSquareMatrix

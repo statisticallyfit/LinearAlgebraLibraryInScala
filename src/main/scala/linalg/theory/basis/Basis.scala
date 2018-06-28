@@ -1,24 +1,26 @@
 package linalg.theory.basis
 
+import linalg._
+
 /**
   *
   */
-trait Basis[V, B, F] /*extends VectorSpace[B, F] with Span[B, F]*/ {
+trait Basis[V, W, F] /*extends VectorSpace[S, F] with VectorSpace[V, F]*/ {
 
      //note ifvecset cols are linearly independent, then the vecset is a basis for vecpsace V^n,
      // if not return None. which means this vecset is not a basis for the V^n vecspace.
      // prereq is isBasisOfSpaceWith function
      //TODO example 3.29 in singh uses the rows instead. versus page 246 howard
-     def basis(vspace: B): B
+     def basis(vset: W): W
 
      // is vset a basis for vecspace which they occupy? only if rank(vset) == numrows(vset)
-     def isBasisOfSpace(vset: B): Boolean // like isSpanned(vset)
+     def isBasisOfSpace(vset: W): Boolean // like isSpanned(vset)
 
      // is basis: B a basis for the vset?
-     def isBasisOfVector(vset: B, v: V): Boolean // like isSpanned(vset, v)
+     def isBasisOfVector(vset: W, v: V): Boolean // like isSpanned(vset, v)
 
      //is v in basis of vset?
-     def isInBasis(v: V, vset: B): Boolean = isBasisOfVector(vset, v)
+     def isInBasis(v: V, vset: W): Boolean = isBasisOfVector(vset, v)
 
 }
 

@@ -56,6 +56,7 @@ class MatrixThings[N: Number] {
           def rowReducedEchelon(mat: Matrix[N]): Matrix[N] = Util.rowReducedEchelon(mat).toMatrix
           def rowEchelon(mat: Matrix[N]): Matrix[N] = Util.rowEchelon(mat).toMatrix
           def size(mat: Matrix[N]): (Int, Int) = Util.size(mat)
+          def transpose(mat: Matrix[N]): Matrix[N] = Util.transpose(mat).toMatrix
      }
 
      class MatrixIsMatrixLike extends MatrixIsSetVecLike with MatrixLike[Matrix[N], N] {
@@ -63,7 +64,6 @@ class MatrixThings[N: Number] {
           def multiply(mat1: Matrix[N], mat2: Matrix[N]): Matrix[N] = Util.multiply(mat1, mat2)
           def power(mat: Matrix[N], exp: N): Matrix[N] = Util.power(mat, exp)
           def inverse(mat: Matrix[N]): Matrix[N] = Util.inverse(mat)
-          def transpose(mat: Matrix[N]): Matrix[N] = Util.transpose(mat)
           def conjugateTranspose(mat: Matrix[N]): Matrix[N] = Util.conjugateTranspose(mat)
           def adjoint(mat: Matrix[N]): Matrix[N] =  Util.adjoint(mat)
           def cofactor(mat: Matrix[N]): Matrix[N] = Util.cofactor(mat)

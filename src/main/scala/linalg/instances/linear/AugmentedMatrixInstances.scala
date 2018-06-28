@@ -54,6 +54,7 @@ class AugmentedMatrixThings[N: Number] {
           def rowReducedEchelon(mat: AugmentedMatrix[N]): AugmentedMatrix[N] =
                AugmentedMatrix(mat.rrefA, mat.rrefB)
 
+          def transpose(mat: AugmentedMatrix[N]): AugmentedMatrix[N] = Util.transpose(mat).toAugMatrix
           def size(mat: AugmentedMatrix[N]): (Int, Int) = Util.size(mat)
      }
 
@@ -63,7 +64,6 @@ class AugmentedMatrixThings[N: Number] {
                Util.multiply(mat1, mat2).toAugMatrix
           def power(mat: AugmentedMatrix[N], exp: N): AugmentedMatrix[N] = Util.power(mat, exp).toAugMatrix
           def inverse(mat: AugmentedMatrix[N]): AugmentedMatrix[N] = Util.inverse(mat).toAugMatrix
-          def transpose(mat: AugmentedMatrix[N]): AugmentedMatrix[N] = Util.transpose(mat).toAugMatrix
           def conjugateTranspose(mat: AugmentedMatrix[N]): AugmentedMatrix[N] = Util.conjugateTranspose(mat).toAugMatrix
           def adjoint(mat: AugmentedMatrix[N]): AugmentedMatrix[N] =  Util.adjoint(mat).toAugMatrix
           def cofactor(mat: AugmentedMatrix[N]): AugmentedMatrix[N] = Util.cofactor(mat).toAugMatrix

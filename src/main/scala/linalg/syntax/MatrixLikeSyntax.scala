@@ -15,7 +15,6 @@ trait MatrixLikeSyntax extends SetVecLikeSyntax {
           def *(other: M[N]): M[N] = mat.multiply(current, other)
           def power(exp: N): M[N] = mat.power(current, exp)
           def inverse(): M[N] = mat.inverse(current)
-          def transpose(): M[N] = mat.transpose(current)
           def conjugateTranspose(): M[N] = mat.conjugateTranspose(current)
           def adjoint(): M[N] = mat.adjoint(current)
           def cofactor(): M[N] = mat.cofactor(current)

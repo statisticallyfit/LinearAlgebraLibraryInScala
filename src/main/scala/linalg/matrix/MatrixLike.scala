@@ -16,7 +16,7 @@ trait MatrixLike[M, F] extends SetVecLike[M, F] {
      def multiply(m1: M, m2: M): M
      def power(m: M, exp: F): M //use linear algebra formula for matrix powers
      def inverse(m: M): M
-     def transpose(m: M): M
+     //def transpose(m: M): M //note: just transpose to keep it simple
      def conjugateTranspose(m: M): M
      def adjoint(m: M): M
      def cofactor(m: M): M
