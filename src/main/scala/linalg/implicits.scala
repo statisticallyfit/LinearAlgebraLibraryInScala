@@ -19,9 +19,12 @@ trait GeneralImplicits {
      // Converting Double To Real
      implicit def doubleToReal(double: Double): Real = Real(double)
 
+     // so that vset * v and v * vset works
+     implicit def vecToSetVec[N: Number](vec: Vector[N]): SetOfVectors[N] = SetOfVectors(vec)
+
      implicit class VectorImplicits[N:Number](v: Vector[N]) {
           def toListB: ListBuffer[N] = ListBuffer(v.getElements():_*)
-          def toSeqM: mutable.Seq[N] = v.getElements()
+          def toMatrix: Matrix[N] = Matrix(v)
      }
 
      implicit class SeqImplicits[N:Number](v: Seq[N]) {

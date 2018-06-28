@@ -38,21 +38,19 @@ package object linalg {
      type Basis[V, B, F] = linalg.theory.basis.Basis[V, B, F]
      type Span[V, W, F] = linalg.theory.basis.Span[V, W, F]
      type LinearIndependence[V] = linalg.theory.basis.LinearIndependence[V]
-     type Rank[V] = linalg.theory.basis.Rank[V]
      type Dimension[V] = linalg.theory.basis.Dimension[V]
      //type Transformation[V, W] = linalg.theory.basis.Transformation[V, W]
      val Basis = linalg.theory.basis.Basis
      val Dimension = linalg.theory.basis.Dimension
      val LinearIndependence = linalg.theory.basis.LinearIndependence
-     val Rank = linalg.theory.basis.Rank
      val Span = linalg.theory.basis.Span
      //val Transformation = linalg.theory.basis.Transformation
 
      type VectorSpace[V, F] = linalg.theory.space.VectorSpace[V, F]
      //type Subspace[S, F] = linalg.theory.space.Subspace[S, F]
-     type ColumnSpace[C, F] = linalg.theory.space.ColumnSpace[C, F]
-     type RowSpace[V, W, F] = linalg.theory.space.RowSpace[V, W, F]
-     type NullSpace[N, F] = linalg.theory.space.NullSpace[N, F]
+     type ColumnSpace[V, C, F] = linalg.theory.space.ColumnSpace[V, C, F]
+     type RowSpace[V, R, F] = linalg.theory.space.RowSpace[V, R, F]
+     type NullSpace[V, N, F] = linalg.theory.space.NullSpace[V, N, F]
      type InnerProductSpace[I, F] = linalg.theory.space.InnerProductSpace[I, F]
      type NormedVectorSpace[N, F] = linalg.theory.space.NormedVectorSpace[N, F]
      type OrthogonalSpace[O, F] = linalg.theory.space.OrthogonalSpace[O, F]

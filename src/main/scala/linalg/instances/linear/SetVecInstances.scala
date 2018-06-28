@@ -88,9 +88,39 @@ class SetVecThings[N: Number] {
           def isLinearlyIndependent(vset: SetOfVectors[N]): Boolean = Util.isLinearlyIndependent(vset)
      }
 
-     class SetVecHasRank extends Rank[SetOfVectors[N]] {
+     class SetVecHasRowSpace extends RowSpace[Vector[N], SetOfVectors[N], N] {
+
+          def isInRowSpace(vset: SetOfVectors[N], v: Vector[N]): Boolean =
+               Util.isInRowSpace(vset, v)
+          def equalRowSpaces(vset1: SetOfVectors[N], vset2: SetOfVectors[N]): Boolean =
+               Util.equalRowSpaces(vset1, vset2)
+          def rowSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Util.rowSpace(vset)
+          def areRowsSpanningSpace(vset: SetOfVectors[N]): Boolean = Util.areRowsSpanningSpace(vset)
+
           def rank(vset: SetOfVectors[N]): Int = Util.rank(vset)
           def isFullRank(vset: SetOfVectors[N]): Boolean = Util.isFullRank(vset)
+     }
+
+     class SetVecHasColumnSpace extends ColumnSpace[Vector[N], SetOfVectors[N], N] {
+
+          def isInColumnSpace(vset: SetOfVectors[N], v: Vector[N]): Boolean =
+               Util.isInColumnSpace(vset, v)
+          def equalColSpaces(vset1: SetOfVectors[N], vset2: SetOfVectors[N]): Boolean =
+               Util.equalColSpaces(vset1, vset2)
+          def columnSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Util.columnSpace(vset)
+          def areColsSpanningSpace(vset: SetOfVectors[N]): Boolean = Util.areColsSpanningSpace(vset)
+          def columnRank(vset: SetOfVectors[N]): Int = Util.columnRank(vset)
+     }
+
+     class SetVecHasNullSpace extends NullSpace[Vector[N], SetOfVectors[N], N] {
+          def isInNullSpace(vset: SetOfVectors[N], v: Vector[N]): Boolean =
+               Util.isInNullSpace(vset, v)
+          def equalNullSpaces(vset1: SetOfVectors[N], vset2: SetOfVectors[N]): Boolean =
+               Util.equalNullSpaces(vset1, vset2)
+          def nullSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Util.nullSpace(vset)
+          def nullity(vset: SetOfVectors[N]): Int = Util.nullity(vset)
+          //TODO def areColsBasisOfSpace(): Boolean = ev.areColsBasisOfSpace(current)
+          //TODO def areColsSpanningSpace(): Boolean = ev.areColsSpanningSpace(current)
      }
 
      //val absolute = new SetVecHasAbsoluteValue
@@ -103,7 +133,9 @@ class SetVecThings[N: Number] {
      val span = new SetVecSpan
      val basis = new SetVecBasis
      val dim = new SetVecHasDimension
-     val rank = new SetVecHasRank
+     val rowSpace = new SetVecHasRowSpace
+     val colSpace = new SetVecHasColumnSpace
+     val nullSpace = new SetVecHasNullSpace
 }
 
 trait SetVecInstances {
@@ -118,7 +150,9 @@ trait SetVecInstances {
      implicit final def setVecHasSpan[N: Number] = new SetVecThings[N].span
      implicit final def setVecHasBasis[N: Number] = new SetVecThings[N].basis
      implicit final def setVecCanHaveLinearIndependence[N: Number] = new SetVecThings[N].independence
-     implicit final def setVecHasRank[N: Number] = new SetVecThings[N].rank
+     implicit final def setVecHasRowSpace[N: Number] = new SetVecThings[N].rowSpace
+     implicit final def setVecHasColSpace[N: Number] = new SetVecThings[N].colSpace
+     implicit final def setVecHasNullSpace[N: Number] = new SetVecThings[N].nullSpace
 }
 
 

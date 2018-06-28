@@ -121,7 +121,7 @@ trait SetVecOps {
      }
 
 
-
+     // Span
      def span[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = rowReducedEchelon(vset)
 
      def doesSetSpanTheSpace[N: Number](vset: SetOfVectors[N]): Boolean ={
@@ -134,7 +134,10 @@ trait SetVecOps {
           system.isConsistent()
      }
 
+     // Basis
+
      //Page 246 of howard: basis for the space spanned by a set of vectors
+     //TODO
      def basis[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
           val freeCols: Seq[Int] = getIndicesOfFreeColumns(vset.reducedEchelon())
           SetOfVectors(vset.getColumnsAt(freeCols:_*):_*)
@@ -148,6 +151,7 @@ trait SetVecOps {
           AugmentedMatrix(vset, v).solve()
      }
 
+     // linear independence
      def linearlyIndependent[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean ={
           vset.size() == wset.size() match {
                case false => false
@@ -164,12 +168,74 @@ trait SetVecOps {
           vset.reducedEchelon() === SetOfVectors.IDENTITY(vset)
      }
 
+     // row space
+     //TODO check all space definitions here.
+
      def rank[N: Number](vset: SetOfVectors[N]): Int = {
           val rref: SetOfVectors[N] = Util.rowReducedEchelon(vset)
           rref.getRows().count(row => ! row.isZero)
      }
 
      def isFullRank[N: Number](vset: SetOfVectors[N]): Boolean = rank(vset) == vset.numRows
+
+
+     def isInRowSpace[N: Number](vset: SetOfVectors[N], v: Vector[N]): Boolean ={
+          AugmentedMatrix(vset.transpose(), v.transpose()).isConsistent()
+     }
+
+     def equalRowSpaces[N: Number](vset1: SetOfVectors[N], vset2: SetOfVectors[N]): Boolean = {
+          vset1.reducedEchelon() === vset2.reducedEchelon()
+     }
+
+     def rowSpace[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
+          SetOfVectors(expressRowsAsCols(getNonZeroRows(vset.reducedEchelon())):_*)
+     }
+
+     def areRowsSpanningSpace[N: Number](vset: SetOfVectors[N]): Boolean ={
+          vset.reducedEchelon() === SetOfVectors.IDENTITY(vset)
+     }
+
+     // column space
+     def isInColumnSpace[N: Number](vset: SetOfVectors[N], v: Vector[N]): Boolean = {
+          AugmentedMatrix(vset, v).isConsistent()
+     }
+
+     //TODO
+     def equalColSpaces[N: Number](vset1: SetOfVectors[N], vset2: SetOfVectors[N]): Boolean ={
+          columnSpace(vset1) === columnSpace(vset2)
+     }
+
+     def columnSpace[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] ={
+          val freeCols: Seq[Int] = getIndicesOfFreeColumns(vset.reducedEchelon())
+          SetOfVectors(vset.getColumnsAt(freeCols:_*):_*)
+     }
+
+     def areColsSpanningSpace[N: Number](vset: SetOfVectors[N]): Boolean = ???
+
+     def columnRank[N: Number](vset: SetOfVectors[N]): Int = columnSpace(vset).numCols
+
+
+     // Null space
+     def isInNullSpace[N: Number](vset: SetOfVectors[N], v: Vector[N]): Boolean = {
+           vset.toMatrix * v.toMatrix === Matrix.ZERO[N](vset.numRows, 1) //vector matrix
+     }
+
+     //TODO
+     def equalNullSpaces[N: Number](vset1: SetOfVectors[N], vset2: SetOfVectors[N]): Boolean = {
+          nullSpace(vset1) === nullSpace(vset2)
+     }
+     def nullSpace[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
+          AugmentedMatrix(vset, Vector.ZERO[N](vset.numRows)).solve().get
+          //TODO is it possible for this to not be defined?
+     }
+
+     //TODO def areColsSpanningSpace(): Boolean = ev.areColsSpanningSpace(current)
+     //TODO def areColsBasisOfSpace(): Boolean = ev.areColsBasisOfSpace(current)
+
+     def nullity[N: Number](vset: SetOfVectors[N]): Int = {
+          nullSpace(vset).numCols
+     }
+
 
 
 
