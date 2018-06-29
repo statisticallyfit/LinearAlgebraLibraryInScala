@@ -75,12 +75,14 @@ class SetVecThings[N: Number] {
 
      class SetVecBasis extends Basis[Vector[N], SetOfVectors[N], N]{
           //TODO check example 8 howard if impl. is truly correct ...
-          def basisOfSpaceSpannedBySet(vset: SetOfVectors[N]): SetOfVectors[N] = Util.basisOfSpaceSpannedBySet(vset)
-          def alternateBasisOfSpaceSpannedBySet(vset: SetOfVectors[N]): SetOfVectors[N] = Util.alternateBasisOfSpaceSpannedBySet(vset)
+          def basisOfSpaceSpannedBySet(vset: SetOfVectors[N]): SetOfVectors[N] =
+               Util.basisOfSpaceSpannedBySet(vset)
+          def alternateBasisOfSpaceSpannedBySet(vset: SetOfVectors[N]): SetOfVectors[N] =
+               Util.alternateBasisOfSpaceSpannedBySet(vset)
           def isBasisOfSet(vset: SetOfVectors[N], maybeBasis: SetOfVectors[N]): Boolean =
                Util.isBasisOfSet(vset, maybeBasis)
 
-          def basisOfSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Util.basisOfSpace(vset)
+          //def basisOfSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Util.basisOfSpace(vset)
           def isBasisOfSpace(vset: SetOfVectors[N]): Boolean = Util.isBasisOfSpace(vset)
 
           def isBasisOfVector(vset: SetOfVectors[N], v: Vector[N]): Boolean =

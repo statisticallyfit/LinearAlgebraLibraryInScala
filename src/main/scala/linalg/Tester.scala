@@ -174,7 +174,7 @@ object Tester extends App {
      //TODO make basis return Seq of type V
      println(mat6)
      println(mat6.reducedEchelon())
-     println("mat6 Basis: " + mat6.basisSet())
+     println("mat6 Basis: " + mat6.basis())
 
 
 
@@ -185,7 +185,7 @@ object Tester extends App {
      println("mat7: " + mat7)
      println(mat7.reducedEchelon())
      println("mat7 transpose rref: " + mat7.transpose().reducedEchelon())
-     println("mat7 basis: " + mat7.basisSet())
+     println("mat7 basis: " + mat7.basis())
 
 
      val mat8: SetOfVectors[Rational] = SetOfVectors(
@@ -202,8 +202,8 @@ object Tester extends App {
           Vector(2,-1,10,3), Vector(3,-1,-6,9)
      )
      println("mat 9 basis for space spanned by the col vecs: ")
-     println(mat9.basisSet())
-     println("is basis: " + mat9.basisSet().isBasisOfSpace())
+     println(mat9.basis())
+     println("is basis: " + mat9.basis().isBasisOfSpace())
      // row approach form (question 4 in part exercises 3.5)
      println("transpose: " + mat9.transpose())
      val res = mat9.transpose().reducedEchelon()
@@ -218,13 +218,13 @@ object Tester extends App {
           Vector(4,9,7)
      )
      println(mat10.reducedEchelon())
-     println(mat10.basisSet())
+     println(mat10.basis())
 
 
      val mat11: SetOfVectors[Rational] = mat4.transpose()
      println("Mat11: " + mat11) //example 3.44 david poole
-     println("basis: " + mat11.basisSet()) //TODO rename to be 'basis of set' and make new methods to be 'basis of space'
-     println("check: " + mat11.isBasisOfSet(mat11.basisSet()))
+     println("basis: " + mat11.basis()) //TODO rename to be 'basis of set' and make new methods to be 'basis of space'
+     println("check: " + mat11.isBasisOfSet(mat11.basis()))
      println("row method basis: " + mat11.alternateBasis())
      println("check: " + mat11.isBasisOfSet(mat11.alternateBasis()))
      println("row echelon of mat4: " + mat4.echelon())

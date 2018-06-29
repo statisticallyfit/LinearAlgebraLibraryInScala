@@ -5,7 +5,7 @@ import linalg.implicits._
 import linalg.vector.{SetOfVectors, Vector}
 import cats.Eq
 import linalg.kernel.Rational
-import linalg.matrix.{AugmentedMatrix, Matrix}
+import linalg.matrix.{AugmentedMatrix, Matrix, SquareMatrix}
 
 import scala.collection.mutable
 import scala.collection.mutable.{ListBuffer, Seq}
@@ -24,7 +24,7 @@ trait SetVecOps {
 
      def size[N: Number](vset: SetOfVectors[N]): (Int, Int) = (vset.numRows, vset.numCols)
 
-     def dimension[N: Number](vset: SetOfVectors[N]): Int = vset.basisSet().numCols
+     def dimension[N: Number](vset: SetOfVectors[N]): Int = vset.basis().numCols
 
      def eqv[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean = {
           vset.size() == wset.size() match {
@@ -175,16 +175,20 @@ trait SetVecOps {
           (rref1 === basis1 || rref1 === basis2) || (rref2 === basis1 || rref2 === basis2)
      }
 
-     //TODO basis of space R^n
-     def basisOfSpace[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
-
-     }
+     //no need to make this - just need to have below method isBasisOfSpace() , given some vecs, show they are a
+     // basis for the relevant space.
+     // no need to make this since by proposition 2.27 singh, any n x n lin indep vec set is a basis for R^n. (so many)
+     /*def basisOfSpace[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
+     }*/
 
 
      // Checks if the rref form is the identity matrix (see exercises 4.3 in David Lay)
      //from page 206 of david poole (fundamental theorem of invertible matrices)
-     def isBasisOfSpace[N: Number](vset: SetOfVectors[N]): Boolean = {
-          vset.reducedEchelon() === SetOfVectors.IDENTITY(vset.numCols)
+     // dim = dimension of space we want to check if the set is a basis of.
+     def isBasisOfSpace[N: Number](vset: SetOfVectors[N], dim: Int): Boolean = {
+          Util.Id.isSquare(vset.toMatrix) &&
+               vset.numRows == dim &&
+               vset.reducedEchelon() === SetOfVectors.IDENTITY(vset)
      }
 
 
