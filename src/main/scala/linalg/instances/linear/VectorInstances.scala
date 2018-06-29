@@ -59,25 +59,21 @@ class VectorThings[N: Number]{
                Util.projection(v, onto)
           def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = Util.outerProduct(v, w)
           def crossProduct(u: Vector[N], v: Vector[N]): Option[Vector[N]] = Util.crossProduct(u, v)
+          def size(v: Vector[N]): Int = v.getElements().length
           def transpose(v: Vector[N]): Vector[N] = {
-               v.isRow() match {
-                    case true => {
-                         val newVec: Vector[N] = Vector(v.getElements())
-                         newVec.toCol()
-                         newVec
-                    }
-                    case false => {
-                         val newVec: Vector[N] = Vector(v.getElements())
-                         newVec.toRow()
-                         newVec
-                    }
+               if(v.isRow()){
+                    v.toCol()
+                    v
+               } else {
+                    v.toRow()
+                    v
                }
           }
      }
 
-     class VectorHasDimension extends Dimension[Vector[N]] {
+     /*class VectorHasDimension extends Dimension[Vector[N]] {
           def dimension(v: Vector[N]): Int = 1 //dim of vec = num of vectors in a basis for the vec
-     }
+     }*/
 
      class VectorHasEq extends Eq[Vector[N]] {
           def eqv(v: Vector[N], w: Vector[N]): Boolean = Util.eqv(v, w)
@@ -98,7 +94,7 @@ class VectorThings[N: Number]{
      val normedSpace = new VectorIsNormedVectorSpace
      val hilbertSpace = new VectorIsHilbertSpace
      val vectorLike = new VectorIsVectorLike
-     val dim = new VectorHasDimension
+     //val dim = new VectorHasDimension
      val independence = new VectorCanHaveLinearIndependence
 }
 
@@ -112,7 +108,7 @@ trait VectorInstances {
      implicit final def vectorIsNormedVectorSpace[N: Number] = new VectorThings[N].normedSpace
      implicit final def vectorIsHilbertSpace[N: Number] = new VectorThings[N].hilbertSpace
      implicit final def vectorIsLikeAVector[N: Number] = new VectorThings[N].vectorLike
-     implicit final def vectorHasDimension[N: Number] = new VectorThings[N].dim
+     //implicit final def vectorHasDimension[N: Number] = new VectorThings[N].dim
      implicit final def vectorHasEq[N: Number] = new VectorThings[N].eq
      implicit final def vectorCanBeLinearlyIndependent[N: Number] = new VectorThings[N].independence
 }

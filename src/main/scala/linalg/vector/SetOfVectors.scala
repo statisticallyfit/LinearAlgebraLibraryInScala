@@ -20,10 +20,22 @@ import scala.collection.mutable.Seq
 
 class SetOfVectors[N: Number](private val cols: Vector[N]*) {
 
-     private val columns: Seq[Vector[N]] = Seq(cols:_*)
-     val numRows: Int = columns.head.dimension()
+     private val columns: Seq[Vector[N]] = makeData()
+     val numRows: Int = columns.head.size()
      val numCols: Int = columns.length
 
+     private def makeData(): Seq[Vector[N]] ={
+          //if all row vecs, make matrix from rows
+          if(cols.forall(vector => vector.isRow())){
+               Util.expressRowsAsCols(Seq(cols:_*))
+          } // if all col vecs make matrix from cols
+          else if(cols.forall(vector => vector.isCol())){
+               Seq(cols:_*)
+          } else {
+               cols.foreach(vector => vector.toCol())
+               Seq(cols:_*)
+          }
+     }
      def copy(): SetOfVectors[N] = SetOfVectors(columns:_*)
      def copy(cols: Seq[Vector[N]]): SetOfVectors[N] = SetOfVectors(cols:_*)
 

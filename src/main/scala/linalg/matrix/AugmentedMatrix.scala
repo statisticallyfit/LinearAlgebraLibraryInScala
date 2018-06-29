@@ -36,8 +36,10 @@ object AugmentedMatrix {
           new AugmentedMatrix[N](A, SquareMatrix.ZERO[N](largest))
      }
 
-     def apply[N: Number](A: SetOfVectors[N], b: Vector[N]): AugmentedMatrix[N] =
+     def apply[N: Number](A: SetOfVectors[N], b: Vector[N]): AugmentedMatrix[N] ={
+          if(b.isRow()) b.toCol()
           new AugmentedMatrix[N](A, Matrix(b))
+     }
 
      def apply[N: Number](cols: Vector[N]*): AugmentedMatrix[N] ={
           if(cols.length == 1){

@@ -57,7 +57,7 @@ trait VectorOps {
      def crossProduct[N: Number](u: Vector[N], v: Vector[N]): Option[Vector[N]] = {
 
           //TODO hacky way to get dimension/length but with Dimension doesn't work...
-          if(u.getElements().length == 3 && v.getElements().length == 3){
+          if(u.size() == 3 && v.size() == 3){
                val w1: N = (u.get(2) * v.get(3)) - (u.get(3) * v.get(2))
                val w2: N = (u.get(3) * v.get(1)) - (u.get(1) * v.get(3))
                val w3: N = (u.get(1) * v.get(2)) - (u.get(2) * v.get(1))
@@ -67,7 +67,7 @@ trait VectorOps {
           } else None
      }
 
-     def dimension[N: Number](v: Vector[N]): Int = v.getElements().length
+     def dimension[N: Number](v: Vector[N]): Int = v.size()
 
      def eqv[N: Number](v: Vector[N], w: Vector[N]): Boolean ={
           v.getElements().zip(w.getElements())
@@ -98,17 +98,17 @@ trait VectorOps {
      def ensureSize[N:Number](v: Vector[N], w: Vector[N], SIZE: Int = 0): Unit = {
 
           SIZE match {
-               case 0 => if(v.dimension() != w.dimension()) {
+               case 0 => if(v.size() != w.size()) {
                     throw Util.VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
                }
                case _ => {
-                    val len = v.dimension()
+                    val len = v.size()
 
-                    if (v.dimension() == w.dimension() && SIZE != len){
+                    if (v.size() == w.size() && SIZE != len){
                          throw Util.VectorLikeSizeException("Vectors do not have same size as given size; cannot " +
                               "continue operation.")
 
-                    } else if (v.dimension() != w.dimension()){
+                    } else if (v.size() != w.size()){
                          throw Util.VectorLikeSizeException("Vectors do not have same size; cannot continue operation.")
                     }
                }

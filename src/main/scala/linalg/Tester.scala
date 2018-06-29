@@ -164,6 +164,15 @@ object Tester extends App {
           Vector(6,-1,1,3))
      val aug5: AugmentedMatrix[Rational] = AugmentedMatrix(mat5, Vector[Rational](0,0,0,0))
      println(aug5.solve()) //this is the basis for the nullspace: solution to Ax = 0
+
+
+
+     val mat6: SetOfVectors[Rational] = SetOfVectors(
+          Vector(1,2,3),
+          Vector(4,5,6),
+          Vector(7,8,9)
+     )
+     println(mat6.basis())
 }
 
 

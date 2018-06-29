@@ -169,18 +169,18 @@ trait SetVecOps {
      }
 
      // row space
-     //TODO check all space definitions here.
 
      def rank[N: Number](vset: SetOfVectors[N]): Int = {
-          val rref: SetOfVectors[N] = Util.rowReducedEchelon(vset)
-          rref.getRows().count(row => ! row.isZero)
+          //val rref: SetOfVectors[N] = Util.rowReducedEchelon(vset)
+          //rref.getRows().count(row => ! row.isZero)
+          rowSpace(vset).dimension()
      }
 
      def isFullRank[N: Number](vset: SetOfVectors[N]): Boolean = rank(vset) == vset.numRows
 
 
      def isInRowSpace[N: Number](vset: SetOfVectors[N], v: Vector[N]): Boolean ={
-          AugmentedMatrix(vset.transpose(), v.transpose()).isConsistent()
+          isInColumnSpace(vset.transpose(), v)
      }
 
      def equalRowSpaces[N: Number](vset1: SetOfVectors[N], vset2: SetOfVectors[N]): Boolean = {
@@ -190,7 +190,7 @@ trait SetVecOps {
      def rowSpace[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
           SetOfVectors(expressRowsAsCols(getNonZeroRows(vset.reducedEchelon())):_*)
      }
-
+     //TODO
      def areRowsSpanningSpace[N: Number](vset: SetOfVectors[N]): Boolean ={
           vset.reducedEchelon() === SetOfVectors.IDENTITY(vset)
      }
@@ -210,9 +210,11 @@ trait SetVecOps {
           SetOfVectors(vset.getColumnsAt(freeCols:_*):_*)
      }
 
+     //TODO
      def areColsSpanningSpace[N: Number](vset: SetOfVectors[N]): Boolean = ???
 
-     def columnRank[N: Number](vset: SetOfVectors[N]): Int = columnSpace(vset).numCols
+     //TODO
+     def columnRank[N: Number](vset: SetOfVectors[N]): Int = columnSpace(vset).dimension()
 
 
      // Null space
@@ -233,7 +235,7 @@ trait SetVecOps {
      //TODO def areColsBasisOfSpace(): Boolean = ev.areColsBasisOfSpace(current)
 
      def nullity[N: Number](vset: SetOfVectors[N]): Int = {
-          nullSpace(vset).numCols
+          nullSpace(vset).dimension()
      }
 
 
@@ -243,15 +245,19 @@ trait SetVecOps {
 
      // Utils ------------------------------------------------------------------------------------
 
-     def colCombine[N:Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): SetOfVectors[N] =
-          SetOfVectors((vset.getColumns() ++ wset.getColumns()):_*)
-
+     def colCombine[N:Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): SetOfVectors[N] = {
+          if(vset.numRows != wset.numRows){
+               throw Util.MatrixLikeSizeException("vset.numRows must equal wset.numRows")
+          } else {
+               SetOfVectors((vset.getColumns() ++ wset.getColumns()):_*)
+          }
+     }
 
 
      def ensureSize[N:Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Unit = {
 
           if(vset.numRows != wset.numRows || vset.numCols != wset.numCols) {
-               throw Util.VectorLikeSizeException("SetOfVectors are not same size; cannot continue operation.")
+               throw Util.MatrixLikeSizeException("SetOfVectors are not same size; cannot continue operation.")
           }
      }
 
@@ -384,7 +390,7 @@ trait SetVecOps {
 
      def expressRowsAsCols[N:Number](rows: Seq[Vector[N]]): Seq[Vector[N]] = {
           //converting from row to col representation
-          val ncol: Int = rows.head.dimension()
+          val ncol: Int = rows.head.size()
           val nrow: Int = rows.length
           val colBuff: Seq[Seq[N]] = Seq.fill[N](ncol, nrow)(Number[N].zero)
 

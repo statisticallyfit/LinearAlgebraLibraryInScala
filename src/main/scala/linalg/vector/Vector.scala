@@ -30,16 +30,14 @@ class Vector[N: Number](private val elems: N*) {
      def copy(): Vector[N] = Vector(elements:_*)
      def copy(es: Seq[N]): Vector[N] = Vector(es:_*)
 
-     def toRow(): Vector[N] = {
+     def toRow(): Unit = {
           this.isRowVector = true
           this.isColVector = false
-          this
      }
 
-     def toCol(): Vector[N] = {
+     def toCol(): Unit = {
           this.isRowVector = false
           this.isColVector = true
-          this
      }
 
      def isRow(): Boolean = this.isRowVector

@@ -6,6 +6,7 @@ import linalg.kernel.{Complex, Imaginary, Rational, Real}
 import linalg.matrix.{AugmentedMatrix, Matrix}
 import linalg.vector.{Polynomial, SetOfVectors, Vector}
 import org.apache.commons.lang3.StringUtils
+import linalg.util._
 
 import scala.collection.mutable.ListBuffer
 import scala.language.higherKinds
@@ -64,7 +65,7 @@ trait ShowInstances {
 
                v.isCol() match {
                     case true => showVecSet(SetOfVectors(v))
-                    case false => showVecSet(SetOfVectors(v).transpose()) //torowvec
+                    case false => showVecSet(Util.transpose(SetOfVectors(v))) //torowvec
                }
           }
      }

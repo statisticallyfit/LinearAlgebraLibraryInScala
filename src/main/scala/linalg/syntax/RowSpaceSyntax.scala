@@ -13,7 +13,7 @@ trait RowSpaceSyntax {
 
           def isInRowSpace(v: V[N]): Boolean = ev.isInRowSpace(current, v)
           def isRowSpaceEqualTo(other: R[N]): Boolean = ev.equalRowSpaces(current, other)
-          def isInRowSpace(other: R[N]): Boolean = ev.isSetInRowSpace(current, other)
+          def isSetInRowSpace(other: R[N]): Boolean = ev.isSetInRowSpace(current, other)
           def rowSpace(): R[N] = ev.rowSpace(current)
           def areRowsSpanningSpace(): Boolean = ev.areRowsSpanningSpace(current)
           def areRowsBasisOfSpace(): Boolean = ev.areRowsBasisOfSpace(current)
