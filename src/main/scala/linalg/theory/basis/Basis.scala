@@ -13,7 +13,8 @@ trait Basis[V, W, F] /*extends VectorSpace[S, F] with VectorSpace[V, F]*/ {
      def isBasisOfSet(vset: W, maybeBasis: W): Boolean //checks if one of the above bases or more
 
      //def basisOfSpace(vset: W): W //basis of spcae like R^n
-     def isBasisOfSpace(vset: W): Boolean // is vset a basis for vecspace which they occupy? only if rank(vset) == numrows(vset)
+     def isBasisOfSpace(vset: W, dim: Int): Boolean // is vset a basis for vecspace which they occupy? only if rank
+     // (vset) == numrows(vset)
 
      // is basis: B a basis for the vset?
      def isBasisOfVector(vset: W, v: V): Boolean // like isSpanned(vset, v)

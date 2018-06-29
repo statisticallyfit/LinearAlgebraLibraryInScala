@@ -62,7 +62,7 @@ class SetVecThings[N: Number] {
      class SetVecSpan extends SetVecIsSetVecLike with Span[Vector[N], SetOfVectors[N], N]{
 
           def span(vset: SetOfVectors[N]): SetOfVectors[N] = Util.span(vset)
-          def doesSetSpanTheSpace(vset: SetOfVectors[N]): Boolean = Util.doesSetSpanTheSpace(vset)
+          def isSpanningSpace(vset: SetOfVectors[N], dim: Int): Boolean = Util.isSpanningSpace(vset, dim)
           def doesSetSpanTheVector(vset: SetOfVectors[N], v: Vector[N]): Boolean =
                Util.doesSetSpanTheVector(vset, v)
           def getSpanningCoefficients(vset: SetOfVectors[N], v: Vector[N]): Option[Matrix[N]] =
@@ -83,7 +83,7 @@ class SetVecThings[N: Number] {
                Util.isBasisOfSet(vset, maybeBasis)
 
           //def basisOfSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Util.basisOfSpace(vset)
-          def isBasisOfSpace(vset: SetOfVectors[N]): Boolean = Util.isBasisOfSpace(vset)
+          def isBasisOfSpace(vset: SetOfVectors[N], dim: Int): Boolean = Util.isBasisOfSpace(vset, dim)
 
           def isBasisOfVector(vset: SetOfVectors[N], v: Vector[N]): Boolean =
                Util.doesSetSpanTheVector(vset, v)

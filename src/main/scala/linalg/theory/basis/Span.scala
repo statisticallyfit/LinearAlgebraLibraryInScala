@@ -12,7 +12,7 @@ trait Span[V, W, F]{
 
      // If the system is consistent then it spans the space R#, where # = numrows.
      // Example 3.10 - singh book, page 198 = howard book
-     def doesSetSpanTheSpace(vset: W): Boolean
+     def isSpanningSpace(vset: W, dim: Int): Boolean
 
      //does vecset span a specific vector? (example 3.11 singh) Is single vec v spanned by vset?
      // is it in span of vset? /page 197 howard

@@ -122,17 +122,22 @@ trait SetVecOps {
 
 
      // Span
-     //TODO
-     def span[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = vset.reducedEchelon()
-     //TODO
-     def doesSetSpanTheSpace[N: Number](vset: SetOfVectors[N]): Boolean ={
-          //or exercises 4.3 david lay method:
-          val dimToSpan: Int = vset.dimension() //TODO is this same as length of any vector in vset ??
-          val rref = vset.reducedEchelon()
-          getIndicesOfLeadingColumns(rref).length == dimToSpan
 
-          /*val system = AugmentedMatrix(vset, Matrix.IDENTITY[N](vset))
-          system.isConsistent()*/
+     def span[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = vset.reducedEchelon()
+
+     def isSpanningSpace[N: Number](vset: SetOfVectors[N], dim: Int): Boolean ={
+          //or page 206 rref == identity method
+          //val rref = vset.reducedEchelon()
+
+          //or exercises 4.3 david lay method:
+          /*val rref = vset.reducedEchelon()
+          getIndicesOfLeadingColumns(rref).length == dim*/
+
+          val system = AugmentedMatrix(vset, SquareMatrix.IDENTITY[N](dim)) //TODO better graceful error handling if
+          // ID is e.g. 2x2 and vset is 4x5, then must return false.
+          println(system.reducedEchelon())
+          println("is consistent?: " + system.isConsistent())
+          system.isConsistent()
      }
 
      def doesSetSpanTheVector[N: Number](vset: SetOfVectors[N], v: Vector[N]): Boolean ={

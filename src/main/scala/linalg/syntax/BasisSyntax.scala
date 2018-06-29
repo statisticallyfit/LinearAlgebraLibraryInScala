@@ -16,7 +16,7 @@ trait BasisSyntax {
           def isBasisOfSet(maybeBasis: B[N]): Boolean = ev.isBasisOfSet(current, maybeBasis)
 
           //def basis(): B[N] = ev.basisOfSpace(current)
-          def isBasisOfSpace(): Boolean = ev.isBasisOfSpace(current)
+          def isBasisOfSpace(dim: Int): Boolean = ev.isBasisOfSpace(current, dim)
 
           def isBasisOfVector(vector: V[N]): Boolean = ev.isBasisOfVector(current, vector)
           def isInBasis(vector: V[N]): Boolean = ev.isInBasis(vector, current)

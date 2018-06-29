@@ -123,8 +123,9 @@ trait MatrixOps {
 
      def isInconsistent[N: Number](mat: AugmentedMatrix[N]): Boolean = {
           //does there exist a zero row in rrefA where the same row has consts in the rrefB?
-          mat.rrefEntire.getRows().exists(row => row.getElements().init.forall(_.isZero) &&
-               row.getElements().drop(mat.A.numCols).exists(elem => ! elem.isZero))
+          mat.rrefEntire.getRows().exists(row =>
+               row.getElements().forall(elem => elem.isZero) &&
+               row.getElements().drop(mat.rrefA.numCols).exists(elem => ! elem.isZero))
      }
 
      //Assume: the system of equations is in matrix A and the user has passed the correct
