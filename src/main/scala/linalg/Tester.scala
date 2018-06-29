@@ -156,14 +156,13 @@ object Tester extends App {
      val mat4: Matrix[Rational] = Matrix(Vector(3,2,0),
           Vector(-1,1,-5), Vector(5,3,1))
      println(mat4.echelon())
-     println("is a rowspace? example: " + AugmentedMatrix(mat4.echelon(), mat4.reducedEchelon()).reducedEchelon())
 
 
      val mat5: Matrix[Rational] = Matrix(Vector(1,2,-3,4),
           Vector(1,-1,2,1), Vector(3,0,1,6), Vector(1,1,-2,1),
           Vector(6,-1,1,3))
      val aug5: AugmentedMatrix[Rational] = AugmentedMatrix(mat5, Vector[Rational](0,0,0,0))
-     println(aug5.solve()) //this is the basis for the nullspace: solution to Ax = 0
+     println("Aug 5 solve: " + aug5.solve()) //this is the basis for the nullspace: solution to Ax = 0
 
 
 
@@ -172,7 +171,66 @@ object Tester extends App {
           Vector(4,5,6),
           Vector(7,8,9)
      )
-     println(mat6.basis())
+     //TODO make basis return Seq of type V
+     println(mat6)
+     println(mat6.reducedEchelon())
+     println("mat6 Basis: " + mat6.basisSet())
+
+
+
+     val mat7: SetOfVectors[Rational] = SetOfVectors(
+          Vector(-1,1,-1,1), Vector(-5,-9,-7,-1),
+          Vector(0,7,1,3), Vector(-6,-1,-7,3), Vector(2,5,3,1)
+     )
+     println("mat7: " + mat7)
+     println(mat7.reducedEchelon())
+     println("mat7 transpose rref: " + mat7.transpose().reducedEchelon())
+     println("mat7 basis: " + mat7.basisSet())
+
+
+     val mat8: SetOfVectors[Rational] = SetOfVectors(
+          Vector(0,2,-1), Vector(2,2,0), Vector(6,16,-5)
+     )
+     println("span equality: ")
+     println(mat8.span())
+     println(SetOfVectors(mat8.getColumnsAt(0,1):_*).span())
+
+
+
+     val mat9: SetOfVectors[Rational] = SetOfVectors(
+          Vector(1,0,-2,3), Vector(0,1,2,3), Vector(2,-2,-8,0),
+          Vector(2,-1,10,3), Vector(3,-1,-6,9)
+     )
+     println("mat 9 basis for space spanned by the col vecs: ")
+     println(mat9.basisSet())
+     println("is basis: " + mat9.basisSet().isBasisOfSpace())
+     // row approach form (question 4 in part exercises 3.5)
+     println("transpose: " + mat9.transpose())
+     val res = mat9.transpose().reducedEchelon()
+     println("is other way basis: " + SetOfVectors(res.transpose().getColumnsAt(1,2,3,4):_*).isBasisOfSpace())
+
+
+
+
+     val mat10: SetOfVectors[Rational] = SetOfVectors(
+          Vector(1,2,3),
+          Vector(-1,0,1),
+          Vector(4,9,7)
+     )
+     println(mat10.reducedEchelon())
+     println(mat10.basisSet())
+
+
+     val mat11: SetOfVectors[Rational] = mat4.transpose()
+     println("Mat11: " + mat11) //example 3.44 david poole
+     println("basis: " + mat11.basisSet()) //TODO rename to be 'basis of set' and make new methods to be 'basis of space'
+     println("check: " + mat11.isBasisOfSet(mat11.basisSet()))
+     println("row method basis: " + mat11.alternateBasis())
+     println("check: " + mat11.isBasisOfSet(mat11.alternateBasis()))
+     println("row echelon of mat4: " + mat4.echelon())
+     //val another: SetOfVectors[Rational] =
+     //val another: SetOfVectors[Rational] = SetOfVectors(Vector[Rational](3,-1,5), Vector[Rational](0,-5, 1))
+     //println("check another echelon if basis: " + mat11.isBasisOfSet(another))
 }
 
 

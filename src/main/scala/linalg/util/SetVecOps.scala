@@ -24,7 +24,7 @@ trait SetVecOps {
 
      def size[N: Number](vset: SetOfVectors[N]): (Int, Int) = (vset.numRows, vset.numCols)
 
-     def dimension[N: Number](vset: SetOfVectors[N]): Int = vset.basis().numCols
+     def dimension[N: Number](vset: SetOfVectors[N]): Int = vset.basisSet().numCols
 
      def eqv[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean = {
           vset.size() == wset.size() match {
@@ -122,11 +122,17 @@ trait SetVecOps {
 
 
      // Span
-     def span[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = rowReducedEchelon(vset)
-
+     //TODO
+     def span[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = vset.reducedEchelon()
+     //TODO
      def doesSetSpanTheSpace[N: Number](vset: SetOfVectors[N]): Boolean ={
-          val system = AugmentedMatrix(vset, Matrix.IDENTITY[N](vset))
-          system.isConsistent()
+          //or exercises 4.3 david lay method:
+          val dimToSpan: Int = vset.dimension() //TODO is this same as length of any vector in vset ??
+          val rref = vset.reducedEchelon()
+          getIndicesOfLeadingColumns(rref).length == dimToSpan
+
+          /*val system = AugmentedMatrix(vset, Matrix.IDENTITY[N](vset))
+          system.isConsistent()*/
      }
 
      def doesSetSpanTheVector[N: Number](vset: SetOfVectors[N], v: Vector[N]): Boolean ={
@@ -134,22 +140,53 @@ trait SetVecOps {
           system.isConsistent()
      }
 
-     // Basis
-
-     //Page 246 of howard: basis for the space spanned by a set of vectors
-     //TODO
-     def basis[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
-          val freeCols: Seq[Int] = getIndicesOfFreeColumns(vset.reducedEchelon())
-          SetOfVectors(vset.getColumnsAt(freeCols:_*):_*)
-     }
-
-     def isBasisOfSpace[N: Number](vset: SetOfVectors[N]): Boolean = vset.rank() == vset.numRows
-     //vset === basis(vset)
-
-
      def getSpanningCoefficients[N: Number](vset: SetOfVectors[N], v: Vector[N]): Option[Matrix[N]] ={
           AugmentedMatrix(vset, v).solve()
      }
+
+     // Basis
+
+     //Page 246 of howard: basis for the space spanned by a set of vectors
+     def basisOfSpaceSpannedBySet[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
+          val ref = vset.reducedEchelon()
+          val leadingCols: Seq[Int] = getIndicesOfLeadingColumns(ref)
+          SetOfVectors(vset.getColumnsAt(leadingCols:_*):_*)
+     }
+
+     def alternateBasisOfSpaceSpannedBySet[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
+          val nonzeroColVecs = getNonZeroRows(vset.transpose().reducedEchelon())
+          SetOfVectors(nonzeroColVecs:_*)
+     }
+
+     // example 3.52 in david lay: checks if the given set is a basis
+     def isBasisOfSet[N: Number](vset: SetOfVectors[N], maybeBasis: SetOfVectors[N]): Boolean ={
+          val basis1: SetOfVectors[N] = basisOfSpaceSpannedBySet(vset)
+          val basis2: SetOfVectors[N] = alternateBasisOfSpaceSpannedBySet(vset)
+
+
+          if (maybeBasis.size() != basis1.size())  {
+               return false
+          }
+          val rref1: SetOfVectors[N] = basisOfSpaceSpannedBySet(maybeBasis) //reduce further to find true
+          // character
+          val rref2: SetOfVectors[N] = alternateBasisOfSpaceSpannedBySet(maybeBasis) //reduce further to find true
+          // character
+
+          (rref1 === basis1 || rref1 === basis2) || (rref2 === basis1 || rref2 === basis2)
+     }
+
+     //TODO basis of space R^n
+     def basisOfSpace[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
+
+     }
+
+
+     // Checks if the rref form is the identity matrix (see exercises 4.3 in David Lay)
+     //from page 206 of david poole (fundamental theorem of invertible matrices)
+     def isBasisOfSpace[N: Number](vset: SetOfVectors[N]): Boolean = {
+          vset.reducedEchelon() === SetOfVectors.IDENTITY(vset.numCols)
+     }
+
 
      // linear independence
      def linearlyIndependent[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean ={
@@ -165,7 +202,8 @@ trait SetVecOps {
      }
 
      def isLinearlyIndependent[N: Number](vset: SetOfVectors[N]): Boolean = {
-          vset.reducedEchelon() === SetOfVectors.IDENTITY(vset)
+          val rref = vset.reducedEchelon()
+          rref === SetOfVectors.IDENTITY(rref)
      }
 
      // row space
@@ -206,8 +244,8 @@ trait SetVecOps {
      }
 
      def columnSpace[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] ={
-          val freeCols: Seq[Int] = getIndicesOfFreeColumns(vset.reducedEchelon())
-          SetOfVectors(vset.getColumnsAt(freeCols:_*):_*)
+          val leadingCols: Seq[Int] = getIndicesOfLeadingColumns(vset.reducedEchelon())
+          SetOfVectors(vset.getColumnsAt(leadingCols:_*):_*)
      }
 
      //TODO
@@ -359,8 +397,15 @@ trait SetVecOps {
 
      def transpose[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = SetOfVectors(vset.getRows(): _*)
 
-     //precondition: expects the rref to come from undetermined system -- used for Solver
+
+
      // Gets indices of columns of original matrix with leading ones when in rref form.
+     def getIndicesOfLeadingColumns[N: Number](rref: SetOfVectors[N]): Array[Int] ={
+          val indices = 0 until rref.numCols
+          (indices diff getIndicesOfFreeColumns(rref)).toArray
+     }
+
+     //precondition: expects the rref to come from undetermined system -- used for Solver
      def getIndicesOfFreeColumns[N:Number](rref: SetOfVectors[N]): Array[Int] = {
           def countNonZero(v: Vector[N]): Int = v.getElements().count(e => ! e.isZero)
 
@@ -378,8 +423,8 @@ trait SetVecOps {
                          None
           })
           //need options to preserve type else Array[Any]
-          val indices2 = indices.filter(option => option.isDefined).map(_.get).toArray
-          indices2
+          val indices2 = indices.filter(option => option.isDefined).map(_.get)
+          indices2.toArray
      }
 
      def expressRowsAsCols[N:Number](mat: SetOfVectors[N]): Seq[Vector[N]] =

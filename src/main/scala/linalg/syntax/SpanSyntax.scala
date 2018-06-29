@@ -13,7 +13,8 @@ trait SpanSyntax {
      implicit class SpanOps[V[_], W[_], N: Number](current: W[N])(implicit ev: Span[V[N], W[N], N]){
 
           def span(): W[N] = ev.span(current)
-          def doesSetSpanTheSpace(): Boolean = ev.doesSetSpanTheSpace(current)
+          def isSpanningSpace(): Boolean = ev.doesSetSpanTheSpace(current)
+          //TODO rename?
           def doesSetSpanTheVector(vector: V[N]): Boolean = ev.doesSetSpanTheVector(current, vector)
           def isSpanned(vector: V[N]): Boolean = ev.isInSpan(vector, current)
           def isInSpan(vector: V[N]): Boolean = ev.isInSpan(vector, current) //same, different wording.
