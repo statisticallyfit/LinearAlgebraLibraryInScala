@@ -232,36 +232,30 @@ object Tester extends App {
 
 
      // TESTING spanning set method from david lay execises 4.3 book
-     val sv1: SetOfVectors[Rational] = SetOfVectors(
-          Vector(1,0,0), Vector(1,1,0), Vector(1,1,1))
+     val sv1: SetOfVectors[Rational] = SetOfVectors(Vector(1,0,0), Vector(1,1,0), Vector(1,1,1))
      assert(sv1.isSpanningSpace(3), "setvec 1 - span TRUE")
 
-     val sv2: SetOfVectors[Rational] = SetOfVectors(
-          Vector(1,1,0), Vector(0,0,0), Vector(0,1,1))
+     val sv2: SetOfVectors[Rational] = SetOfVectors(Vector(1,1,0), Vector(0,0,0), Vector(0,1,1))
      assert( ! sv2.isSpanningSpace(3), "setvec 2 - span FALSE")
 
-     val sv3: SetOfVectors[Rational] = SetOfVectors(
-          Vector(1,0,-3), Vector(3,1,-4), Vector(-2,-1,1))
+     val sv3: SetOfVectors[Rational] = SetOfVectors(Vector(1,0,-3), Vector(3,1,-4), Vector(-2,-1,1))
      assert( ! sv3.isSpanningSpace(3), "setvec 3 - span FALSE")
 
-     val sv4: SetOfVectors[Rational] = SetOfVectors(
-          Vector(2,-1,1), Vector(2,-3,2), Vector(-8,5,4))
+     val sv4: SetOfVectors[Rational] = SetOfVectors(Vector(2,-1,1), Vector(2,-3,2), Vector(-8,5,4))
      assert(sv4.isSpanningSpace(3), "setvec 4 - span TRUE")
 
-     val sv5: SetOfVectors[Rational] = SetOfVectors(
-          Vector(3,-3,0), Vector(-3,7,0), Vector(0,0,0), Vector(0,-3,5))
+     val sv5: SetOfVectors[Rational] = SetOfVectors(Vector(3,-3,0), Vector(-3,7,0), Vector(0,0,0),
+          Vector(0,-3,5))
      assert(sv5.isSpanningSpace(3), "setvec 5 - span TRUE")
 
-     val sv6: SetOfVectors[Rational] = SetOfVectors(
-          Vector[Rational](1,2,-4), Vector[Rational](-4,3,6))
+     val sv6: SetOfVectors[Rational] = SetOfVectors(Vector[Rational](1,2,-4), Vector[Rational](-4,3,6))
      assert( ! sv6.isSpanningSpace(3), "setvec 6 - span FALSE")
 
-     val sv7: SetOfVectors[Rational] = SetOfVectors(
-          Vector[Rational](-2,3,0), Vector[Rational](6,-1,5))
+     val sv7: SetOfVectors[Rational] = SetOfVectors(Vector[Rational](-2,3,0), Vector[Rational](6,-1,5))
      assert( ! sv7.isSpanningSpace(3), "setvec 7 - span FALSE")
 
-     val sv8: SetOfVectors[Rational] = SetOfVectors(
-          Vector(1,-2,3), Vector(0,3,-1), Vector(2,-1,5), Vector(0,0,-1))
+     val sv8: SetOfVectors[Rational] = SetOfVectors(Vector(1,-2,3), Vector(0,3,-1), Vector(2,-1,5),
+          Vector(0,0,-1))
      assert(sv8.isSpanningSpace(3), "setvec 8 - span TRUE")
 }
 
