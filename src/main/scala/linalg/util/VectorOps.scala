@@ -15,7 +15,7 @@ import scala.collection.mutable.Seq
 trait VectorOps {
 
      def plus[N: Number](v: Vector[N], w: Vector[N]): Vector[N] ={
-          Util.ensureSize(v, w)
+          Ops.ensureSize(v, w)
           Vector(v.getElements().zip(w.getElements()).map(pair => pair._1 + pair._2):_*)
      }
 
@@ -24,14 +24,14 @@ trait VectorOps {
      def scale[N: Number](v: Vector[N], factor: N): Vector[N] = Vector(v.getElements().map(e => e * factor):_*)
 
      def innerProduct[N: Number](v: Vector[N], w: Vector[N]): N = {
-          Util.ensureSize(v, w)
+          Ops.ensureSize(v, w)
           v.getElements().zip(w.getElements()).map(pair => pair._1 * pair._2).reduceLeft((acc, y) => acc + y)
      }
 
      def norm[N: Number](v: Vector[N])(implicit field: Field[N], root: Root[N, N]): N = {
 
           val two: N = field.one + field.one
-          val sum: N = Util.sumElements[N](Vector(v.getElements().map(e => root.power(e, two)):_*))
+          val sum: N = Ops.sumElements[N](Vector(v.getElements().map(e => root.power(e, two)):_*))
           sum.sqrt()
      }
 
@@ -44,7 +44,7 @@ trait VectorOps {
           scale(onto, field.divide(innerProduct(v, onto), norm(onto)) )
 
      def outerProduct[N: Number](v: Vector[N], w: Vector[N]): SetOfVectors[N] = {
-          Util.ensureSize(v, w)
+          Ops.ensureSize(v, w)
 
           val as: Seq[N] = v.getElements()
           val bs: Seq[N] = w.getElements()
@@ -75,7 +75,7 @@ trait VectorOps {
      }
 
      def linearlyIndependent[N: Number](v: Vector[N], w: Vector[N]): Boolean =
-          Util.isLinearlyIndependent(Util.colCombine(v, w))
+          Ops.isLinearlyIndependent(Ops.colCombine(v, w))
 
      def isLinearlyIndependent[N: Number](v: Vector[N]): Boolean = true //yes a single vector is lin indep.
 
@@ -99,17 +99,17 @@ trait VectorOps {
 
           SIZE match {
                case 0 => if(v.size() != w.size()) {
-                    throw Util.VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
+                    throw Ops.VectorLikeSizeException("Vectors are not same size; cannot continue operation.")
                }
                case _ => {
                     val len = v.size()
 
                     if (v.size() == w.size() && SIZE != len){
-                         throw Util.VectorLikeSizeException("Vectors do not have same size as given size; cannot " +
+                         throw Ops.VectorLikeSizeException("Vectors do not have same size as given size; cannot " +
                               "continue operation.")
 
                     } else if (v.size() != w.size()){
-                         throw Util.VectorLikeSizeException("Vectors do not have same size; cannot continue operation.")
+                         throw Ops.VectorLikeSizeException("Vectors do not have same size; cannot continue operation.")
                     }
                }
           }

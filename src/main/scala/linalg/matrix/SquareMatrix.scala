@@ -14,7 +14,7 @@ import scala.collection.mutable.ListBuffer
 //TODO: ssquarematrix implements setveclike using hlist shapeless so that no need
 // for extending from Matrix (no effect, anyway)
 class SquareMatrix[N: Number](mat: Matrix[N]) extends Matrix[N](mat.getColumns():_*) {
-     require(Util.Id.isSquare(mat))
+     require(Ops.Id.isSquare(mat))
 }
 
 

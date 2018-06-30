@@ -8,7 +8,7 @@ import linalg.util._
   *
   */
 class OrthogonalMatrix[N: Number](smat: SquareMatrix[N]) extends SquareMatrix[N](smat) {
-     require(Util.Id.isOrthogonal(smat))
+     require(Ops.Id.isOrthogonal(smat))
 }
 
 

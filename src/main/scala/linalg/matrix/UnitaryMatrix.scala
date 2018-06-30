@@ -7,7 +7,7 @@ import linalg.util._
   *
   */
 class UnitaryMatrix[N: Number](smat: SquareMatrix[N]) extends SquareMatrix[N](smat) {
-     require(Util.Id.isUnitary(smat))
+     require(Ops.Id.isUnitary(smat))
 }
 
 

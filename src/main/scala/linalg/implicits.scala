@@ -22,6 +22,8 @@ trait GeneralImplicits {
      // so that vset * v and v * vset works
      implicit def vecToSetVec[N: Number](vec: Vector[N]): SetOfVectors[N] = SetOfVectors(vec)
 
+     implicit def setVecToMatrix[N: Number](vset: SetOfVectors[N]): Matrix[N] = Matrix.fromSeq(vset.getColumns())
+
      implicit class VectorImplicits[N:Number](v: Vector[N]) {
           def toListB: ListBuffer[N] = ListBuffer(v.getElements():_*)
           def toMatrix: Matrix[N] = Matrix(v)

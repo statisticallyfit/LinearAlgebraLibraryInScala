@@ -9,7 +9,7 @@ import linalg.vector.SetOfVectors
   *
   */
 class UpperTriangularMatrix[N: Number](smat: SquareMatrix[N]) extends SquareMatrix[N](smat) {
-     require(Util.Id.isUpperTriangular(smat))
+     require(Ops.Id.isUpperTriangular(smat))
 }
 
 

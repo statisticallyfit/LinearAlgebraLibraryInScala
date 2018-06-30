@@ -31,102 +31,98 @@ class SetVecThings[N: Number] {
           val zero: SetOfVectors[N] = SetOfVectors(Vector.ZERO[N](1))
 
           def plus(vset: SetOfVectors[N], wset: SetOfVectors[N]): SetOfVectors[N] =
-               Util.plus(vset, wset)
+               Ops.plus(vset, wset)
      }
 
      class SetVecIsAbelianGroup extends SetVecIsMonoid with AbelianGroup[SetOfVectors[N]]{
-          def negate(vset: SetOfVectors[N]): SetOfVectors[N] = Util.negate(vset)
+          def negate(vset: SetOfVectors[N]): SetOfVectors[N] = Ops.negate(vset)
      }
 
      class SetVecIsVectorSpace extends SetVecIsAbelianGroup with VectorSpace[SetOfVectors[N], N]{
           val one: SetOfVectors[N] = SetOfVectors(Vector.ONE[N](1))
-          def scale(vset: SetOfVectors[N], factor: N): SetOfVectors[N] = Util.scale(vset, factor)
+          def scale(vset: SetOfVectors[N], factor: N): SetOfVectors[N] = Ops.scale(vset, factor)
      }
 
      class SetVecIsSetVecLike extends SetVecIsVectorSpace with SetVecLike[SetOfVectors[N], N]{
-          def isZero(vset: SetOfVectors[N]): Boolean = Util.isZero(vset)
-          def rowReducedEchelon(vset: SetOfVectors[N]): SetOfVectors[N] = Util.rowReducedEchelon[N](vset)
-          def rowEchelon(mat: SetOfVectors[N]): SetOfVectors[N] = Util.rowEchelon(mat)
-          def size(mat: SetOfVectors[N]): (Int, Int) = Util.size(mat)
-          def transpose(vset: SetOfVectors[N]): SetOfVectors[N] = Util.transpose(vset)
+          def isZero(vset: SetOfVectors[N]): Boolean = Ops.isZero(vset)
+          def rowReducedEchelon(vset: SetOfVectors[N]): SetOfVectors[N] = Ops.rowReducedEchelon[N](vset)
+          def rowEchelon(mat: SetOfVectors[N]): SetOfVectors[N] = Ops.rowEchelon(mat)
+          def size(mat: SetOfVectors[N]): (Int, Int) = Ops.size(mat)
+          def transpose(vset: SetOfVectors[N]): SetOfVectors[N] = Ops.transpose(vset)
      }
 
      class SetVecHasDimension extends Dimension[SetOfVectors[N]]{
-          def dimension(vset: SetOfVectors[N]): Int = Util.dimension(vset)
+          def dimension(vset: SetOfVectors[N]): Int = Ops.dimension(vset)
      }
 
      class SetVecHasEq extends Eq[SetOfVectors[N]]{
-          def eqv(vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean = Util.eqv(vset, wset)
+          def eqv(vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean = Ops.eqv(vset, wset)
      }
 
      class SetVecSpan extends SetVecIsSetVecLike with Span[Vector[N], SetOfVectors[N], N]{
 
-          def span(vset: SetOfVectors[N]): SetOfVectors[N] = Util.span(vset)
-          def isSpanningSpace(vset: SetOfVectors[N], dim: Int): Boolean = Util.isSpanningSpace(vset, dim)
-          def doesSetSpanTheVector(vset: SetOfVectors[N], v: Vector[N]): Boolean =
-               Util.doesSetSpanTheVector(vset, v)
+          def span(vset: SetOfVectors[N]): SetOfVectors[N] = Ops.span(vset)
+          def isSpanningSpace(vset: SetOfVectors[N], dim: Int): Boolean = Ops.isSpanningSpace(vset, dim)
+          def isSpanningVector(vset: SetOfVectors[N], v: Vector[N]): Boolean =
+               Ops.isSpanningVector(vset, v)
           def getSpanningCoefficients(vset: SetOfVectors[N], v: Vector[N]): Option[Matrix[N]] =
-               Util.getSpanningCoefficients(vset, v)
+               Ops.getSpanningCoefficients(vset, v)
      }
 
-     //TODO ATTENTION!!! rowreducedechelon is implemented by removing zero rows at the end
-     // TODO so need to fix that because a vset is only a basis of a space R^n if it is n by n and
-     // TODO the cols are linealry independent.
-
      class SetVecBasis extends Basis[Vector[N], SetOfVectors[N], N]{
-          //TODO check example 8 howard if impl. is truly correct ...
+
           def basisOfSpaceSpannedBySet(vset: SetOfVectors[N]): SetOfVectors[N] =
-               Util.basisOfSpaceSpannedBySet(vset)
+               Ops.basisOfSpaceSpannedBySet(vset)
           def alternateBasisOfSpaceSpannedBySet(vset: SetOfVectors[N]): SetOfVectors[N] =
-               Util.alternateBasisOfSpaceSpannedBySet(vset)
+               Ops.alternateBasisOfSpaceSpannedBySet(vset)
           def isBasisOfSet(vset: SetOfVectors[N], maybeBasis: SetOfVectors[N]): Boolean =
-               Util.isBasisOfSet(vset, maybeBasis)
+               Ops.isBasisOfSet(vset, maybeBasis)
 
           //def basisOfSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Util.basisOfSpace(vset)
-          def isBasisOfSpace(vset: SetOfVectors[N], dim: Int): Boolean = Util.isBasisOfSpace(vset, dim)
+          def isBasisOfSpace(vset: SetOfVectors[N], dim: Int): Boolean = Ops.isBasisOfSpace(vset, dim)
 
           def isBasisOfVector(vset: SetOfVectors[N], v: Vector[N]): Boolean =
-               Util.doesSetSpanTheVector(vset, v)
+               Ops.isSpanningVector(vset, v)
      }
 
      class SetVecCanHaveLinearIndependence extends LinearIndependence[SetOfVectors[N]] {
 
           def linearlyIndependent(vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean =
-               Util.linearlyIndependent(vset, wset)
-          def isLinearlyIndependent(vset: SetOfVectors[N]): Boolean = Util.isLinearlyIndependent(vset)
+               Ops.linearlyIndependent(vset, wset)
+          def isLinearlyIndependent(vset: SetOfVectors[N]): Boolean = Ops.isLinearlyIndependent(vset)
      }
 
      class SetVecHasRowSpace extends RowSpace[Vector[N], SetOfVectors[N], N] {
 
           def isInRowSpace(vset: SetOfVectors[N], v: Vector[N]): Boolean =
-               Util.isInRowSpace(vset, v)
+               Ops.isInRowSpace(vset, v)
           def equalRowSpaces(vset1: SetOfVectors[N], vset2: SetOfVectors[N]): Boolean =
-               Util.equalRowSpaces(vset1, vset2)
-          def rowSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Util.rowSpace(vset)
-          def areRowsSpanningSpace(vset: SetOfVectors[N]): Boolean = Util.areRowsSpanningSpace(vset)
+               Ops.equalRowSpaces(vset1, vset2)
+          def rowSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Ops.rowSpace(vset)
+          def areRowsSpanningSpace(vset: SetOfVectors[N]): Boolean = Ops.areRowsSpanningSpace(vset)
 
-          def rank(vset: SetOfVectors[N]): Int = Util.rank(vset)
-          def isFullRank(vset: SetOfVectors[N]): Boolean = Util.isFullRank(vset)
+          def rank(vset: SetOfVectors[N]): Int = Ops.rank(vset)
+          def isFullRank(vset: SetOfVectors[N]): Boolean = Ops.isFullRank(vset)
      }
 
      class SetVecHasColumnSpace extends ColumnSpace[Vector[N], SetOfVectors[N], N] {
 
           def isInColumnSpace(vset: SetOfVectors[N], v: Vector[N]): Boolean =
-               Util.isInColumnSpace(vset, v)
+               Ops.isInColumnSpace(vset, v)
           def equalColSpaces(vset1: SetOfVectors[N], vset2: SetOfVectors[N]): Boolean =
-               Util.equalColSpaces(vset1, vset2)
-          def columnSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Util.columnSpace(vset)
-          def areColsSpanningSpace(vset: SetOfVectors[N]): Boolean = Util.areColsSpanningSpace(vset)
-          def columnRank(vset: SetOfVectors[N]): Int = Util.columnRank(vset)
+               Ops.equalColSpaces(vset1, vset2)
+          def columnSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Ops.columnSpace(vset)
+          def areColsSpanningSpace(vset: SetOfVectors[N]): Boolean = Ops.areColsSpanningSpace(vset)
+          def columnRank(vset: SetOfVectors[N]): Int = Ops.columnRank(vset)
      }
 
      class SetVecHasNullSpace extends NullSpace[Vector[N], SetOfVectors[N], N] {
           def isInNullSpace(vset: SetOfVectors[N], v: Vector[N]): Boolean =
-               Util.isInNullSpace(vset, v)
+               Ops.isInNullSpace(vset, v)
           def equalNullSpaces(vset1: SetOfVectors[N], vset2: SetOfVectors[N]): Boolean =
-               Util.equalNullSpaces(vset1, vset2)
-          def nullSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Util.nullSpace(vset)
-          def nullity(vset: SetOfVectors[N]): Int = Util.nullity(vset)
+               Ops.equalNullSpaces(vset1, vset2)
+          def nullSpace(vset: SetOfVectors[N]): SetOfVectors[N] = Ops.nullSpace(vset)
+          def nullity(vset: SetOfVectors[N]): Int = Ops.nullity(vset)
           //TODO def areColsBasisOfSpace(): Boolean = ev.areColsBasisOfSpace(current)
           //TODO def areColsSpanningSpace(): Boolean = ev.areColsSpanningSpace(current)
      }

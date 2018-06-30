@@ -65,17 +65,18 @@ trait ShowInstances {
 
                v.isCol() match {
                     case true => showVecSet(SetOfVectors(v))
-                    case false => showVecSet(Util.transpose(SetOfVectors(v))) //torowvec
+                    case false => showVecSet(Ops.transpose(SetOfVectors(v))) //torowvec
                }
           }
      }
 
      //todo
      implicit def PolynomialHasShow[R: RealNumber] = new Show[Polynomial[R]]{
-          def show(poly: Polynomial[R]): String = showPoly(poly)
+          def show(poly: Polynomial[R]): String = {
+               ???
+          }
      }
 
-     private def showPoly[R: RealNumber](poly: Polynomial[R]): String = ???
 
      implicit def SetVecHasShow[N: Number] = new Show[SetOfVectors[N]]{
           def show(vset: SetOfVectors[N]): String = showVecSet(vset)
@@ -86,6 +87,34 @@ trait ShowInstances {
 
      }
 
+
+
+
+     private def showVecSet[N:Number](vset: SetOfVectors[N]): String ={
+          if(vset.isEmpty()) return "/   \\\n|   |\n\\   /\n"
+
+          val colsStr: Seq[Seq[String]] = vset.getColumns().map(vec => vec.getElements().map(elem => elem.toString))
+
+          // max widths measured per col
+          val maxWidths: Seq[Int] = colsStr.map(vec => vec.reduceLeft((acc,y) =>
+               if(acc.length > y.length) acc else y)).map(_.length)
+
+          val maxWidthsTwoDim: Seq[Seq[Int]] = maxWidths.map(elem => Seq.fill(vset.numRows)(elem))
+
+          // col center length tupled with actual matrix col element in vector of vectors
+          val pairs: Seq[Seq[(String, Int)]] = colsStr.zip(maxWidthsTwoDim).map(pair => pair._1.zip(pair._2))
+          val aligned: Seq[Seq[String]] = pairs.map(vec => vec.map(pair => StringUtils.leftPad(pair._1.toString, pair._2)))
+
+          // note: let maxWidth + 2 separate the numbers in the row
+          if(vset.numRows == 1)
+               return "\n{" + aligned.transpose.head.mkString("  ") + "}"
+          val firstRow: String = "\n/ " + aligned.transpose.head.mkString("  ") + " \\\n"
+          val lastRow: String = "\\ " + aligned.transpose.last.mkString("  ") + " /"
+          val middleRows: Seq[String] = aligned.transpose.tail.init
+               .map(list => "| " + list.mkString("  ") + " |\n")
+
+          firstRow + middleRows.mkString + lastRow
+     }
 
      private def showAugMatrix[N:Number](mat: AugmentedMatrix[N]): String ={
           val colsStr: Seq[Seq[String]] = mat.getColumns().map(vec => vec.getElements().map(e => e.toString))
@@ -109,32 +138,6 @@ trait ShowInstances {
           val firstRow: String = "\n/ " + sepAlignedCols.transpose.head.mkString("  ") + " \\\n"
           val lastRow: String = "\\ " + sepAlignedCols.transpose.last.mkString("  ") + " /"
           val middleRows: Seq[String] = sepAlignedCols.transpose.tail.init.map(list => "| " + list.mkString("  ") + " |\n")
-
-          firstRow + middleRows.mkString + lastRow
-     }
-
-
-
-     private def showVecSet[N:Number](vset: SetOfVectors[N]): String ={
-          val colsStr: Seq[Seq[String]] = vset.getColumns().map(vec => vec.getElements().map(elem => elem.toString))
-
-          // max widths measured per col
-          val maxWidths: Seq[Int] = colsStr.map(vec => vec.reduceLeft((acc,y) =>
-               if(acc.length > y.length) acc else y)).map(_.length)
-
-          val maxWidthsTwoDim: Seq[Seq[Int]] = maxWidths.map(elem => Seq.fill(vset.numRows)(elem))
-
-          // col center length tupled with actual matrix col element in vector of vectors
-          val pairs: Seq[Seq[(String, Int)]] = colsStr.zip(maxWidthsTwoDim).map(pair => pair._1.zip(pair._2))
-          val aligned: Seq[Seq[String]] = pairs.map(vec => vec.map(pair => StringUtils.leftPad(pair._1.toString, pair._2)))
-
-          // note: let maxWidth + 2 separate the numbers in the row
-          if(vset.numRows == 1)
-               return "\n{" + aligned.transpose.head.mkString("  ") + "}"
-          val firstRow: String = "\n/ " + aligned.transpose.head.mkString("  ") + " \\\n"
-          val lastRow: String = "\\ " + aligned.transpose.last.mkString("  ") + " /"
-          val middleRows: Seq[String] = aligned.transpose.tail.init
-               .map(list => "| " + list.mkString("  ") + " |\n")
 
           firstRow + middleRows.mkString + lastRow
      }

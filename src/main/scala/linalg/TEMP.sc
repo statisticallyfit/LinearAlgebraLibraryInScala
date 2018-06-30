@@ -1,14 +1,3 @@
-val x = 0.333
+import linalg.matrix.Matrix
 
-
-
-val (first, last): (String, String) = x.toString.splitAt(x.toString.indexOf("."))
-
-if(last.toDouble == 0){
-     if(first.toDouble == 0) "0" //getting rid of minus sign in cases like "-0.0"
-     else first
-} else {
-
-     x.toString
-}
-
+val m = Matrix.fromSeqs()

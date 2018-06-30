@@ -27,51 +27,51 @@ class MatrixThings[N: Number] {
      }*/
 
      class MatrixHasDimension extends Dimension[Matrix[N]]{
-          def dimension(mat: Matrix[N]): Int = Util.dimension(mat)
+          def dimension(mat: Matrix[N]): Int = Ops.dimension(mat)
      }
 
      class MatrixHasEq extends Eq[Matrix[N]]{
-          def eqv(mat1: Matrix[N], mat2: Matrix[N]): Boolean = Util.eqv(mat1, mat2)
+          def eqv(mat1: Matrix[N], mat2: Matrix[N]): Boolean = Ops.eqv(mat1, mat2)
      }
 
      class MatrixIsMonoid extends Monoid[Matrix[N]]{
 
           val zero: Matrix[N] = Matrix(Vector.ZERO[N](1))
 
-          def plus(mat1: Matrix[N], mat2: Matrix[N]): Matrix[N] = Util.plus(mat1, mat2).toMatrix
+          def plus(mat1: Matrix[N], mat2: Matrix[N]): Matrix[N] = Ops.plus(mat1, mat2).toMatrix
      }
 
      class MatrixIsAbelianGroup extends MatrixIsMonoid with AbelianGroup[Matrix[N]]{
-          def negate(mat: Matrix[N]): Matrix[N] = Util.negate(mat).toMatrix
+          def negate(mat: Matrix[N]): Matrix[N] = Ops.negate(mat).toMatrix
      }
 
      class MatrixIsVectorSpace extends MatrixIsAbelianGroup with VectorSpace[Matrix[N], N]{
           val one: Matrix[N] = Matrix(Vector.ONE[N](1))
 
-          def scale(mat: Matrix[N], factor: N): Matrix[N] = Util.scale(mat, factor).toMatrix
+          def scale(mat: Matrix[N], factor: N): Matrix[N] = Ops.scale(mat, factor).toMatrix
      }
 
      class MatrixIsSetVecLike extends MatrixIsVectorSpace with SetVecLike[Matrix[N], N]{
-          def isZero(mat: Matrix[N]): Boolean = Util.isZero(mat)
-          def rowReducedEchelon(mat: Matrix[N]): Matrix[N] = Util.rowReducedEchelon(mat).toMatrix
-          def rowEchelon(mat: Matrix[N]): Matrix[N] = Util.rowEchelon(mat).toMatrix
-          def size(mat: Matrix[N]): (Int, Int) = Util.size(mat)
-          def transpose(mat: Matrix[N]): Matrix[N] = Util.transpose(mat).toMatrix
+          def isZero(mat: Matrix[N]): Boolean = Ops.isZero(mat)
+          def rowReducedEchelon(mat: Matrix[N]): Matrix[N] = Ops.rowReducedEchelon(mat).toMatrix
+          def rowEchelon(mat: Matrix[N]): Matrix[N] = Ops.rowEchelon(mat).toMatrix
+          def size(mat: Matrix[N]): (Int, Int) = Ops.size(mat)
+          def transpose(mat: Matrix[N]): Matrix[N] = Ops.transpose(mat).toMatrix
      }
 
      class MatrixIsMatrixLike extends MatrixIsSetVecLike with MatrixLike[Matrix[N], N] {
 
-          def multiply(mat1: Matrix[N], mat2: Matrix[N]): Matrix[N] = Util.multiply(mat1, mat2)
-          def power(mat: Matrix[N], exp: N): Matrix[N] = Util.power(mat, exp)
-          def inverse(mat: Matrix[N]): Matrix[N] = Util.inverse(mat)
-          def conjugateTranspose(mat: Matrix[N]): Matrix[N] = Util.conjugateTranspose(mat)
-          def adjoint(mat: Matrix[N]): Matrix[N] =  Util.adjoint(mat)
-          def cofactor(mat: Matrix[N]): Matrix[N] = Util.cofactor(mat)
-          def cofactor(mat: Matrix[N], r:Int, c:Int): N = Util.cofactor(mat, r, c)
-          def minor(mat: Matrix[N]): Matrix[N] = Util.minor(mat)
-          def minor(mat: Matrix[N], r: Int, c: Int): N = Util.minor(mat, r, c)
-          def determinant(mat: Matrix[N]): N = Util.determinant(mat)
-          def trace(mat: Matrix[N]): N = Util.trace(mat)
+          def multiply(mat1: Matrix[N], mat2: Matrix[N]): Matrix[N] = Ops.multiply(mat1, mat2)
+          def power(mat: Matrix[N], exp: N): Matrix[N] = Ops.power(mat, exp)
+          def inverse(mat: Matrix[N]): Matrix[N] = Ops.inverse(mat)
+          def conjugateTranspose(mat: Matrix[N]): Matrix[N] = Ops.conjugateTranspose(mat)
+          def adjoint(mat: Matrix[N]): Matrix[N] =  Ops.adjoint(mat)
+          def cofactor(mat: Matrix[N]): Matrix[N] = Ops.cofactor(mat)
+          def cofactor(mat: Matrix[N], r:Int, c:Int): N = Ops.cofactor(mat, r, c)
+          def minor(mat: Matrix[N]): Matrix[N] = Ops.minor(mat)
+          def minor(mat: Matrix[N], r: Int, c: Int): N = Ops.minor(mat, r, c)
+          def determinant(mat: Matrix[N]): N = Ops.determinant(mat)
+          def trace(mat: Matrix[N]): N = Ops.trace(mat)
      }
 
 

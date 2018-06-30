@@ -24,7 +24,7 @@ trait SetVecOps {
 
      def size[N: Number](vset: SetOfVectors[N]): (Int, Int) = (vset.numRows, vset.numCols)
 
-     def dimension[N: Number](vset: SetOfVectors[N]): Int = vset.basis().numCols
+     def dimension[N: Number](vset: SetOfVectors[N]): Int = Ops.basisOfSpaceSpannedBySet(vset).numCols
 
      def eqv[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean = {
           vset.size() == wset.size() match {
@@ -39,7 +39,7 @@ trait SetVecOps {
      }
 
      def plus[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): SetOfVectors[N] ={
-          Util.ensureSize(vset, wset)
+          Ops.ensureSize(vset, wset)
           SetOfVectors(vset.getColumns().zip(wset.getColumns())
                .map(colPair => colPair._1 + colPair._2):_*)
      }
@@ -72,7 +72,7 @@ trait SetVecOps {
 
           for(r <- 0 until echelon.numRows){
                val denoms: Seq[Int] = echelon.getRow(r).getElements().map(e => e.denominator())
-               val lcm: N = Number[N].from(Util.lcmSeq(denoms:_*))
+               val lcm: N = Number[N].from(Ops.lcmSeq(denoms:_*))
                echelon = scaleRow(r, lcm, echelon)
           }
           echelon
@@ -123,7 +123,7 @@ trait SetVecOps {
 
      // Span
 
-     def span[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = vset.reducedEchelon()
+     def span[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = Ops.rowReducedEchelon(vset)
 
      def isSpanningSpace[N: Number](vset: SetOfVectors[N], dim: Int): Boolean ={
           //or page 206 rref == identity method
@@ -133,48 +133,47 @@ trait SetVecOps {
           /*val rref = vset.reducedEchelon()
           getIndicesOfLeadingColumns(rref).length == dim*/
 
-          val system = AugmentedMatrix(vset, SquareMatrix.IDENTITY[N](dim)) //TODO better graceful error handling if
-          // ID is e.g. 2x2 and vset is 4x5, then must return false.
-          println(system.reducedEchelon())
-          println("is consistent?: " + system.isConsistent())
+          if(vset.numRows != dim) return false
+          //else
+          val system = AugmentedMatrix(vset, SquareMatrix.IDENTITY[N](dim))
           system.isConsistent()
      }
 
-     def doesSetSpanTheVector[N: Number](vset: SetOfVectors[N], v: Vector[N]): Boolean ={
+     def isSpanningVector[N: Number](vset: SetOfVectors[N], v: Vector[N]): Boolean ={
           val system = AugmentedMatrix(vset, v)
           system.isConsistent()
      }
 
      def getSpanningCoefficients[N: Number](vset: SetOfVectors[N], v: Vector[N]): Option[Matrix[N]] ={
-          AugmentedMatrix(vset, v).solve()
+          Ops.solve(AugmentedMatrix(vset, v))
      }
 
      // Basis
 
      //Page 246 of howard: basis for the space spanned by a set of vectors
      def basisOfSpaceSpannedBySet[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
-          val ref = vset.reducedEchelon()
+          val ref = Ops.rowReducedEchelon(vset)
           val leadingCols: Seq[Int] = getIndicesOfLeadingColumns(ref)
           SetOfVectors(vset.getColumnsAt(leadingCols:_*):_*)
      }
 
      def alternateBasisOfSpaceSpannedBySet[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
-          val nonzeroColVecs = getNonZeroRows(vset.transpose().reducedEchelon())
+          val nonzeroColVecs = Ops.getNonZeroRows(Ops.rowReducedEchelon(Ops.transpose(vset)))
           SetOfVectors(nonzeroColVecs:_*)
      }
 
      // example 3.52 in david lay: checks if the given set is a basis
      def isBasisOfSet[N: Number](vset: SetOfVectors[N], maybeBasis: SetOfVectors[N]): Boolean ={
-          val basis1: SetOfVectors[N] = basisOfSpaceSpannedBySet(vset)
-          val basis2: SetOfVectors[N] = alternateBasisOfSpaceSpannedBySet(vset)
+          val basis1: SetOfVectors[N] = Ops.basisOfSpaceSpannedBySet(vset)
+          val basis2: SetOfVectors[N] = Ops.alternateBasisOfSpaceSpannedBySet(vset)
 
 
           if (maybeBasis.size() != basis1.size())  {
                return false
           }
-          val rref1: SetOfVectors[N] = basisOfSpaceSpannedBySet(maybeBasis) //reduce further to find true
+          val rref1: SetOfVectors[N] = Ops.basisOfSpaceSpannedBySet(maybeBasis) //reduce further to find true
           // character
-          val rref2: SetOfVectors[N] = alternateBasisOfSpaceSpannedBySet(maybeBasis) //reduce further to find true
+          val rref2: SetOfVectors[N] = Ops.alternateBasisOfSpaceSpannedBySet(maybeBasis) //reduce further to find true
           // character
 
           (rref1 === basis1 || rref1 === basis2) || (rref2 === basis1 || rref2 === basis2)
@@ -191,15 +190,18 @@ trait SetVecOps {
      //from page 206 of david poole (fundamental theorem of invertible matrices)
      // dim = dimension of space we want to check if the set is a basis of.
      def isBasisOfSpace[N: Number](vset: SetOfVectors[N], dim: Int): Boolean = {
-          Util.Id.isSquare(vset.toMatrix) &&
+          Ops.Id.isSquare(vset.toMatrix) &&
                vset.numRows == dim &&
-               vset.reducedEchelon() === SetOfVectors.IDENTITY(vset)
+               Ops.rowReducedEchelon(vset) === SetOfVectors.IDENTITY(vset)
      }
 
 
      // linear independence
      def linearlyIndependent[N: Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Boolean ={
-          vset.size() == wset.size() match {
+          val entire: SetOfVectors[N] = Ops.colCombine(vset, wset)
+          val rref: SetOfVectors[N] = Ops.rowReducedEchelon(entire)
+          rref === SetOfVectors.IDENTITY(rref) //TODO
+          /*vset.size() == wset.size() match {
                case false => false
                case true => {
                     //TODO is it correct to use the numCols?
@@ -207,11 +209,11 @@ trait SetVecOps {
                     val aug = AugmentedMatrix(vset + wset, SetOfVectors.ZERO[N](dim))
                     aug.rrefA === Matrix.IDENTITY[N](aug.rrefA)
                }
-          }
+          }*/
      }
 
      def isLinearlyIndependent[N: Number](vset: SetOfVectors[N]): Boolean = {
-          val rref = vset.reducedEchelon()
+          val rref = Ops.rowReducedEchelon(vset)
           rref === SetOfVectors.IDENTITY(rref)
      }
 
@@ -223,23 +225,23 @@ trait SetVecOps {
           rowSpace(vset).dimension()
      }
 
-     def isFullRank[N: Number](vset: SetOfVectors[N]): Boolean = rank(vset) == vset.numRows
+     def isFullRank[N: Number](vset: SetOfVectors[N]): Boolean = Ops.rank(vset) == vset.numRows
 
 
      def isInRowSpace[N: Number](vset: SetOfVectors[N], v: Vector[N]): Boolean ={
-          isInColumnSpace(vset.transpose(), v)
+          isInColumnSpace(Ops.transpose(vset), v)
      }
 
      def equalRowSpaces[N: Number](vset1: SetOfVectors[N], vset2: SetOfVectors[N]): Boolean = {
-          vset1.reducedEchelon() === vset2.reducedEchelon()
+          Ops.rowReducedEchelon(vset1) === Ops.rowReducedEchelon(vset2)
      }
 
      def rowSpace[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
-          SetOfVectors(expressRowsAsCols(getNonZeroRows(vset.reducedEchelon())):_*)
+          SetOfVectors(Ops.expressRowsAsCols(Ops.getNonZeroRows(Ops.rowReducedEchelon(vset))):_*)
      }
      //TODO
      def areRowsSpanningSpace[N: Number](vset: SetOfVectors[N]): Boolean ={
-          vset.reducedEchelon() === SetOfVectors.IDENTITY(vset)
+          Ops.rowReducedEchelon(vset) === SetOfVectors.IDENTITY(vset)
      }
 
      // column space
@@ -253,7 +255,7 @@ trait SetVecOps {
      }
 
      def columnSpace[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] ={
-          val leadingCols: Seq[Int] = getIndicesOfLeadingColumns(vset.reducedEchelon())
+          val leadingCols: Seq[Int] = getIndicesOfLeadingColumns(Ops.rowReducedEchelon(vset))
           SetOfVectors(vset.getColumnsAt(leadingCols:_*):_*)
      }
 
@@ -273,6 +275,7 @@ trait SetVecOps {
      def equalNullSpaces[N: Number](vset1: SetOfVectors[N], vset2: SetOfVectors[N]): Boolean = {
           nullSpace(vset1) === nullSpace(vset2)
      }
+
      def nullSpace[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] = {
           AugmentedMatrix(vset, Vector.ZERO[N](vset.numRows)).solve().get
           //TODO is it possible for this to not be defined?
@@ -293,18 +296,19 @@ trait SetVecOps {
      // Utils ------------------------------------------------------------------------------------
 
      def colCombine[N:Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): SetOfVectors[N] = {
-          if(vset.numRows != wset.numRows){
+          SetOfVectors((vset.getColumns() ++ wset.getColumns()):_*)
+          /*if(vset.numRows != wset.numRows){
                throw Util.MatrixLikeSizeException("vset.numRows must equal wset.numRows")
           } else {
                SetOfVectors((vset.getColumns() ++ wset.getColumns()):_*)
-          }
+          }*/
      }
 
 
      def ensureSize[N:Number](vset: SetOfVectors[N], wset: SetOfVectors[N]): Unit = {
 
           if(vset.numRows != wset.numRows || vset.numCols != wset.numCols) {
-               throw Util.MatrixLikeSizeException("SetOfVectors are not same size; cannot continue operation.")
+               throw Ops.MatrixLikeSizeException("SetOfVectors are not same size; cannot continue operation.")
           }
      }
 
@@ -320,7 +324,7 @@ trait SetVecOps {
      def scaleRow[N:Number](row: Int, factor: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
 
           val rowMat: Seq[N] = vset.getRows().reduceLeft((accRow, yRow) =>
-               Util.lengthCombine(accRow, yRow)).getElements()
+               Ops.lengthCombine(accRow, yRow)).getElements()
 
           for (i <- row * vset.numCols until ((row + 1) * vset.numCols)) {
                rowMat(i) = rowMat(i) * factor
@@ -329,7 +333,7 @@ trait SetVecOps {
           //converting from row to col representation
           val rows: Seq[Vector[N]] = Seq(rowMat.grouped(vset.numCols).toList.map(_.toVec):_*)
 
-          SetOfVectors(expressRowsAsCols[N](rows): _*)
+          SetOfVectors(Ops.expressRowsAsCols[N](rows): _*)
      }
 
      /**
@@ -340,7 +344,7 @@ trait SetVecOps {
        */
      def sumRows[N:Number](rowA: Int, rowB: Int, scale: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
           val oldMatList: Seq[N] = vset.getRows().reduceLeft((accRow, yRow) =>
-               Util.lengthCombine(accRow, yRow)).getElements()
+               Ops.lengthCombine(accRow, yRow)).getElements()
           val newMatList: Seq[N] = oldMatList
           for (i <- 0 until vset.numCols) { // for each value in rowA
                newMatList(rowA * vset.numCols + i) += oldMatList(rowB * vset.numCols + i) * scale //
@@ -349,7 +353,7 @@ trait SetVecOps {
           // using grouped so we get cols again
           val rows: Seq[Vector[N]] = Seq(newMatList.grouped(vset.numCols).toList.map(_.toVec):_*)
 
-          SetOfVectors(expressRowsAsCols[N](rows): _*)
+          SetOfVectors(Ops.expressRowsAsCols[N](rows): _*)
      }
 
      /**
@@ -360,7 +364,7 @@ trait SetVecOps {
        */
      def sumCols[N:Number](colA: Int, colB: Int, scale: N, vset: SetOfVectors[N]): SetOfVectors[N] = {
           val oldMatList: Seq[N] = vset.getColumns().reduceLeft((accCol, yCol) =>
-               Util.lengthCombine(accCol, yCol)).getElements()
+               Ops.lengthCombine(accCol, yCol)).getElements()
           val newMatList: Seq[N] = oldMatList
           for (i <- 0 until vset.numRows) { // for each value in rowA
                newMatList(colA * vset.numRows + i) += oldMatList(colB * vset.numRows + i) * scale //
@@ -383,7 +387,7 @@ trait SetVecOps {
           rows(rowA) = rows(rowB)
           rows(rowB) = temp
 
-          SetOfVectors(expressRowsAsCols[N](rows): _*)
+          SetOfVectors(Ops.expressRowsAsCols[N](rows): _*)
      }
 
      def swapCols[N:Number](colA: Int, colB: Int, vset: SetOfVectors[N]): SetOfVectors[N] = {
@@ -411,7 +415,7 @@ trait SetVecOps {
      // Gets indices of columns of original matrix with leading ones when in rref form.
      def getIndicesOfLeadingColumns[N: Number](rref: SetOfVectors[N]): Array[Int] ={
           val indices = 0 until rref.numCols
-          (indices diff getIndicesOfFreeColumns(rref)).toArray
+          (indices diff Ops.getIndicesOfFreeColumns(rref)).toArray
      }
 
      //precondition: expects the rref to come from undetermined system -- used for Solver
@@ -437,10 +441,10 @@ trait SetVecOps {
      }
 
      def expressRowsAsCols[N:Number](mat: SetOfVectors[N]): Seq[Vector[N]] =
-          expressRowsAsCols(mat.getRows())
+          Ops.expressRowsAsCols(mat.getRows())
 
      def expressColsAsRows[N:Number](mat: SetOfVectors[N]): Seq[Vector[N]] =
-          expressColsAsRows(mat.getColumns())
+          Ops.expressColsAsRows(mat.getColumns())
 
      def expressRowsAsCols[N:Number](rows: Seq[Vector[N]]): Seq[Vector[N]] = {
           //converting from row to col representation
@@ -455,7 +459,7 @@ trait SetVecOps {
      }
 
      def expressColsAsRows[N:Number](cols: Seq[Vector[N]]): Seq[Vector[N]] = {
-          expressRowsAsCols(cols)
+          Ops.expressRowsAsCols(cols)
      }
 
 

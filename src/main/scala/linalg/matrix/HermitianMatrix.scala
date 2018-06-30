@@ -11,7 +11,7 @@ import scala.collection.mutable.ListBuffer
   *
   */
 class HermitianMatrix[N: Number](smat: SquareMatrix[N]) extends SquareMatrix[N](smat) {
-     require(Util.Id.isHermitian(smat))
+     require(Ops.Id.isHermitian(smat))
 }
 
 

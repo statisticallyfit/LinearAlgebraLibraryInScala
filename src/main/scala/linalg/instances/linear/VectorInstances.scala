@@ -26,39 +26,39 @@ class VectorThings[N: Number]{
      class VectorIsMonoid extends Monoid[Vector[N]]{
 
           val zero: Vector[N] = Vector(Number.ZERO[N]) //just vector with one element
-          def plus(v: Vector[N], w: Vector[N]): Vector[N] = Util.plus(v, w)
+          def plus(v: Vector[N], w: Vector[N]): Vector[N] = Ops.plus(v, w)
      }
 
      class VectorIsAbelianGroup extends VectorIsMonoid with AbelianGroup[Vector[N]]{
-          def negate(v: Vector[N]): Vector[N] = Util.negate(v)
+          def negate(v: Vector[N]): Vector[N] = Ops.negate(v)
      }
 
      class VectorIsVectorSpace extends VectorIsAbelianGroup with VectorSpace[Vector[N], N]{
 
           val one: Vector[N] = Vector(Number.ONE[N]) //just vector with one element
-          def scale(v: Vector[N], factor: N): Vector[N] = Util.scale(v, factor)
+          def scale(v: Vector[N], factor: N): Vector[N] = Ops.scale(v, factor)
      }
 
      class VectorIsInnerProductSpace extends VectorIsVectorSpace with InnerProductSpace[Vector[N], N]{
-          def innerProduct(v: Vector[N], w: Vector[N]): N = Util.innerProduct(v, w)
+          def innerProduct(v: Vector[N], w: Vector[N]): N = Ops.innerProduct(v, w)
      }
 
      class VectorIsNormedVectorSpace extends VectorIsInnerProductSpace with NormedVectorSpace[Vector[N], N]{
-          def norm(v: Vector[N])(implicit field: Field[N], root: Root[N, N]): N = Util.norm(v)
+          def norm(v: Vector[N])(implicit field: Field[N], root: Root[N, N]): N = Ops.norm(v)
      }
 
      class VectorIsHilbertSpace extends VectorIsNormedVectorSpace with HilbertSpace[Vector[N], N]{
           def angle(v: Vector[N], w: Vector[N])(implicit t: Trig[N], field: Field[N], r: Root[N,N]): N =
-               Util.angle(v, w)
+               Ops.angle(v, w)
      }
 
      class VectorIsVectorLike extends VectorIsHilbertSpace with VectorLike[Vector[N], N]{
 
-          def isZero(v: Vector[N]): Boolean = Util.isZero(v)
+          def isZero(v: Vector[N]): Boolean = Ops.isZero(v)
           def projection(v: Vector[N], onto: Vector[N])(implicit field: Field[N], r: Root[N,N]): Vector[N] =
-               Util.projection(v, onto)
-          def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = Util.outerProduct(v, w)
-          def crossProduct(u: Vector[N], v: Vector[N]): Option[Vector[N]] = Util.crossProduct(u, v)
+               Ops.projection(v, onto)
+          def outerProduct(v: Vector[N], w: Vector[N]): SetOfVectors[N] = Ops.outerProduct(v, w)
+          def crossProduct(u: Vector[N], v: Vector[N]): Option[Vector[N]] = Ops.crossProduct(u, v)
           def size(v: Vector[N]): Int = v.getElements().length
           def transpose(v: Vector[N]): Vector[N] = {
                if(v.isRow()){
@@ -77,13 +77,13 @@ class VectorThings[N: Number]{
      }
 
      class VectorHasEq extends Eq[Vector[N]] {
-          def eqv(v: Vector[N], w: Vector[N]): Boolean = Util.eqv(v, w)
+          def eqv(v: Vector[N], w: Vector[N]): Boolean = Ops.eqv(v, w)
      }
 
      class VectorCanHaveLinearIndependence extends LinearIndependence[Vector[N]] {
 
-          def linearlyIndependent(v: Vector[N], w: Vector[N]): Boolean = Util.linearlyIndependent(v, w)
-          def isLinearlyIndependent(v: Vector[N]): Boolean = Util.isLinearlyIndependent(v)
+          def linearlyIndependent(v: Vector[N], w: Vector[N]): Boolean = Ops.linearlyIndependent(v, w)
+          def isLinearlyIndependent(v: Vector[N]): Boolean = Ops.isLinearlyIndependent(v)
      }
 
      //val absolute = new VectorHasAbsoluteValue

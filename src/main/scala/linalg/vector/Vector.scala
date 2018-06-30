@@ -56,12 +56,12 @@ object Vector {
 
      def apply[N: Number](elems: N*): Vector[N] = new Vector(elems:_*)
      def apply[N: Number](elems: Seq[N]): Vector[N] = new Vector(elems:_*)
-     def apply[N: Number](elems: List[N]): Vector[N] = new Vector(elems:_*)
-     def apply[N: Number](elems: ListBuffer[N]): Vector[N] = new Vector(elems:_*)
+     //def apply[N: Number](elems: List[N]): Vector[N] = new Vector(elems:_*)
+     //def apply[N: Number](elems: ListBuffer[N]): Vector[N] = new Vector(elems:_*)
 
      //todo could go on, adding types, because if List < Seq but we do Vector(list), and list apply isn't there
      //todo then it doesn't see the seq apply and completely ignores it!
 
-     def ZERO[N: Number](len: Int): Vector[N] = Vector(List.fill[N](len)(Number.ZERO[N]))
+     def ZERO[N: Number](len: Int): Vector[N] = Vector(Seq.fill[N](len)(Number.ZERO[N]))
      def ONE[N: Number](len: Int): Vector[N] = Vector(Seq.fill[N](len)(Number.ONE[N]))
 }

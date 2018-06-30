@@ -137,11 +137,11 @@ object Tester extends App {
 
 
 
-     /*val mat1A: Matrix[Rational] = Matrix(Vector(1,2,-1), Vector(3,-1,2),  Vector(2,-1,1))
+     val mat1A: Matrix[Rational] = Matrix(Vector(1,2,-1), Vector(3,-1,2),  Vector(2,-1,1))
      val v1A: Vector[Rational] = Vector(5,1,3)
      val aug1A = AugmentedMatrix[Rational](mat1A, v1A)
-     println(aug1A.rowReducedEchelon())
-     Console.println("1A: " + aug1A.solve())*/
+     println(aug1A.reducedEchelon())
+     Console.println("1A: " + aug1A.solve())
 
      val mat3: Matrix[Rational] = Matrix(
           Vector(-1,1,2), Vector(3,2,1), Vector(2,-3,-2)
@@ -257,6 +257,15 @@ object Tester extends App {
      val sv8: SetOfVectors[Rational] = SetOfVectors(Vector(1,-2,3), Vector(0,3,-1), Vector(2,-1,5),
           Vector(0,0,-1))
      assert(sv8.isSpanningSpace(3), "setvec 8 - span TRUE")
+
+
+
+     val uneven: SetOfVectors[Rational] = SetOfVectors(Vector(1,2,8,4,-1), Vector(1,1,-1,0,2),
+          Vector(6,3,-2,0,5))
+     val unevenVec: Vector[Rational] = Vector(1,2,3)
+     val augUneven: AugmentedMatrix[Rational] = AugmentedMatrix(uneven, unevenVec)
+     println(augUneven)
+     println(augUneven.rrefEntire)
 }
 
 

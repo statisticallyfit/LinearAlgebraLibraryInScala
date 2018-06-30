@@ -10,9 +10,9 @@ import scala.language.implicitConversions
 trait LinearIndependenceSyntax {
 
      implicit class LinearIndependenceOps[V[_], F](current: V[F])
-                                                  (implicit indep: LinearIndependence[V[F]]){
+                                                  (implicit ev: LinearIndependence[V[F]]){
 
-          def linearlyIndependent(other: V[F]): Boolean = indep.linearlyIndependent(current, other)
-          def isLinearlyIndependent(): Boolean = indep.isLinearlyIndependent(current)
+          def linearlyIndependent(other: V[F]): Boolean = ev.linearlyIndependent(current, other)
+          def isLinearlyIndependent(): Boolean = ev.isLinearlyIndependent(current)
      }
 }

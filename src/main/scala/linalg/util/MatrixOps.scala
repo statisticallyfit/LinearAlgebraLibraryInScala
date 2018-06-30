@@ -14,7 +14,7 @@ import scala.util.control.Breaks.{break, breakable}
 trait MatrixOps {
 
      def multiply[N: Number](mat1: Matrix[N], mat2: Matrix[N]): Matrix[N] = {
-          Util.ensureSizeMat(mat1, mat2)
+          Ops.ensureSizeMat(mat1, mat2)
 
           val prod: Seq[Seq[N]] = Seq.fill[N](mat1.numCols, mat1.numRows)(Number[N].zero)
           for(r <- 0 until mat1.numRows){
@@ -33,7 +33,7 @@ trait MatrixOps {
      def inverse[N: Number](mat: Matrix[N]): Matrix[N] = ??? // TODO - solve using augmented?
 
      def conjugateTranspose[N: Number](mat: Matrix[N]): Matrix[N] =
-          Util.transpose(Matrix.fromSeqs(mat.getColumns().map(col => col.getElements()
+          Ops.transpose(Matrix.fromSeqs(mat.getColumns().map(col => col.getElements()
                .map(e => e.conjugate())):_*)).toMatrix
 
      def adjoint[N: Number](mat: Matrix[N]): Matrix[N] = {
@@ -61,7 +61,7 @@ trait MatrixOps {
 
           val indexes: IndexedSeq[(Int, Int)] = for(r <- 0 until mat.numRows; c <- 0 until mat.numCols) yield (r, c)
           val cofactors = indexes.map(indexPair => cofactor(mat, indexPair._1, indexPair._2))
-          Util.transpose(Matrix.fromSeq(mat.numRows, mat.numCols, cofactors)).toMatrix
+          Ops.transpose(Matrix.fromFlat(mat.numRows, mat.numCols, cofactors))
      }
 
      def cofactor[N: Number](mat: Matrix[N], r:Int, c:Int): N = ((r + c) % 2 == 0) match {
@@ -72,7 +72,7 @@ trait MatrixOps {
      def minor[N: Number](mat: Matrix[N]): Matrix[N] ={
           val indexes: IndexedSeq[(Int, Int)] = for(r <- 0 until mat.numRows; c <- 0 until mat.numCols) yield (r, c)
           val minors = indexes.map(indexPair => minor(mat, indexPair._1, indexPair._2))
-          Util.transpose(Matrix.fromSeq(mat.numRows, mat.numCols, minors)).toMatrix //isrow=true since we travel along
+          Ops.transpose(Matrix.fromFlat(mat.numRows, mat.numCols, minors)) //isrow=true since we travel along
           // rows.
      }
 
@@ -95,7 +95,7 @@ trait MatrixOps {
                     }
                }
           }
-          determinant(Util.transpose(Matrix(newMat:_*)).toMatrix)
+          Ops.determinant(Ops.transpose(Matrix.fromSeq(newMat)))
      }
 
      def determinant[N: Number](mat: Matrix[N]): N ={
@@ -115,16 +115,14 @@ trait MatrixOps {
                     }
                }
           }
-          Util.sumElements(diag)
+          Ops.sumElements(diag)
      }
 
 
 
 
+     //does there exist a zero row in rrefA where the same row has consts in the rrefB?
      def isInconsistent[N: Number](mat: AugmentedMatrix[N]): Boolean = {
-          //does there exist a zero row in rrefA where the same row has consts in the rrefB?
-          println("mat.rrefEntire: " + mat.rrefEntire)
-
           mat.rrefEntire.getRows().exists(row =>
                row.getElements().take(mat.rrefA.numCols).forall(elem => elem.isZero) &&
                row.getElements().drop(mat.rrefA.numCols).exists(elem => ! elem.isZero))
@@ -142,7 +140,7 @@ trait MatrixOps {
 
      def infiniteSolutionSolver[N: Number](mat: AugmentedMatrix[N]): Matrix[N] ={
           //get the indices of free cols
-          val freeIndices: Array[Int] = Util.getIndicesOfFreeColumns(mat.rrefA)
+          val freeIndices: Array[Int] = Ops.getIndicesOfFreeColumns(mat.rrefA)
           //get the freecolumns and attach to each column another zero vector to make it length = numcolsrref
           val freeCols: List[Vector[N]] = mat.rrefA.getColumns().zipWithIndex
                .filter(colIndexPair => freeIndices.contains(colIndexPair._2)).map(_._1).toList
@@ -199,7 +197,7 @@ trait MatrixOps {
                val pivotIndices: Array[Int] = indices.diff(freeIndices)
                // Step 2: zip pivotindices with rrefB - assert always will be same length since
                // it's sliced from rrefThis. Filter to get tuples with nonzero rrefB elements.
-               val tuples = pivotIndices.zip(Util.expressColsAsRows(mat.rrefB))
+               val tuples = pivotIndices.zip(Ops.expressColsAsRows(mat.rrefB))
                val tuplesNoZeroRows = tuples.filter({
                     case (index, vec) => ! vec.getElements().forall(e => e.isZero)
                })
@@ -207,16 +205,16 @@ trait MatrixOps {
                val maxIndex: Int = tuplesNoZeroRows.map(_._1).max // get max index to make list
 
                var newRrefB: Seq[Vector[N]] =
-                    Util.expressColsAsRows(Matrix.ZERO[N](maxIndex + 1,
+                    Ops.expressColsAsRows(Matrix.ZERO[N](maxIndex + 1,
                          mat.rrefB.numCols))
 
                // inserting the elements in the tuples at the indices.
                for((index, vec) <- tuplesNoZeroRows){
-                    newRrefB = Util.insertVec(vec, index, newRrefB)
+                    newRrefB = Ops.insertVec(vec, index, newRrefB)
                }
-               newRrefB = Util.expressRowsAsCols(newRrefB)
+               newRrefB = Ops.expressRowsAsCols(newRrefB)
 
-               Util.colCombine(Matrix(newRrefB:_*), solution).toMatrix
+               Ops.colCombine(Matrix(newRrefB:_*), solution).toMatrix
           }
      }
 
@@ -240,7 +238,7 @@ trait MatrixOps {
      def ensureSizeMat[N:Number](mat1: Matrix[N], mat2: Matrix[N]): Unit = {
 
           if(mat1.numCols != mat2.numRows) {
-               throw Util.MatrixLikeSizeException("Matrices do not have correct size for multiplication.")
+               throw Ops.MatrixLikeSizeException("Matrices do not have correct size for multiplication.")
           }
      }
 

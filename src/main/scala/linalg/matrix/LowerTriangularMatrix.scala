@@ -11,7 +11,7 @@ import scala.collection.mutable.ListBuffer
   *
   */
 class LowerTriangularMatrix[N: Number](smat: SquareMatrix[N]) extends SquareMatrix[N](smat) {
-     require(Util.Id.isLowerTriangular(smat))
+     require(Ops.Id.isLowerTriangular(smat))
 }
 
 

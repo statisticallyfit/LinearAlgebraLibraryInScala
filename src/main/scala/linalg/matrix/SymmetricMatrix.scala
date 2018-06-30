@@ -10,7 +10,7 @@ import linalg.vector.Vector
   *
   */
 class SymmetricMatrix[N: Number](smat: SquareMatrix[N]) extends SquareMatrix[N](smat) {
-     require(Util.Id.isSymmetric(smat))
+     require(Ops.Id.isSymmetric(smat))
 }
 
 

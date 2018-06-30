@@ -24,52 +24,52 @@ class SquareMatrixThings[N: Number] {
      }*/
 
      class SquareMatrixHasDimension extends Dimension[SquareMatrix[N]]{
-          def dimension(mat: SquareMatrix[N]): Int = Util.dimension(mat)
+          def dimension(mat: SquareMatrix[N]): Int = Ops.dimension(mat)
      }
 
      class SquareMatrixHasEq extends Eq[SquareMatrix[N]]{
-          def eqv(mat1: SquareMatrix[N], mat2: SquareMatrix[N]): Boolean = Util.eqv(mat1, mat2)
+          def eqv(mat1: SquareMatrix[N], mat2: SquareMatrix[N]): Boolean = Ops.eqv(mat1, mat2)
      }
 
      class SquareMatrixIsMonoid extends Monoid[SquareMatrix[N]]{
 
           val zero: SquareMatrix[N] = SquareMatrix(Vector.ZERO[N](1))
           def plus(mat1: SquareMatrix[N], mat2: SquareMatrix[N]): SquareMatrix[N] =
-               Util.plus(mat1, mat2).toSquareMatrix
+               Ops.plus(mat1, mat2).toSquareMatrix
      }
 
      class SquareMatrixIsAbelianGroup extends SquareMatrixIsMonoid with AbelianGroup[SquareMatrix[N]]{
-          def negate(mat: SquareMatrix[N]): SquareMatrix[N] = Util.negate(mat).toSquareMatrix
+          def negate(mat: SquareMatrix[N]): SquareMatrix[N] = Ops.negate(mat).toSquareMatrix
      }
 
      class SquareMatrixIsVectorSpace extends SquareMatrixIsAbelianGroup with VectorSpace[SquareMatrix[N], N]{
           val one: SquareMatrix[N] = SquareMatrix(Vector.ONE[N](1))
-          def scale(mat: SquareMatrix[N], factor: N): SquareMatrix[N] = Util.scale(mat, factor).toSquareMatrix
+          def scale(mat: SquareMatrix[N], factor: N): SquareMatrix[N] = Ops.scale(mat, factor).toSquareMatrix
      }
 
      class SquareMatrixIsSetVecLike extends SquareMatrixIsVectorSpace with SetVecLike[SquareMatrix[N], N]{
-          def isZero(mat: SquareMatrix[N]): Boolean = Util.isZero(mat)
+          def isZero(mat: SquareMatrix[N]): Boolean = Ops.isZero(mat)
           def rowReducedEchelon(mat: SquareMatrix[N]): SquareMatrix[N] =
-               Util.rowReducedEchelon(mat).toSquareMatrix
-          def rowEchelon(mat: SquareMatrix[N]): SquareMatrix[N] = Util.rowEchelon(mat).toSquareMatrix
-          def size(mat: SquareMatrix[N]): (Int, Int) = Util.size(mat)
-          def transpose(mat: SquareMatrix[N]): SquareMatrix[N] = Util.transpose(mat).toSquareMatrix
+               Ops.rowReducedEchelon(mat).toSquareMatrix
+          def rowEchelon(mat: SquareMatrix[N]): SquareMatrix[N] = Ops.rowEchelon(mat).toSquareMatrix
+          def size(mat: SquareMatrix[N]): (Int, Int) = Ops.size(mat)
+          def transpose(mat: SquareMatrix[N]): SquareMatrix[N] = Ops.transpose(mat).toSquareMatrix
      }
 
      class SquareMatrixIsMatrixLike extends SquareMatrixIsSetVecLike with MatrixLike[SquareMatrix[N], N] {
 
           def multiply(mat1: SquareMatrix[N], mat2: SquareMatrix[N]): SquareMatrix[N] =
-               Util.multiply(mat1, mat2).toSquareMatrix
-          def power(mat: SquareMatrix[N], exp: N): SquareMatrix[N] = Util.power(mat, exp).toSquareMatrix
-          def inverse(mat: SquareMatrix[N]): SquareMatrix[N] = Util.inverse(mat).toSquareMatrix
-          def conjugateTranspose(mat: SquareMatrix[N]): SquareMatrix[N] = Util.conjugateTranspose(mat).toSquareMatrix
-          def adjoint(mat: SquareMatrix[N]): SquareMatrix[N] =  Util.adjoint(mat).toSquareMatrix
-          def cofactor(mat: SquareMatrix[N]): SquareMatrix[N] = Util.cofactor(mat).toSquareMatrix
-          def cofactor(mat: SquareMatrix[N], r:Int, c:Int): N = Util.cofactor(mat, r, c)
-          def minor(mat: SquareMatrix[N]): SquareMatrix[N] = Util.minor(mat).toSquareMatrix
-          def minor(mat: SquareMatrix[N], r: Int, c: Int): N = Util.minor(mat, r, c)
-          def determinant(mat: SquareMatrix[N]): N = Util.determinant(mat)
-          def trace(mat: SquareMatrix[N]): N = Util.trace(mat)
+               Ops.multiply(mat1, mat2).toSquareMatrix
+          def power(mat: SquareMatrix[N], exp: N): SquareMatrix[N] = Ops.power(mat, exp).toSquareMatrix
+          def inverse(mat: SquareMatrix[N]): SquareMatrix[N] = Ops.inverse(mat).toSquareMatrix
+          def conjugateTranspose(mat: SquareMatrix[N]): SquareMatrix[N] = Ops.conjugateTranspose(mat).toSquareMatrix
+          def adjoint(mat: SquareMatrix[N]): SquareMatrix[N] =  Ops.adjoint(mat).toSquareMatrix
+          def cofactor(mat: SquareMatrix[N]): SquareMatrix[N] = Ops.cofactor(mat).toSquareMatrix
+          def cofactor(mat: SquareMatrix[N], r:Int, c:Int): N = Ops.cofactor(mat, r, c)
+          def minor(mat: SquareMatrix[N]): SquareMatrix[N] = Ops.minor(mat).toSquareMatrix
+          def minor(mat: SquareMatrix[N], r: Int, c: Int): N = Ops.minor(mat, r, c)
+          def determinant(mat: SquareMatrix[N]): N = Ops.determinant(mat)
+          def trace(mat: SquareMatrix[N]): N = Ops.trace(mat)
      }
 
 

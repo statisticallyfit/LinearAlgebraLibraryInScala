@@ -11,14 +11,14 @@ import scala.collection.mutable.ListBuffer
   *
   */
 class AugmentedMatrix[N: Number](val A: SetOfVectors[N], val B: SetOfVectors[N])
-     extends Matrix[N](Util.colCombine(A, B).getColumns():_*) {
+     extends Matrix[N](Ops.colCombine(A, B).getColumns():_*) {
 
 
-     val rrefEntire: SetOfVectors[N] = Util.rowReducedEchelon(this)
+     val rrefEntire: SetOfVectors[N] = Ops.rowReducedEchelon(this)
      val rrefA: SetOfVectors[N] = SetOfVectors(rrefEntire.getColumns().take(A.numCols):_*)
      val rrefB: SetOfVectors[N] = SetOfVectors(rrefEntire.getColumns().takeRight(B.numCols):_*)
 
-     val echelonEntire: SetOfVectors[N] = Util.rowEchelon(this)
+     val echelonEntire: SetOfVectors[N] = Ops.rowEchelon(this)
      val echelonA: SetOfVectors[N] = SetOfVectors(echelonEntire.getColumns().take(A.numCols):_*)
      val echelonB: SetOfVectors[N] = SetOfVectors(echelonEntire.getColumns().takeRight(B.numCols):_*)
 
@@ -54,7 +54,7 @@ object AugmentedMatrix {
      def ZERO[N: Number](nrows: Int, ncols: Int): AugmentedMatrix[N] =
           AugmentedMatrix.fromSeqs(ListBuffer.fill[N](ncols, nrows)(Number.ZERO[N]): _*)
 
-     def IDENTITY[N: Number](size: Int): AugmentedMatrix[N] = Util.identity[N](size).toAugMatrix
+     def IDENTITY[N: Number](size: Int): AugmentedMatrix[N] = Ops.identity[N](size).toAugMatrix
 
      def fromSeqs[N: Number](seqs: Seq[N]*): AugmentedMatrix[N] = AugmentedMatrix(seqs.map(_.toVec):_*)
 

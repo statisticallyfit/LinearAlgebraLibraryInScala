@@ -16,9 +16,9 @@ trait Span[V, W, F]{
 
      //does vecset span a specific vector? (example 3.11 singh) Is single vec v spanned by vset?
      // is it in span of vset? /page 197 howard
-     def doesSetSpanTheVector(vset: W, v: V): Boolean
+     def isSpanningVector(vset: W, v: V): Boolean
 
-     def isInSpan(v: V, vset: W): Boolean = doesSetSpanTheVector(vset, v)
+     def isInSpan(v: V, vset: W): Boolean = isSpanningVector(vset, v)
 
      // Gets the coefficients the relate the vset to the vector v in the linear combination.
      // They are:  k1v1 + k2v2 + k3v3 + ... = v, where vset = {v1,v2,v3...} and v = v.

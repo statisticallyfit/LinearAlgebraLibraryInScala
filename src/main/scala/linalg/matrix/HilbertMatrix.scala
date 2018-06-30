@@ -22,7 +22,7 @@ object HilbertMatrix {
      def ZERO[N: Number](nrows: Int, ncols: Int): HilbertMatrix[N] =
           HilbertMatrix.fromSeqs(ListBuffer.fill[N](ncols, nrows)(Number.ZERO[N]): _*)
 
-     def IDENTITY[N: Number](size: Int): HilbertMatrix[N] = Util.identity[N](size).toHilbertMatrix
+     def IDENTITY[N: Number](size: Int): HilbertMatrix[N] = Ops.identity[N](size).toHilbertMatrix
 
      def fromSeqs[N: Number](seqs: Seq[N]*): HilbertMatrix[N] = HilbertMatrix(seqs.map(aSeq => Vector(aSeq:_*)):_*)
 

@@ -20,24 +20,41 @@ import scala.collection.mutable.Seq
 
 class SetOfVectors[N: Number](private val cols: Vector[N]*) {
 
-     private val columns: Seq[Vector[N]] = makeData()
-     val numRows: Int = columns.head.size()
-     val numCols: Int = columns.length
+     private val columns: Seq[Vector[N]] = makeCols(cols:_*)
+     val numRows: Int = calcRows(columns:_*)
+     val numCols: Int = calcCols(columns:_*)
 
-     private def makeData(): Seq[Vector[N]] ={
+
+     private def calcCols(theCols: Vector[N]*): Int = if(theCols.isEmpty) 0 else theCols.head.size()
+     private def calcRows(theCols: Vector[N]*): Int = if(theCols.isEmpty) 0 else theCols.length
+
+     private def makeCols(theCols: Vector[N]*): Seq[Vector[N]] ={
+
+          //Case 1 - empty
+          if(theCols.isEmpty) return Seq()
+
+          // Case 2 - different sizes
+          val sizes = theCols.map(vec => vec.size())
+          val allColsSameSize: Boolean = sizes.forall(s => s == sizes.head)
+
+          if( ! allColsSameSize) return Seq()
+
+          // Case 3 = appro.priate input
           //if all row vecs, make matrix from rows
-          if(cols.forall(vector => vector.isRow())){
-               Util.expressRowsAsCols(Seq(cols:_*))
+          if(theCols.forall(vector => vector.isRow())){
+               Ops.expressRowsAsCols(Seq(theCols:_*))
           } // if all col vecs make matrix from cols
-          else if(cols.forall(vector => vector.isCol())){
-               Seq(cols:_*)
+          else if(theCols.forall(vector => vector.isCol())){
+               Seq(theCols:_*)
           } else {
-               cols.foreach(vector => vector.toCol())
-               Seq(cols:_*)
+               theCols.foreach(vector => vector.toCol())
+               Seq(theCols:_*)
           }
      }
      def copy(): SetOfVectors[N] = SetOfVectors(columns:_*)
      def copy(cols: Seq[Vector[N]]): SetOfVectors[N] = SetOfVectors(cols:_*)
+
+     def isEmpty(): Boolean = if(columns.isEmpty) true else false
 
      def getColumnsSeq(): Seq[Seq[N]] = Seq(columns.map(vec => vec.getElements()):_*)
      def getRowsSeq(): Seq[Seq[N]] = Seq(getRows().map(vec => vec.getElements()):_*)
@@ -57,7 +74,7 @@ class SetOfVectors[N: Number](private val cols: Vector[N]*) {
           //val rows: Seq[Vector[N]] = Seq()
           //for(r <- 0 until this.numRows) rows(r) = Vector(columns.map(colVec => colVec.get(r)):_*)
           //rows
-          Util.expressColsAsRows(columns)
+          Ops.expressColsAsRows(columns)
      }
 
      /**
@@ -102,7 +119,7 @@ object SetOfVectors {
      def ONE[N: Number](numCols: Int, numRows: Int): SetOfVectors[N] =
           SetOfVectors.fromSeqs(Seq.fill[N](numCols, numRows)(Number[N].one):_*)
 
-     def IDENTITY[N: Number](size: Int):SetOfVectors[N] = Util.identity[N](size)
+     def IDENTITY[N: Number](size: Int):SetOfVectors[N] = Ops.identity[N](size)
 
      def IDENTITY[N: Number](vset: SetOfVectors[N]): SetOfVectors[N] ={
           //val largestSize: Int = List(vset.numRows, vset.numCols).max
