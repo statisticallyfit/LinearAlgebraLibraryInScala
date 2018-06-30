@@ -15,14 +15,18 @@ import scala.collection.mutable.ListBuffer
 
 object Tester extends App {
 
-     val a: Complex[Rational] = Rational(3,5) + Rational(2, 4).i + Rational(1)
-     val b1: Complex[Int] = 3 + 5.i + 3
-     val c1: Complex[Int] = 1 - 2.i
+     val a1: Complex[Rational] = Rational(3,5) + Rational(2, 4).i + Rational(1) + Rational(5)
+     val a2: Complex[Int] = 3 + 5.i + 3
+     val a3: Complex[Int] = 1 - 2.i
 
-     val r1: Rational = Rational(2)
-     val r2: Rational = Rational(4,5)
+     assert(Rational(2).den == 1 && Rational(2).num == 2)
+     assert(Rational(4, 5).den == 5 && Rational(4,5).num == 4)
+     assert(a1.re === Rational(33,5) && a1.im === Rational(1,2))
+     assert(a2.re === 6 && a2.im === 5)
+     assert(a3.re === 1 && a3.im === 2)
 
-
+     //nroot test
+     assert(Complex(1.0, 2.0).nRoot(2) === )
      println("NROOT TEST: " + Complex(1.0, 2.0).nRoot(2))
      println("^ test: " + (Complex(1.0, 2.0) ^ 2))
      println("^ test and + after: " + ((Complex(1 ,3) ^ 2) + 4))
@@ -34,10 +38,10 @@ object Tester extends App {
 
 
      println(r1 + r2)
-     println(c1)
+     println(a3)
 
-     println(b1 < c1)
-     println(b1 === c1)
+     println(a2 < a3)
+     println(a2 === a3)
      println((4 + 3.i) === (4 + 3.i))
      println((2 + 5.i) < (2 + 7.i))
      println((2 + 5.i) < (2 - 5.i))
@@ -45,10 +49,10 @@ object Tester extends App {
      println((8 + 2.i) - (9 + 2.i))
      println((8 + 2.i) < (9 + 2.i))
 
-     println(a)
-     println(b1)
-     println(a + Rational(1))
-     println(Rational(33) + a)
+     println(a1)
+     println(a2)
+     println(a1 + Rational(1))
+     println(Rational(33) + a1)
      println(23.0 + (1.0 + 3.0.i))
      println((1.5 + 3.2.i) + 23.2)
      println((1 + 3.i) + 1)

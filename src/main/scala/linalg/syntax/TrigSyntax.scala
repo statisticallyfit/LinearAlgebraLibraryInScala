@@ -16,6 +16,9 @@ trait TrigSyntax {
           private val trig: Trig[T] = implicitly[Trig[T]]
 
           // Trig stuff
+          //TODO shouldn't these look like functions, not methods? take arguments directly, not
+          //TODO by method . access ...
+
           def sin(): T = trig.sin(current)
           def cos(): T = trig.cos(current)
           def tan(): T = trig.tan(current)

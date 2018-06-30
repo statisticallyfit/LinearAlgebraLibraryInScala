@@ -56,7 +56,6 @@ trait VectorOps {
 
      def crossProduct[N: Number](u: Vector[N], v: Vector[N]): Option[Vector[N]] = {
 
-          //TODO hacky way to get dimension/length but with Dimension doesn't work...
           if(u.size() == 3 && v.size() == 3){
                val w1: N = (u.get(2) * v.get(3)) - (u.get(3) * v.get(2))
                val w2: N = (u.get(3) * v.get(1)) - (u.get(1) * v.get(3))

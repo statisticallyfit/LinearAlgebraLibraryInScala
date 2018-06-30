@@ -23,6 +23,7 @@ class ComplexThings[R:RealNumber] {
      }
 
      trait ComplexIsRoot extends Root[Complex[R], R] {
+          //TODO use object complex nth root
           def power(base: Complex[R], exp: R): Complex[R] =
                Complex(Complex.magnitude(base) ^ exp, Complex.angle(base) * exp)
      }
