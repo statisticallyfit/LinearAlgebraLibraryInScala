@@ -3,7 +3,7 @@ package linalg.instances.std
 import cats.Eq
 import linalg.implicits._
 import linalg._
-import linalg.kernel.Complex
+import linalg.kernel.{Complex, Rational, Real}
 //import linalg.theory.{AbelianGroup, Field, Monoid, Ring}
 
 /**
@@ -23,9 +23,32 @@ class ComplexThings[R:RealNumber] {
      }
 
      trait ComplexIsRoot extends Root[Complex[R], R] {
-          //TODO use object complex nth root
-          def power(base: Complex[R], exp: R): Complex[R] =
-               Complex(Complex.magnitude(base) ^ exp, Complex.angle(base) * exp)
+
+          def power(base: Complex[R], exp: R): Complex[R] ={
+               //Complex(Complex.magnitude(base) ^ exp, Complex.angle(base) * exp)
+
+               def rationalPowerToComplex(rat: Rational): Complex[R] = {
+                    val complexPowerNumerator: Complex[R] = Complex.powerDeMoivre(base, rat.num)
+
+                    val (modulusRoot, nRootsList): (R, List[R]) =
+                         Complex.nthRootComplex(complexPowerNumerator, rat.den)
+                    val first: R = nRootsList.head
+
+                    modulusRoot * Complex(first.cos(), first.sin())
+               }
+
+               val complexPower: Complex[R] = exp match {
+                    case r:Rational => rationalPowerToComplex(r)
+                    case Real(d) => rationalPowerToComplex(Rational(d))
+                    case d:Double => rationalPowerToComplex(Rational(d))
+                    case n: Int => Complex.powerDeMoivre(base, n)
+               }
+
+               complexPower
+          }
+
+
+
      }
 
      /*trait ComplexIsAbsoluteComplex extends Absolute[Complex[R], Complex[R]]{
