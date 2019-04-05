@@ -7,7 +7,6 @@ import linalg.theory.Field
   */
 trait Trig[T] /*extends Field[T]*/ {
 
-//TODO: just assign these types as double - cannot make a complex number out of PI!!!!
      //val E: T
      val PI: T
 
@@ -29,7 +28,6 @@ trait Trig[T] /*extends Field[T]*/ {
      def theta(y: T, x: T)(implicit f: Field[T]): T = tan(f.divide(y, x))
 
      //TODO do the sinh + hyperbolic functions + log + exp
-//TODO can also define these for complex numbers (PMTH333), so we're good to go. 
 }
 
 object Trig {

@@ -34,7 +34,9 @@ class ComplexThings[R:RealNumber] {
                          Complex.nthRootComplex(complexPowerNumerator, rat.den)
                     val first: R = nRootsList.head
 
-                    modulusRoot * Complex(first.cos(), first.sin())
+                    ??? //modulusRoot * Complex(first.cos(), first.sin())
+                    //TODO: can now define ComplexIsRoot by Root(Complex[R]] since can take the
+                    //power and logarithm and trig etc of a complex number!! (PMTH 333)
                }
 
                val complexPower: Complex[R] = exp match {

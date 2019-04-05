@@ -15,6 +15,10 @@ trait IntIsAbsolute extends Absolute[Int,Int]{
      def absoluteValue(x: Int): Int = math.abs(x)
 }
 
+//TODO how to remedy this part?
+//TODO: maybe make IntegerNumberLike and have Int, IntegerZ, Whole, etc extend this, just like
+// they will have no: trig, root, field
+//TODO the Real and Rational extend RealNumberLIke (with trig, root, field)
 trait IntIsRoot extends Root[Int, Int] {
      def power(base: Int, exp: Int): Int = math.pow(base, exp).toInt
 }

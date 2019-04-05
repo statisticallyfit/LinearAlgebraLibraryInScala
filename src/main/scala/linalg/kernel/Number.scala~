@@ -15,11 +15,6 @@ import scala.language.higherKinds
 // Equality though because just one parameter N. So now Number - Is - Equality but need
 // to give separate absolute implicit in methods using absolute... whereas can use equality
 //things directly when calling numbe     r.
-
-// TODO: ask teacher: is it good construction principle to make Number inherit the properties we want it to have? Like making it inherit Equality even though it's a HAS-A not IS-A relationship?
-//TODO; ask teacher: ask how this impacts the types and instances package.
-
-//TODO: put Root[N] here and Trig[N] extending (since this works for complex nums (PMTH333))
 trait Number[N] extends Field[N] /*with Absolute[N, N] with Root[N,N]*/ with Equality[N] {
 
      val two: N = plus(one, one)
@@ -34,7 +29,7 @@ trait Number[N] extends Field[N] /*with Absolute[N, N] with Root[N,N]*/ with Equ
      def doubleValue(x: N): Double
      def denominator(x: N): Int
      def from(x: Int): N
-//TODO: consider if we need from(x: Double): N
+//TODO: consider if we need from(x: Double): N 
 
      //def to(x: Number[N]): N
 }
